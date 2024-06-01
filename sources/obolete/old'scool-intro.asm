@@ -627,7 +627,7 @@ pf1_color_table
 ; -------------------------
   INCLUDE "music-tracker/pt-sample-starts-table.i"
 
-; ** Pionters to priod tables for different tuning **
+; ** Pointers to priod tables for different tuning **
 ; ---------------------------------------------------
   INCLUDE "music-tracker/pt-finetune-starts-table.i"
 

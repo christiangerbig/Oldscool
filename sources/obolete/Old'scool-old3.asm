@@ -469,7 +469,6 @@ bv_fill_blit_y_size             EQU extra_pf1_y_size
 bv_fill_blit_depth              EQU extra_pf1_depth
 
 ; **** Image-Fader ****
-if_start_color                  EQU 00
 if_colors_number                EQU pf1_colors_number
 
 ; **** Image-Fader-In ****
@@ -1421,9 +1420,9 @@ beam_routines
   bsr     swap_second_copperlist
   bsr     spr_swap_structures
   bsr     swap_images
+  bsr     if_copy_color_table
   bsr     blind_fader_in
   bsr     blind_fader_out
-  bsr     if_copy_color_table
   tst.w   fx_state(a3)       ;Effekte beendet ?
   bne.s   beam_routines      ;Nein -> verzweige
   rts
@@ -1510,7 +1509,7 @@ no_wave_scrolltext
 
 ; ** Neues Image für Character ermitteln **
 ; -----------------------------------------
-  GET_NEW_CHARACTER_IMAGE.W wst,wst_check_control_codes,NORESTART
+  GET_NEW_CHARACTER_IMAGE wst,wst_check_control_codes,NORESTART
 
   CNOP 0,4
 wst_check_control_codes
@@ -2110,8 +2109,8 @@ ifi_no_restart_fader_angle
   MULUF.L ifi_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
   ADDF.W  ifi_fader_center,d0 ;+ Fader-Mittelpunkt
-  lea     pf1_color_table+(if_start_color*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
-  lea     ifi_color_table+(if_start_color*LONGWORDSIZE)(pc),a1 ;Sollwerte
+  lea     pf1_color_table(pc),a0 ;Puffer für Farbwerte
+  lea     ifi_color_table(pc),a1 ;Sollwerte
   move.w  d0,a5              ;Additions-/Subtraktionswert für Blau
   swap    d0                 ;WORDSHIFT
   clr.w   d0                 ;Bits 0-15 löschen
@@ -2149,8 +2148,8 @@ ifo_no_restart_fader_angle
   MULUF.L ifo_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
   ADDF.W  ifo_fader_center,d0 ;+ Fader-Mittelpunkt
-  lea     pf1_color_table+(if_start_color*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
-  lea     ifo_color_table+(if_start_color*LONGWORDSIZE)(pc),a1 ;Sollwerte
+  lea     pf1_color_table(pc),a0 ;Puffer für Farbwerte
+  lea     ifo_color_table(pc),a1 ;Sollwerte
   move.w  d0,a5              ;Additions-/Subtraktionswert für Blau
   swap    d0                 ;WORDSHIFT
   clr.w   d0                 ;Bits 0-15 löschen
@@ -2170,7 +2169,75 @@ no_image_fader_out
 
   COLOR_FADER if
 
-  COPY_COLOR_TABLE_TO_COPPERLIST if,pf1,cl1,cl1_COLOR00_high1,cl1_COLOR00_low1
+; ** Farbwerte in Copperliste kopieren **
+; ---------------------------------------
+  CNOP 0,4
+if_copy_color_table
+  IFNE cl1_size2
+    move.l  a4,-(a7)
+  ENDC
+  tst.w   if_copy_colors_state(a3)  ;Kopieren der Farbwerte beendet ?
+  bne.s   if_no_copy_color_table ;Ja -> verzweige
+  move.w  #$0f0f,d3          ;Maske für RGB-Nibbles
+  IFGT if_colors_number-32
+    moveq   #TRUE,d4         ;Color-Bank Farbregisterzähler
+  ENDC
+  lea     pf1_color_table(pc),a0 ;Puffer für Farbwerte
+  move.l  cl1_display(a3),a1 ;CL
+  ADDF.W  cl1_COLOR00_high1+2,a1
+  IFNE cl1_size1
+    move.l  cl1_construction1(a3),a2 ;CL
+    ADDF.W  cl1_COLOR00_high1+2,a2
+  ENDC
+  IFNE cl1_size2
+    move.l  cl1_construction2(a3),a4 ;CL
+    ADDF.W  cl1_COLOR00_high1+2,a4
+  ENDC
+  MOVEF.W if_colors_number-1,d7 ;Anzahl der Farben
+if_copy_color_table_loop
+  move.l  (a0)+,d0           ;RGB8-Farbwert
+  move.l  d0,d2              ;retten
+  RGB8_TO_RGB4HI d0,d1,d3
+  move.w  d0,(a1)            ;COLORxx High-Bits
+  IFNE cl1_size1
+    move.w  d0,(a2)          ;COLORxx High-Bits
+  ENDC
+  IFNE cl1_size2
+    move.w  d0,(a4)          ;COLORxx High-Bits
+  ENDC
+  RGB8_TO_RGB4LO d2,d1,d3
+  move.w  d2,cl1_COLOR00_low1-cl1_COLOR00_high1(a1) ;Low-Bits COLORxx
+  addq.w  #4,a1              ;nächstes Farbregister
+  IFNE cl1_size1
+    move.w  d2,cl1_COLOR00_low1-cl1_COLOR00_high1(a2) ;Low-Bits COLORxx
+    addq.w  #4,a2            ;nächstes Farbregister
+  ENDC
+  IFNE cl1_size2
+    move.w  d2,cl1_COLOR00_low1-cl1_COLOR00_high1(a4) ;Low-Bits COLORxx
+    addq.w  #4,a4            ;nächstes Farbregister
+  ENDC
+  IFGT if_colors_number-32
+    addq.b  #1*8,d4          ;Farbregister-Zähler erhöhen
+    bne.s   if_no_restart_color_bank ;Nein -> verzweige
+    addq.w  #4,a1            ;CMOVE überspringen
+    IFNE cl1_size1
+      addq.w  #4,a2          ;CMOVE überspringen
+    ENDC
+    IFNE cl1_size2
+      addq.w  #4,a4          ;CMOVE überspringen
+    ENDC
+if_no_restart_color_bank
+  ENDC
+  dbf     d7,if_copy_color_table_loop
+  tst.w   if_colors_counter(a3) ;Fading beendet ?
+  bne.s   if_no_copy_color_table ;Nein -> verzweige
+  moveq   #FALSE,d0
+  move.w  d0,if_copy_colors_state(a3) ;Kopieren beendet
+if_no_copy_color_table
+  IFNE cl1_size2
+    move.l  (a7)+,a4
+  ENDC
+  rts
 
 ; ** Blind-Fader-In **
 ; --------------------
