@@ -469,7 +469,8 @@ bv_fill_blit_y_size             EQU extra_pf1_y_size
 bv_fill_blit_depth              EQU extra_pf1_depth
 
 ; **** Image-Fader ****
-if_start_color                  EQU 00
+if_start_color                  EQU 0
+if_color_table_offset           EQU 0
 if_colors_number                EQU pf1_colors_number
 
 ; **** Image-Fader-In ****
@@ -2110,8 +2111,8 @@ ifi_no_restart_fader_angle
   MULUF.L ifi_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
   ADDF.W  ifi_fader_center,d0 ;+ Fader-Mittelpunkt
-  lea     pf1_color_table+(if_start_color*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
-  lea     ifi_color_table+(if_start_color*LONGWORDSIZE)(pc),a1 ;Sollwerte
+  lea     pf1_color_table+(if_color_table_offset*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
+  lea     ifi_color_table+(if_color_table_offset*LONGWORDSIZE)(pc),a1 ;Sollwerte
   move.w  d0,a5              ;Additions-/Subtraktionswert für Blau
   swap    d0                 ;WORDSHIFT
   clr.w   d0                 ;Bits 0-15 löschen
@@ -2149,8 +2150,8 @@ ifo_no_restart_fader_angle
   MULUF.L ifo_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
   ADDF.W  ifo_fader_center,d0 ;+ Fader-Mittelpunkt
-  lea     pf1_color_table+(if_start_color*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
-  lea     ifo_color_table+(if_start_color*LONGWORDSIZE)(pc),a1 ;Sollwerte
+  lea     pf1_color_table+(if_color_table_offset*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
+  lea     ifo_color_table+(if_color_table_offset*LONGWORDSIZE)(pc),a1 ;Sollwerte
   move.w  d0,a5              ;Additions-/Subtraktionswert für Blau
   swap    d0                 ;WORDSHIFT
   clr.w   d0                 ;Bits 0-15 löschen
@@ -2170,6 +2171,8 @@ no_image_fader_out
 
   COLOR_FADER if
 
+; ** Farbwerte in Copperliste kopieren **
+; ---------------------------------------
   COPY_COLOR_TABLE_TO_COPPERLIST if,pf1,cl1,cl1_COLOR00_high1,cl1_COLOR00_low1
 
 ; ** Blind-Fader-In **
