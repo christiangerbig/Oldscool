@@ -1215,7 +1215,7 @@ bv_init_object_info_table_loop
 ; -----------------------------------
   CNOP 0,4
 init_first_copperlist
-  move.l  cl1_construction2(a3),a0 ;CL
+  move.l  cl1_construction2(a3),a0 
   bsr.s   cl1_init_playfield_registers
   bsr.s   cl1_init_sprite_pointers
   bsr     cl1_init_color_registers
@@ -1460,7 +1460,7 @@ wave_scrolltext
   bne     no_wave_scrolltext ;Nein -> verzweige
   movem.l a4-a6,-(a7)
   move.w  wst_y_angle(a3),d4  ;Y-Winkel holen
-  move.w  d4,d0              ;retten
+  move.w  d4,d0              
   add.w   wst_variable_y_angle_speed(a3),d0 ;nächster Y-Winkel
   and.w   #sine_table_length-1,d0 ;Überlauf entfernen
   move.w  d0,wst_y_angle(a3) ;Y-Winkel retten
@@ -1473,7 +1473,7 @@ wave_scrolltext
 wave_scrolltext_loop1
   move.l  (a4)+,a1           ;Zeiger auf Sprite-Struktur
   move.w  (a2),d5            ;X-Position
-  move.w  d5,d0              ;retten
+  move.w  d5,d0              
   move.l  (a5,d4.w*4),d1     ;sin(w)
   MULUF.L wst_y_radius*2,d1,d2 ;y'=(yr*sin(w))/2^15
   add.w   #(display_window_HSTART-wst_text_character_x_size)*4,d0 ;X-Zentrierung
@@ -1616,7 +1616,7 @@ bv_move_lightsource
 bv_rotation
   movem.l a4-a5,-(a7)
   move.w  bv_rotation_x_angle(a3),d1 ;X-Winkel
-  move.w  d1,d0              ;retten
+  move.w  d1,d0              
   lea     sine_table(pc),a2
   move.w  2(a2,d0.w*4),d4    ;sin(a)
   move.w  #sine_table_length/4,a4
@@ -1629,7 +1629,7 @@ bv_rotation
   and.w   d3,d1              ;Übertrag entfernen
   move.w  d1,bv_rotation_x_angle(a3) ;X-Winkel retten
   move.w  bv_rotation_y_angle(a3),d1 ;Y-Winkel
-  move.w  d1,d0              ;retten
+  move.w  d1,d0              
   move.w  2(a2,d0.w*4),d5    ;sin(b)
   add.w   a4,d0              ;+ 90 Grad
   swap    d5                 ;Bits 16-31 = sin(b)
@@ -1639,7 +1639,7 @@ bv_rotation
   and.w   d3,d1              ;Übertrag entfernen
   move.w  d1,bv_rotation_y_angle(a3) ;Y-Winkel retten
   move.w  bv_rotation_z_angle(a3),d1 ;Z-Winkel
-  move.w  d1,d0              ;retten
+  move.w  d1,d0              
   move.w  2(a2,d0.w*4),d6    ;sin(c)
   add.w   a4,d0              ;+ 90 Grad
   swap    d6                 ;Bits 16-31 = sin(c)
@@ -1695,7 +1695,7 @@ bv_draw_lines
   lea     bv_rotation_xyz_coordinates(pc),a1 ;Zeiger auf XYZ-Koordinaten
   move.l  extra_pf2(a3),a2   ;Plane0
   move.l  (a2),a2
-  move.l  cl1_construction2(a3),a4 ;CL<<16
+  move.l  cl1_construction2(a3),a4 <<16
   move.l  #((BC0F_SRCA+BC0F_SRCC+BC0F_DEST+NANBC+NABC+ABNC)<<16)+(BLTCON1F_LINE+BLTCON1F_SING),a3
   ADDF.W  cl1_COLOR12_high5+2,a4 ;Farbregister
   lea     bv_color_table(pc),a7 ;Zeiger auf Tabelle mit Farbverlaufwerten
@@ -1920,13 +1920,13 @@ bv_move_sprites_loop
 bv_wobble_sprites
   movem.l a4-a6,-(a7)
   move.w  bv_wobble_x_radius_angle(a3),d1 ;X-Winkel holen
-  move.w  d1,d0              ;retten
+  move.w  d1,d0              
   MOVEF.W sine_table_length-1,d5
   addq.w  #bv_wobble_x_radius_angle_speed,d0 ;nächster X-Radius-Winkel
   move.w  bv_wobble_x_angle(a3),d2 ;X-Winkel holen
   and.w   d5,d0              ;Überlauf entfernen
   move.w  d0,bv_wobble_x_radius_angle(a3) ;Startwert retten
-  move.w  d2,d0              ;retten
+  move.w  d2,d0              
   addq.w  #bv_wobble_x_angle_speed,d0 ;nächster X-Winkel
   move.w  d5,d0              ;Überlauf entfernen
   move.w  d0,bv_wobble_x_angle(a3) ;Startwert retten
@@ -1937,7 +1937,7 @@ bv_wobble_sprites
   move.w  (a2),a6            
   lea     sine_table(pc),a0
   move.l  cl1_construction2(a3),a1
-  ADDF.W  cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subext1_SPR6POS+2,a1 ;CL
+  ADDF.W  cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subext1_SPR6POS+2,a1 
   move.w  #bv_wobble_x_center,a2
   move.w  #cl1_subextension1_SIZE,a4
   MOVEF.W cl2_display_y_size-1,d7 ;Anzahl der Zeilen
@@ -1950,7 +1950,7 @@ bv_wobble_sprites_loop2
   muls.w  2(a0,d2.w*4),d0    ;x'=(xr'*cos(w))/2*^15
   swap    d0
   add.w   a2,d0              ;x' + X-Mittelpunkt
-  move.w  d0,d3              ;retten
+  move.w  d0,d3              
   add.w   a5,d0              ;x' + vertikaler/horizontaler Startwert des Sprites6
   move.w  d0,(a1)            ;Neue SPR6POS in CL Schreiben
   addq.w  #bv_wobble_x_radius_angle_step,d1 ;nächster X-Radius-Winkel
@@ -2061,7 +2061,7 @@ rz_no_zoomer
   move.w  d0,a3              ;cos(w) retten
   move.w  d1,a7              ;sin(w)
   add.w   a3,a3              ;*2 ist notwendig, um die 2:1 Pixelverzerrung auszugleichen
-  ADDF.W  cl2_extension1_entry+cl2_ext1_BPLCON4_1+2,a1 ;CL
+  ADDF.W  cl2_extension1_entry+cl2_ext1_BPLCON4_1+2,a1 
   move.w  #(cl2_extension1_SIZE*cl2_display_y_size)-4,a6
   add.w   a7,a7              ;*2 ist notwendig, um die 2:1 Pixelverzerrung auszugleichen
   moveq   #TRUE,d2           ;Langwortzugriff
@@ -2184,7 +2184,7 @@ blind_fader_in
   move.l  a4,-(a7)
   move.w  bf_address_offsets_table_start(a3),d2 ;Startwert holen
   MOVEF.W bf_table_length-1,d3
-  move.w  d2,d0              ;retten
+  move.w  d2,d0              
   MOVEF.L cl2_extension1_SIZE,d4
   addq.w  #bf_speed,d0       ;Startwert erhöhen
   moveq   #bf_step2,d5
@@ -2197,7 +2197,7 @@ bfi_finished
   bra.s   bfi_no_blind_fader_in
   CNOP 0,4
 bfi_not_finished
-  move.w  d0,bf_address_offsets_table_start(a3) ;retten
+  move.w  d0,bf_address_offsets_table_start(a3) 
   lea     bf_address_offsets_table(pc),a0 ;Tabelle mit Registeroffsets
   IFNE cl2_size1
     move.l  cl2_construction1(a3),a1 ;1. CL
@@ -2254,7 +2254,7 @@ blind_fader_out
   move.l  a4,-(a7)
   move.w  bf_address_offsets_table_start(a3),d2 ;Startwert holen
   MOVEF.W bf_table_length-1,d3
-  move.w  d2,d0              ;retten
+  move.w  d2,d0              
   MOVEF.L cl2_extension1_SIZE,d4
   subq.w  #bf_speed,d0       ;Startwert verringern
   bpl.s   bfo_not_finished   ;Wenn positiv -> verzweige
@@ -2277,7 +2277,7 @@ bfo_restart_intro
   bra.s   bfo_no_blind_fader_out
   CNOP 0,4
 bfo_not_finished
-  move.w  d0,bf_address_offsets_table_start(a3) ;retten
+  move.w  d0,bf_address_offsets_table_start(a3) 
   moveq   #bf_step2,d5
   lea     bf_address_offsets_table(pc),a0 ;Tabelle mit Registeroffsets
   IFNE cl2_size1
@@ -2330,9 +2330,9 @@ bfo_no_blind_fader_out
 init_color_registers2
 ; ***** Bild *****
   lea     ifo_color_table(pc),a0 ;Farbwerte
-  move.l  cl1_construction2(a3),a1 ;CL
+  move.l  cl1_construction2(a3),a1 
   ADDF.W  cl1_COLOR00_high1+2,a1
-  move.l  cl1_display(a3),a2 ;CL
+  move.l  cl1_display(a3),a2 
   ADDF.W  cl1_COLOR00_high1+2,a2
   move.w  #$f0f,d3           ;Maske für gb/GB-Bits
   IFGT pf1_colors_number-32
@@ -2341,7 +2341,7 @@ init_color_registers2
   moveq   #pf1_colors_number-1,d7 ;Anzahl der Farben
 init_color_registers2_loop
   move.l  (a0)+,d0           ;24-Bit-Farbwert holen
-  move.l  d0,d1              ;retten
+  move.l  d0,d1              
   RGB8_TO_RGB4HI d0,d2,d3
   move.w  d0,(a1)            ;High-Bits COLORxx
   addq.w  #4,a1
@@ -2360,9 +2360,9 @@ no_restart_color_bank
   dbf     d7,init_color_registers2_loop
 ; **** Sprites ****
   lea     spr_color_table(pc),a0 ;Farbwerte
-  move.l  cl1_construction2(a3),a1 ;CL
+  move.l  cl1_construction2(a3),a1 
   ADDF.W  cl1_COLOR00_high5+2,a1
-  move.l  cl1_display(a3),a2 ;CL
+  move.l  cl1_display(a3),a2 
   ADDF.W  cl1_COLOR00_high5+2,a2
   move.w  #$f0f,d3           ;Maske für gb/GB-Bits
   IFGT spr_colors_number-32
@@ -2371,7 +2371,7 @@ no_restart_color_bank
   moveq   #spr_colors_number-1,d7 ;Anzahl der Farben
 init_color_registers2_loop2
   move.l  (a0)+,d0           ;24-Bit-Farbwert holen
-  move.l  d0,d1              ;retten
+  move.l  d0,d1              
   RGB8_TO_RGB4HI d0,d2,d3
   move.w  d0,(a1)            ;High-Bits COLORxx
   addq.w  #4,a1
@@ -2440,7 +2440,7 @@ cube_zoomer_in
   moveq   #TRUE,d0           ;Langwort-Zugriff
   move.w  2(a0,d1.w*4),d0    ;sin(w)
   add.w   #czi_zoom_center,d0 ;+ Zoom-In-Mittelpunkt
-  move.l  d0,bv_zoom_distance(a3) ;retten
+  move.l  d0,bv_zoom_distance(a3) 
   addq.w  #czi_zoom_angle_speed,d1 ;nächster Zoom-In-Winkel
   cmp.w   #sine_table_length/4,d1 ;90 Grad erreicht ?
   bgt.s   czi_finished       ;Ja -> verzweige
@@ -2716,9 +2716,9 @@ pt_start_fade_in_image
   move.w  d0,ifi_state(a3)   ;Image-Fader-In an
   move.w  d0,if_copy_colors_state(a3) ;Kopieren der Farben an
   move.w  d0,part_title_state(a3) ;Title-Part aktivieren
-  move.l  cl1_construction2(a3),a0 ;CL
+  move.l  cl1_construction2(a3),a0 
   move.w  #BPLCON0BITS2,cl1_BPLCON0+2(a0) ;Bitplanes darstellen
-  move.l  cl1_display(a3),a0 ;CL
+  move.l  cl1_display(a3),a0 
   move.w  #BPLCON0BITS2,cl1_BPLCON0+2(a0)
   move.l  (a7)+,a0
   rts
@@ -2738,9 +2738,9 @@ pt_start_fade_in_rotation_zoomer
   move.w  d0,part_main_state(a3) ;Main-Part aktivieren
   bsr.s   rz_init_color_registers
   bsr     rz_set_branches_pointers
-  move.l  cl1_construction2(a3),a0 ;CL
+  move.l  cl1_construction2(a3),a0 
   move.w  #BPLCON0BITS,cl1_BPLCON0+2(a0) ;Keine Bitplanes darstellen
-  move.l  cl1_display(a3),a0 ;CL
+  move.l  cl1_display(a3),a0 
   move.w  #BPLCON0BITS,cl1_BPLCON0+2(a0)
   movem.l (a7)+,d1-d7/a0-a2
   rts
@@ -2763,9 +2763,9 @@ pt_stop_zoomer
   CNOP 0,4
 rz_init_color_registers
   lea     pf1_color_table+(pf1_colors_number*LONGWORDSIZE),a0
-  move.l  cl1_construction2(a3),a1 ;CL
+  move.l  cl1_construction2(a3),a1 
   ADDF.W  cl1_COLOR00_high1+2,a1
-  move.l  cl1_display(a3),a2 ;CL
+  move.l  cl1_display(a3),a2 
   ADDF.W  cl1_COLOR00_high1+2,a2
   move.w  #$f0f,d3           ;Maske gb/GB-Bits
   IFGT if_colors_number-32
@@ -2774,7 +2774,7 @@ rz_init_color_registers
   MOVEF.W if_colors_number-1,d7 ;Anzahl der Farben
 rz_init_color_registers_loop
   move.l  (a0)+,d0           ;24-Bit-Farbwert holen
-  move.l  d0,d1              ;retten
+  move.l  d0,d1              
   RGB8_TO_RGB4HI d0,d2,d3
   move.w  d0,(a1)            ;High-Bits COLORxx
   addq.w  #4,a1
@@ -3184,7 +3184,7 @@ cube_zoomer_out
   moveq   #TRUE,d0           ;Langwort-Zugriff
   move.w  2(a0,d1.w*4),d0    ;sin(w)
   add.w   #czo_zoom_center,d0 ;+ Zoom-Out-Mittelpunkt
-  move.l  d0,bv_zoom_distance(a3) ;retten
+  move.l  d0,bv_zoom_distance(a3) 
   addq.w  #czo_zoom_angle_speed,d1 ;nächster Zoom-Out-Winkel
   cmp.w   #sine_table_length/2,d1 ;180 Grad erreicht ?
   bge.s   czo_finished       ;Ja -> verzweige
