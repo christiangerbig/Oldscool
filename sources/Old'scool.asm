@@ -1523,13 +1523,13 @@ wst_check_control_codes
   beq.s   wst_set_y_angle_step
   cmp.b   #"³",d0            ;Y-Winkel setzen ?
   beq.s   wst_set_y_angle_speed
-  cmp.b   #"",d0
+  cmp.b   #ASCII_CTRL_S,d0
   beq.s   wst_set_horiz_scroll_speed_slow
-  cmp.b   #"",d0
+  cmp.b   #ASCII_CTRL_M,d0
   beq.s   wst_set_horiz_scroll_speed_medium
-  cmp.b   #"",d0
+  cmp.b   #ASCII_CTRL_F,d0
   beq.s   wst_set_horiz_scroll_speed_fast
-  cmp.b   #"",d0
+  cmp.b   #ASCII_CTRL_W,d0
   beq.s   wst_stop_scrolltext
   rts
   CNOP 0,4
@@ -3080,7 +3080,7 @@ bf_address_offsets_table
 ; ** Text für Laufschrift **
 ; --------------------------
 wst_text
-  DC.B "°¹RESISTANCE"
+  DC.B ASCII_CTRL_F,"°¹RESISTANCE"
   REPT wst_text_characters_number/(wst_origin_character_x_size/wst_text_character_x_size)
     DC.B " "
   ENDR
@@ -3088,18 +3088,18 @@ wst_text
   REPT wst_text_characters_number/(wst_origin_character_x_size/wst_text_character_x_size)
     DC.B " "
   ENDR
-  DC.B ""
-  DC.B "¹³ YES WE ARE BACK ON THE AMIGA ### "
+  DC.B ASCII_CTRL_W
+  DC.B ASCII_CTRL_M,"¹³ YES WE ARE BACK ON THE AMIGA ### "
   REPT wst_text_characters_number/(wst_origin_character_x_size/wst_text_character_x_size)
     DC.B " "
   ENDR
-  DC.B ""
-  DC.B "PRESS F1-F10 FOR DIFFERENT CUBE MOVEMENTS...  "
+  DC.B ASCII_CTRL_W
+  DC.B ASCII_CTRL_S,"PRESS F1-F10 FOR DIFFERENT CUBE MOVEMENTS...  "
   REPT wst_text_characters_number/(wst_origin_character_x_size/wst_text_character_x_size)
     DC.B " "
   ENDR
-  DC.B ""
-  DC.B "²³"
+  DC.B ASCII_CTRL_W
+  DC.B ASCII_CTRL_F,"²³"
   DC.B "THE ELECRONIC KNIGHTS  "
   DC.B "DESIRE  "
   DC.B "NAH-KOLOR  "
@@ -3113,8 +3113,8 @@ wst_text
   REPT wst_text_characters_number/(wst_origin_character_x_size/wst_text_character_x_size)
     DC.B " "
   ENDR
-  DC.B ""
-  DC.B "¹³THE CREDITS      "
+  DC.B ASCII_CTRL_W
+  DC.B ASCII_CTRL_M,"¹³THE CREDITS      "
   DC.B "CODING AND MUSIC *DISSIDENT*     "
   DC.B "GRAPHICS *GRASS*      "
   DC.B "RELEASED @ NORDLICHT 2023"
@@ -3122,7 +3122,7 @@ wst_stop_text
   REPT wst_text_characters_number/(wst_origin_character_x_size/wst_text_character_x_size)
     DC.B " "
   ENDR
-  DC.B " "
+  DC.B ASCII_CTRL_W," "
   EVEN
 
 ; ** Programmversion für Version-Befehl **
