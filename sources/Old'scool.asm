@@ -2340,7 +2340,7 @@ init_color_registers2
   ENDC
   moveq   #pf1_colors_number-1,d7 ;Anzahl der Farben
 init_color_registers2_loop
-  move.l  (a0)+,d0           ;24-Bit-Farbwert 
+  move.l  (a0)+,d0           ;RGB8-Farbwert 
   move.l  d0,d1              
   RGB8_TO_RGB4HI d0,d2,d3
   move.w  d0,(a1)            ;High-Bits COLORxx
@@ -2370,7 +2370,7 @@ no_restart_color_bank
   ENDC
   moveq   #spr_colors_number-1,d7 ;Anzahl der Farben
 init_color_registers2_loop2
-  move.l  (a0)+,d0           ;24-Bit-Farbwert 
+  move.l  (a0)+,d0           ;RGB8-Farbwert 
   move.l  d0,d1              
   RGB8_TO_RGB4HI d0,d2,d3
   move.w  d0,(a1)            ;High-Bits COLORxx
@@ -2773,7 +2773,7 @@ rz_init_color_registers
   ENDC
   MOVEF.W if_colors_number-1,d7 ;Anzahl der Farben
 rz_init_color_registers_loop
-  move.l  (a0)+,d0           ;24-Bit-Farbwert 
+  move.l  (a0)+,d0           ;RGB8-Farbwert 
   move.l  d0,d1              
   RGB8_TO_RGB4HI d0,d2,d3
   move.w  d0,(a1)            ;High-Bits COLORxx
