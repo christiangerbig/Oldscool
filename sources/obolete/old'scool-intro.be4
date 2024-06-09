@@ -1064,7 +1064,7 @@ bv_convert_RGB8_to_RGB4_loop1
   move.w  #color_values_number1-1,d6 ;Anzahl der Einträge in der Zieltabelle
 bv_convert_RGB8_to_RGB4_loop2
   move.l  (a0),d0            ;Farbwert aus Tabelle lesen
-  move.l  d0,d2              ;retten
+  move.l  d0,d2              
   RGB8_TO_RGB4HI d0,d1,d3
   move.w  d0,(a0)+           ;High-Bits
   RGB8_TO_RGB4LO d2,d1,d3
@@ -1324,18 +1324,18 @@ wave_scrolltext
   lea     wst_characters_x_positions(pc),a2 ;X-Positionen der Chars
   lea     spr_pointers_display(pc),a4 ;Zeiger auf Sprites
   lea     sine_table(pc),a5  ;Zeiger auf Sinustabelle
-  move.w  wst_y_angle(a3),d4  ;Y-Winkel holen
-  move.w  d4,d0              ;retten
+  move.w  wst_y_angle(a3),d4  ;Y-Winkel
+  move.w  d4,d0              
   add.w   wst_variable_y_angle_speed(a3),d0 ;nächster Y-Winkel
   move.w  #wst_horiz_scroll_speed,a6
   and.w   #sine_table_length-1,d0 ;Überlauf entfernen
-  move.w  d0,wst_y_angle(a3) ;Y-Winkel retten
+  move.w  d0,wst_y_angle(a3) 
   moveq   #wst_image_plane_width-4,d3
   moveq   #wst_text_characters_number-1,d7 ;Anzahl der Chars
 wave_scrolltext_loop1
   move.l  (a4)+,a1           ;Zeiger auf Sprite-Struktur
   move.w  (a2),d5            ;X-Position
-  move.w  d5,d0              ;retten
+  move.w  d5,d0              
   move.l  (a5,d4.w*4),d1     ;sin(w)
   MULUF.L wst_y_radius*2,d1,d2 ;y'=(yr*sin(w))/2^15
   add.w   #(display_window_HSTART-wst_text_character_x_size)*4,d0 ;X-Zentrierung
@@ -1372,7 +1372,7 @@ wst_no_new_character_image
 
 ; ** Neues Image für Character ermitteln **
 ; -----------------------------------------
-  GET_NEW_CHARACTER_IMAGE wst,wst_check_control_codes
+  GET_NEW_CHARACTER_IMAGE.W wst,wst_check_control_codes
 
   CNOP 0,4
 wst_check_control_codes
@@ -1415,9 +1415,9 @@ wst_set_y_angle_speed
 chunky_rotation_zoomer
   movem.l a3-a6,-(a7)
   lea     sine_table(pc),a0  
-  move.w  crz_z_rotation_angle(a3),d4 ;Rotations-Winkel holen
+  move.w  crz_z_rotation_angle(a3),d4 ;Rotations-Winkel 
   move.w  d4,d3              ;Rotations-Winkel retten
-  move.w  crz_zoom_angle(a3),d5 ;Zoom-Winkel holen
+  move.w  crz_zoom_angle(a3),d5 ;Zoom-Winkel 
   IFNE crz_table_length_256
     MOVEF.W sine_table_length-1,d6 ;Überlauf
   ENDC
@@ -1483,7 +1483,7 @@ skip
 
 ; ** Farbwerte in Copperliste kopieren **
 ; ---------------------------------------
-  move.l  a7,save_a7(a3)     ;Stackpointer retten
+  move.l  a7,save_a7(a3)     
   move.w  #cl2_extension1_SIZE,a2
   move.w  d0,a3              ;cos(w) retten
   move.w  d1,a7              ;sin(w)
@@ -1498,8 +1498,8 @@ chunky_rotation_zoomer_loop1
   move.w  a4,d5              ;Y Linke obere Ecke in Playfield
   moveq   #cl2_display_y_size-1,d6 ;Anzahl der Zeilen
 chunky_rotation_zoomer_loop2
-  move.w  d4,d3              ;X-Pos in Playfield holen
-  move.w  d5,d2              ;Y-Pos in Playfield holen
+  move.w  d4,d3              ;X-Pos in Playfield 
+  move.w  d5,d2              ;Y-Pos in Playfield 
   lsr.w   #8,d3              ;Bits in richtige Postion bringen
   add.w   d1,d4              ;nächste Pixel-Spalte in Playfield
   move.b  d3,d2              ;Bits 15-8 = Y-Offset, Bits 7-0 = X-Offset
@@ -1560,8 +1560,8 @@ bv_no_y_max
   moveq   #bv_used_sprites_number-1,d7 ;Anzahl der Objekte
 bv_move_sprites_loop
   move.l  (a1)+,a0           ;Sprite-Struktur
-  move.w  d3,d0              ;X-Pos. holen
-  move.w  d4,d1              ;Y-Pos. holen
+  move.w  d3,d0              ;X-Pos. 
+  move.w  d4,d1              ;Y-Pos. 
   MOVEF.W bv_image_y_size,d2 ;Höhe
   add.w   d1,d2              ;Höhe zu Y addieren
   SET_SPRITE_POSITION d0,d1,d2
@@ -1611,7 +1611,7 @@ bv_draw_lines_loop1
 ; ** Mittlere Z-Koordinate der Fläche berechnen **
 ; ------------------------------------------------
 bv_face_visible
-  move.w  6(a5),d7           ;P4-Startwert holen
+  move.w  6(a5),d7           ;P4-Startwert 
   move.w  4(a1,d4.w*2),d0    ;zm=zp1+zp2+zp3+zp4
   add.w   4(a1,d5.w*2),d0
   add.w   4(a1,d6.w*2),d0
@@ -1722,10 +1722,10 @@ bv_check_plane2
 bv_no_line
   dbf     d6,bv_draw_lines_loop2
 bv_no_face_visible
-  swap    d7                 ;Flächenzähler holen
+  swap    d7                 ;Flächenzähler 
   addq.w  #4,a0              ;Farbnummer und Anzahl der Linien überspringen
   dbf     d7,bv_draw_lines_loop1
-  move.l  variables+save_a7(pc),a7 ;Alten Stackpointer holen
+  move.l  variables+save_a7(pc),a7 ;Alten Stackpointer 
   movem.l (a7)+,a3-a5
   move.w  #DMAF_BLITHOG,DMACON-DMACONR(a6)
   rts
@@ -1765,10 +1765,10 @@ bv_rotation
   movem.l a4-a6,-(a7)
   lea     bv_3d_object(pc),a0 ;Koordinaten der Linien
   lea     bv_xyz_rotation_coordinates(pc),a1 ;Koord.-Tab.
-  lea     sine_table(pc),a2   ;Sinus-Tabelle
+  lea     sine_table(pc),a2   
   move.w  #sine_table_length/4,a6 ;90 Grad
   move.w  bv_x_rotation_angle(a3),d0 ;X-Winkel
-  move.w  d0,d7              ;X-Winkel -> d7
+  move.w  d0,d7              
   move.w  2(a2,d0.w*4),d4    ;sin(a)
   add.w   a6,d7              ;+ 90 Grad
   MOVEF.W sine_table_length-1,d3
@@ -1777,7 +1777,7 @@ bv_rotation
   swap    d4                 ;Bits 16-31 = sin(a)
   move.w  #bv_d*8,a4         ;d
   move.w  2(a2,d7.w*4),d4    ;Bits  0-15 = cos(a)
-  move.w  d1,d7              ;Y-Winkel -> d7
+  move.w  d1,d7              
   move.w  2(a2,d1.w*4),d5    ;sin(b)
   add.w   a6,d7              ;+ 90 Grad
   move.w  #bv_xy_rotation_centre,a5 ;X+Y-Mittelpunkt
@@ -1785,7 +1785,7 @@ bv_rotation
   move.w  bv_z_rotation_angle(a3),d2 ;Z-Winkel
   swap    d5                 ;Bits 16-31 = sin(b)
   move.w  2(a2,d7.w*4),d5    ;Bits  0-15 = cos(b)
-  move.w  d2,d7              ;Z-Winkel -> d7
+  move.w  d2,d7              
   add.w   a6,d7              ;+ 90 Grad
   move.w  2(a2,d2.w*4),d6    ;sin(c)
   and.w   d3,d7              ;Übertrag entfernen
@@ -1794,12 +1794,12 @@ bv_rotation
   move.w  2(a2,d7.w*4),d6    ;Bits  0-15 = cos(c)
   and.w   d3,d0              ;Übertrag entfernen
   add.w   bv_variable_y_rotation_angle_speed(a3),d1  ;nächster Y-Winkel
-  move.w  d0,bv_x_rotation_angle(a3) ;X-Winkel retten
+  move.w  d0,bv_x_rotation_angle(a3) 
   and.w   d3,d1              ;Übertrag entfernen
   add.w   bv_variable_z_rotation_angle_speed(a3),d2 ;nächster Z-Winkel
-  move.w  d1,bv_y_rotation_angle(a3) ;Y-Winkel retten
+  move.w  d1,bv_y_rotation_angle(a3) 
   and.w   d3,d2              ;Übertrag entfernen
-  move.w  d2,bv_z_rotation_angle(a3) ;Z-Winkel retten
+  move.w  d2,bv_z_rotation_angle(a3) 
   move.w  #bv_object1_edge_points_number-1,d7 ;Anzahl der Punkte
 bv_rotatation_loop
   move.w  (a0)+,d0           ;X-Koord.
@@ -1874,7 +1874,7 @@ bv_rotatation_loop
   move.w  d1,(a1)+           ;Y-Pos.
   asr.w   #3,d2              ;Z/8
   move.w  d2,(a1)+           ;Z-Pos.
-  move.l  a2,d7              ;Alten Inhalt von d7 holen
+  move.l  a2,d7              ;Alten Inhalt von d7 
   dbf     d7,bv_rotatation_loop
   movem.l (a7)+,a4-a6
   rts
@@ -1895,7 +1895,7 @@ bv_clear_image
 
 ;  movem.l a3-a6,-(a7)
 ;  moveq   #TRUE,d0
-;  move.l  a7,save_a7(a3)     ;Stackpointer retten
+;  move.l  a7,save_a7(a3)     
 ;  moveq   #TRUE,d1
 ;  move.l  extra_pf1(a3),a7   ;Zeiger erste Plane
 ;  moveq   #TRUE,d2
@@ -1966,14 +1966,14 @@ bv_wobble_sprites
   ADDF.W  cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subext1_SPR6POS+2,a2 ;CL
   move.w  #bv_wobble_x_centre,a4
   move.w  #cl1_subextension1_SIZE,a5
-  move.w  bv_wobble_x_radius_angle(a3),d1 ;X-Winkel holen
-  move.w  d1,d0              ;retten
+  move.w  bv_wobble_x_radius_angle(a3),d1 ;X-Winkel
+  move.w  d1,d0              
   MOVEF.W sine_table_length-1,d5
   addq.w  #bv_wobble_x_radius_angle_speed,d0 ;nächster X-Radius-Winkel
-  move.w  bv_wobble_x_angle(a3),d2 ;X-Winkel holen
+  move.w  bv_wobble_x_angle(a3),d2 ;X-Winkel
   and.w   d5,d0              ;Überlauf entfernen
   move.w  d0,bv_wobble_x_radius_angle(a3) ;Startwert retten
-  move.w  d2,d0              ;retten
+  move.w  d2,d0              
   addq.w  #bv_wobble_x_angle_speed,d0 ;nächster X-Winkel
   and.w   d5,d0              ;Überlauf entfernen
   move.w  d0,bv_wobble_x_angle(a3) ;Startwert retten
@@ -1991,7 +1991,7 @@ bv_wobble_sprites_loop2
   swap    d0
   and.w   d5,d2              ;Überlauf entfernen
   add.w   a4,d0              ;x' + X-Mittelpunkt
-  move.w  d0,a0              ;retten
+  move.w  d0,a0              
   add.w   d3,d0              ;+ X-Shift
   move.w  d0,(a2)            ;Neue SPR6POS in CL Schreiben
   add.w   d4,a0              ;+ X-Shift

@@ -1457,11 +1457,11 @@ wave_scrolltext
   tst.w   wst_state(a3)      ;Wave-Scrolltext an ?
   bne     no_wave_scrolltext ;Nein -> verzweige
   movem.l a4-a6,-(a7)
-  move.w  wst_y_angle(a3),d4  ;Y-Winkel holen
-  move.w  d4,d0              ;retten
+  move.w  wst_y_angle(a3),d4  ;Y-Winkel
+  move.w  d4,d0              
   add.w   wst_variable_y_angle_speed(a3),d0 ;nächster Y-Winkel
   and.w   #sine_table_length-1,d0 ;Überlauf entfernen
-  move.w  d0,wst_y_angle(a3) ;Y-Winkel retten
+  move.w  d0,wst_y_angle(a3) 
   moveq   #wst_image_plane_width-4,d3
   lea     wst_characters_x_positions(pc),a2 ;X-Positionen der Chars
   lea     spr_pointers_display(pc),a4 ;Zeiger auf Sprites
@@ -1471,7 +1471,7 @@ wave_scrolltext
 wave_scrolltext_loop1
   move.l  (a4)+,a1           ;Zeiger auf Sprite-Struktur
   move.w  (a2),d5            ;X-Position
-  move.w  d5,d0              ;retten
+  move.w  d5,d0              
   move.l  (a5,d4.w*4),d1     ;sin(w)
   MULUF.L wst_y_radius*2,d1,d2 ;y'=(yr*sin(w))/2^15
   add.w   #(display_window_HSTART-wst_text_character_x_size)*4,d0 ;X-Zentrierung
@@ -1509,7 +1509,7 @@ no_wave_scrolltext
 
 ; ** Neues Image für Character ermitteln **
 ; -----------------------------------------
-  GET_NEW_CHARACTER_IMAGE wst,wst_check_control_codes,NORESTART
+  GET_NEW_CHARACTER_IMAGE.W wst,wst_check_control_codes,NORESTART
 
   CNOP 0,4
 wst_check_control_codes
@@ -1523,7 +1523,8 @@ wst_check_control_codes
   beq.s   wst_set_y_angle_speed
   cmp.b   #"",d0
   beq.s   wst_set_horiz_scroll_speed_slow
-  cmp.b   #"",d0
+  cmp.b   #"
+",d0
   beq.s   wst_set_horiz_scroll_speed_medium
   cmp.b   #"",d0
   beq.s   wst_set_horiz_scroll_speed_fast
@@ -1614,7 +1615,7 @@ bv_move_lightsource
 bv_rotation
   movem.l a4-a5,-(a7)
   move.w  bv_rotation_x_angle(a3),d1 ;X-Winkel
-  move.w  d1,d0              ;retten
+  move.w  d1,d0              
   lea     sine_table(pc),a2  ;Sinus-Tabelle
   move.w  2(a2,d0.w*4),d4    ;sin(a)
   move.w  #sine_table_length/4,a4
@@ -1625,9 +1626,9 @@ bv_rotation
   move.w  2(a2,d0.w*4),d4    ;Bits  0-15 = cos(a)
   add.w   bv_variable_rotation_x_angle_speed(a3),d1 ;nächster X-Winkel
   and.w   d3,d1              ;Übertrag entfernen
-  move.w  d1,bv_rotation_x_angle(a3) ;X-Winkel retten
+  move.w  d1,bv_rotation_x_angle(a3) 
   move.w  bv_rotation_y_angle(a3),d1 ;Y-Winkel
-  move.w  d1,d0              ;retten
+  move.w  d1,d0              
   move.w  2(a2,d0.w*4),d5    ;sin(b)
   add.w   a4,d0              ;+ 90 Grad
   swap    d5                 ;Bits 16-31 = sin(b)
@@ -1635,9 +1636,9 @@ bv_rotation
   move.w  2(a2,d0.w*4),d5    ;Bits  0-15 = cos(b)
   add.w   bv_variable_rotation_y_angle_speed(a3),d1 ;nächster Y-Winkel
   and.w   d3,d1              ;Übertrag entfernen
-  move.w  d1,bv_rotation_y_angle(a3) ;Y-Winkel retten
+  move.w  d1,bv_rotation_y_angle(a3) 
   move.w  bv_rotation_z_angle(a3),d1 ;Z-Winkel
-  move.w  d1,d0              ;retten
+  move.w  d1,d0              
   move.w  2(a2,d0.w*4),d6    ;sin(c)
   add.w   a4,d0              ;+ 90 Grad
   swap    d6                 ;Bits 16-31 = sin(c)
@@ -1645,7 +1646,7 @@ bv_rotation
   move.w  2(a2,d0.w*4),d6    ;Bits  0-15 = cos(c)
   add.w   bv_variable_rotation_z_angle_speed(a3),d1 ;nächster Z-Winkel
   and.w   d3,d1              ;Übertrag entfernen
-  move.w  d1,bv_rotation_z_angle(a3) ;Z-Winkel retten
+  move.w  d1,bv_rotation_z_angle(a3) 
   lea     bv_object_coordinates(pc),a0 ;Koordinaten der Linien
   lea     bv_rotation_xyz_coordinates(pc),a1 ;Koord.-Tab.
   move.w  #bv_rotation_d*8,a4 ;d
@@ -1654,7 +1655,7 @@ bv_rotation
   moveq   #bv_object_edge_points_number-1,d7 ;Anzahl der Punkte
 bv_rotation_loop
   move.w  (a0)+,d0           ;X-Koord.
-  move.l  d7,a2              ;Schleifenzähler retten
+  move.l  d7,a2              
   move.w  (a0)+,d1           ;Y-Koord.
   move.w  (a0)+,d2           ;Z-Koord.
   ROTATE_X_AXIS
@@ -1674,7 +1675,7 @@ bv_rotation_loop
   add.w   a5,d1              ;y' + Y-Mittelpunkt
   move.w  d1,(a1)+           ;Y-Pos.
   asr.w   #3,d2              ;Z/8
-  move.l  a2,d7              ;Schleifenzähler holen
+  move.l  a2,d7              ;Schleifenzähler 
   move.w  d2,(a1)+           ;Z-Pos.
   dbf     d7,bv_rotation_loop
   movem.l (a7)+,a4-a5
@@ -1716,7 +1717,7 @@ bv_draw_lines_loop1
   sub.l   d0,d1              ;zn = (yu*xv)-(xu*yv)
   bpl     bv_draw_lines_no_face ;Wenn zn positiv -> verzweige
 ; ** Mittlere Z-Koordinate der Fläche berechnen **
-  move.w  6(a5),d7           ;P4-Startwert holen
+  move.w  6(a5),d7           ;P4-Startwert 
   move.w  4(a1,d4.w*2),d0    ;zm = zp1+zp2+zp3+zp4
   add.w   4(a1,d5.w*2),d0
   add.w   4(a1,d6.w*2),d0
@@ -1782,10 +1783,10 @@ bv_draw_lines_check_bitplane2
 bv_draw_lines_no_line
   dbf     d6,bv_draw_lines_loop2
 bv_draw_lines_no_face
-  swap    d7                 ;Flächenzähler holen
+  swap    d7                 ;Flächenzähler 
   addq.w  #4,a0              ;Farbnummer und Anzahl der Linien überspringen
   dbf     d7,bv_draw_lines_loop1
-  move.l  variables+save_a7(pc),a7 ;Alten Stackpointer holen
+  move.l  variables+save_a7(pc),a7 ;Alten Stackpointer 
   movem.l (a7)+,a3-a5
   move.w  #DMAF_BLITHOG,DMACON-DMACONR(a6) ;BLTPRI aus
 bv_no_draw_lines
@@ -1900,8 +1901,8 @@ bv_set_sprites_positions
   moveq   #bv_used_sprites_number-1,d7 ;Anzahl der Objekte
 bv_move_sprites_loop
   move.l  (a1)+,a0           ;Sprite-Struktur
-  move.w  d3,d0              ;X-Pos. holen
-  move.w  d4,d1              ;Y-Pos. holen
+  move.w  d3,d0              ;X-Pos. 
+  move.w  d4,d1              ;Y-Pos. 
   MOVEF.W bv_image_y_size,d2 ;Höhe
   add.w   d1,d2              ;Höhe zu Y addieren
   SET_SPRITE_POSITION d0,d1,d2
@@ -1917,14 +1918,14 @@ bv_move_sprites_loop
   CNOP 0,4
 bv_wobble_sprites
   movem.l a4-a6,-(a7)
-  move.w  bv_wobble_x_radius_angle(a3),d1 ;X-Winkel holen
-  move.w  d1,d0              ;retten
+  move.w  bv_wobble_x_radius_angle(a3),d1 ;X-Winkel
+  move.w  d1,d0              
   MOVEF.W sine_table_length-1,d5
   addq.w  #bv_wobble_x_radius_angle_speed,d0 ;nächster X-Radius-Winkel
-  move.w  bv_wobble_x_angle(a3),d2 ;X-Winkel holen
+  move.w  bv_wobble_x_angle(a3),d2 ;X-Winkel
   and.w   d5,d0              ;Überlauf entfernen
   move.w  d0,bv_wobble_x_radius_angle(a3) ;Startwert retten
-  move.w  d2,d0              ;retten
+  move.w  d2,d0              
   addq.w  #bv_wobble_x_angle_speed,d0 ;nächster X-Winkel
   move.w  d5,d0              ;Überlauf entfernen
   move.w  d0,bv_wobble_x_angle(a3) ;Startwert retten
@@ -1948,7 +1949,7 @@ bv_wobble_sprites_loop2
   muls.w  2(a0,d2.w*4),d0    ;x'=(xr'*cos(w))/2*^15
   swap    d0
   add.w   a2,d0              ;x' + X-Mittelpunkt
-  move.w  d0,d3              ;retten
+  move.w  d0,d3              
   add.w   a5,d0              ;x' + vertikaler/horizontaler Startwert des Sprites6
   move.w  d0,(a1)            ;Neue SPR6POS in CL Schreiben
   addq.w  #bv_wobble_x_radius_angle_step,d1 ;nächster X-Radius-Winkel
@@ -1972,9 +1973,9 @@ rotation_zoomer
   bne     no_rotation_zoomer
   movem.l a3-a6,-(a7)
   lea     sine_table(pc),a0  ;Zeiger auf Sinus-Tabelle
-  move.w  rz_z_rotation_angle(a3),d4 ;Rotations-Winkel holen
+  move.w  rz_z_rotation_angle(a3),d4 ;Rotations-Winkel 
   move.w  d4,d3              ;Rotations-Winkel retten
-  move.w  rz_zoom_angle(a3),d5 ;Zoom-Winkel holen
+  move.w  rz_zoom_angle(a3),d5 ;Zoom-Winkel 
   IFNE rz_table_length_256
     MOVEF.W sine_table_length-1,d6 ;Überlauf
   ENDC
@@ -2054,7 +2055,7 @@ rz_no_zoomer
 
 ; ** Farbwerte in Copperliste kopieren **
 ; ---------------------------------------
-  move.l  a7,save_a7(a3)     ;Stackpointer retten
+  move.l  a7,save_a7(a3)     
   move.w  #cl2_extension1_SIZE,a2
   move.w  d0,a3              ;cos(w) retten
   move.w  d1,a7              ;sin(w)
@@ -2069,8 +2070,8 @@ rotation_zoomer_loop1
   move.w  a5,d5              ;Y Linke obere Ecke in Bild
   moveq   #cl2_display_y_size-1,d6 ;Anzahl der Zeilen
 rotation_zoomer_loop2
-  move.w  d4,d3              ;X-Pos in Bild holen
-  move.w  d5,d2              ;Y-Pos in Bild holen
+  move.w  d4,d3              ;X-Pos in Bild 
+  move.w  d5,d2              ;Y-Pos in Bild 
   lsr.w   #8,d3              ;Bits in richtige Postion bringen
   move.b  d3,d2              ;Bits 15-8 = Y-Offset, Bits 7-0 = X-Offset
   move.b  (a0,d2.l),(a1)     ;Switchwert setzen
@@ -2095,15 +2096,15 @@ image_fader_in
   tst.w   ifi_state(a3)      ;Image-Fader-In an ?
   bne.s   no_image_fader_in  ;Nein -> verzweige
   movem.l a4-a6,-(a7)
-  move.w  ifi_fader_angle(a3),d2 ;Fader-Winkel holen
+  move.w  ifi_fader_angle(a3),d2 ;Fader-Winkel 
   move.w  d2,d0
   ADDF.W  ifi_fader_angle_speed,d0 ;nächster Fader-Winkel
   cmp.w   #sine_table_length/2,d0 ;Y-Winkel <= 180 Grad ?
   ble.s   ifi_no_restart_fader_angle ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d0 ;180 Grad
 ifi_no_restart_fader_angle
-  move.w  d0,ifi_fader_angle(a3) ;Fader-Winkel retten
-  MOVEF.W if_colors_number*3,d6 ;Zähler
+  move.w  d0,ifi_fader_angle(a3) 
+  MOVEF.W if_colors_number*3,
   lea     sine_table(pc),a0  ;Sinus-Tabelle
   move.l  (a0,d2.w*4),d0     ;sin(w)
   MULUF.L ifi_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
@@ -2134,15 +2135,15 @@ image_fader_out
   tst.w   ifo_state(a3)      ;Image-Fader-Out an ?
   bne.s   no_image_fader_out ;Nein -> verzweige
   movem.l a4-a6,-(a7)
-  move.w  ifo_fader_angle(a3),d2 ;Fader-Winkel holen
+  move.w  ifo_fader_angle(a3),d2 ;Fader-Winkel 
   move.w  d2,d0
   ADDF.W  ifo_fader_angle_speed,d0 ;nächster Fader-Winkel
   cmp.w   #sine_table_length/2,d0 ;Y-Winkel <= 180 Grad ?
   ble.s   ifo_no_restart_fader_angle ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d0 ;180 Grad
 ifo_no_restart_fader_angle
-  move.w  d0,ifo_fader_angle(a3) ;Fader-Winkel retten
-  MOVEF.W if_colors_number*3,d6 ;Zähler
+  move.w  d0,ifo_fader_angle(a3) 
+  MOVEF.W if_colors_number*3,
   lea     sine_table(pc),a0  ;Sinus-Tabelle
   move.l  (a0,d2.w*4),d0     ;sin(w)
   MULUF.L ifo_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
@@ -2196,7 +2197,7 @@ if_copy_color_table
   MOVEF.W if_colors_number-1,d7 ;Anzahl der Farben
 if_copy_color_table_loop
   move.l  (a0)+,d0           ;RGB8-Farbwert
-  move.l  d0,d2              ;retten
+  move.l  d0,d2              
   RGB8_TO_RGB4HI d0,d1,d3
   move.w  d0,(a1)            ;COLORxx High-Bits
   IFNE cl1_size1
@@ -2246,9 +2247,9 @@ blind_fader_in
   tst.w   bfi_state(a3)     ;Blind-Fader-In an ?
   bne.s   bfi_no_blind_fader_in ;Nein -> verzweige
   move.l  a4,-(a7)
-  move.w  bf_address_offsets_table_start(a3),d2 ;Startwert holen
+  move.w  bf_address_offsets_table_start(a3),d2 ;Startwert 
   MOVEF.W bf_table_length-1,d3
-  move.w  d2,d0              ;retten
+  move.w  d2,d0              
   MOVEF.L cl2_extension1_SIZE,d4
   addq.w  #bf_speed,d0       ;Startwert erhöhen
   moveq   #bf_step2,d5
@@ -2261,7 +2262,7 @@ bfi_finished
   bra.s   bfi_no_blind_fader_in
   CNOP 0,4
 bfi_not_finished
-  move.w  d0,bf_address_offsets_table_start(a3) ;retten
+  move.w  d0,bf_address_offsets_table_start(a3) 
   lea     bf_address_offsets_table(pc),a0 ;Tabelle mit Registeroffsets
   IFNE cl2_size1
     move.l  cl2_construction1(a3),a1 ;1. CL
@@ -2283,10 +2284,10 @@ bfi_not_finished
   ENDC
   moveq   #bf_lamellas_number-1,d7 ;Anzahl der Lamellen
 blind_fader_in_loop1
-  move.w  d2,d1              ;Startwert holen
+  move.w  d2,d1              ;Startwert 
   moveq   #bf_lamella_height-1,d6 ;Höhe der Lamelle
 blind_fader_in_loop2
-  move.w  (a0,d1.w*2),d0     ;Registeroffset aus Tabelle holen
+  move.w  (a0,d1.w*2),d0     ;Registeroffset aus Tabelle 
   addq.w  #bf_step1,d1       ;nächster Wert aus Tabelle
   IFNE cl2_size1
     move.w  d0,(a1)          ;Registeroffset in 1. CL schreiben
@@ -2316,9 +2317,9 @@ blind_fader_out
   tst.w   bfo_state(a3)      ;Blind-Fader-Out an ?
   bne     bfo_no_blind_fader_out ;Nein -> verzweige
   move.l  a4,-(a7)
-  move.w  bf_address_offsets_table_start(a3),d2 ;Startwert holen
+  move.w  bf_address_offsets_table_start(a3),d2 ;Startwert 
   MOVEF.W bf_table_length-1,d3
-  move.w  d2,d0              ;retten
+  move.w  d2,d0              
   MOVEF.L cl2_extension1_SIZE,d4
   subq.w  #bf_speed,d0       ;Startwert verringern
   bpl.s   bfo_not_finished   ;Wenn positiv -> verzweige
@@ -2341,7 +2342,7 @@ bfo_restart_intro
   bra.s   bfo_no_blind_fader_out
   CNOP 0,4
 bfo_not_finished
-  move.w  d0,bf_address_offsets_table_start(a3) ;retten
+  move.w  d0,bf_address_offsets_table_start(a3) 
   moveq   #bf_step2,d5
   lea     bf_address_offsets_table(pc),a0 ;Tabelle mit Registeroffsets
   IFNE cl2_size1
@@ -2364,10 +2365,10 @@ bfo_not_finished
   ENDC
   moveq   #bf_lamellas_number-1,d7 ;Anzahl der Lamellen
 blind_fader_out_loop1
-  move.w  d2,d1              ;Startwert holen
+  move.w  d2,d1              ;Startwert 
   moveq   #bf_lamella_height-1,d6 ;Höhe der Lamelle
 blind_fader_out_loop2
-  move.w  (a0,d1.w*2),d0     ;Registeradresse aus Tabelle holen
+  move.w  (a0,d1.w*2),d0     ;Registeradresse aus Tabelle 
   addq.w  #bf_step1,d1       ;nächster Wert aus Tabelle
   IFNE cl2_size1
     move.w  d0,(a1)          ;Registeroffset in 1. CL schreiben
@@ -2404,8 +2405,8 @@ init_color_registers2
   ENDC
   moveq   #pf1_colors_number-1,d7 ;Anzahl der Farben
 init_color_registers2_loop
-  move.l  (a0)+,d0           ;24-Bit-Farbwert holen
-  move.l  d0,d1              ;retten
+  move.l  (a0)+,d0           ;24-Bit-Farbwert 
+  move.l  d0,d1              
   RGB8_TO_RGB4HI d0,d2,d3
   move.w  d0,(a1)            ;High-Bits COLORxx
   addq.w  #4,a1
@@ -2434,8 +2435,8 @@ no_restart_color_bank
   ENDC
   moveq   #spr_colors_number-1,d7 ;Anzahl der Farben
 init_color_registers2_loop2
-  move.l  (a0)+,d0           ;24-Bit-Farbwert holen
-  move.l  d0,d1              ;retten
+  move.l  (a0)+,d0           ;24-Bit-Farbwert 
+  move.l  d0,d1              
   RGB8_TO_RGB4HI d0,d2,d3
   move.w  d0,(a1)            ;High-Bits COLORxx
   addq.w  #4,a1
@@ -2500,11 +2501,11 @@ cube_zoomer_in
   tst.w   czi_state(a3)      ;Cube-Zoomer-In an ?
   bne.s   no_cube_zoomer_in  
   lea     sine_table(pc),a0  ;Zeiger auf Sinus-Tabelle
-  move.w  czi_zoom_angle(a3),d1 ;Zoom-In-Winkel holen
+  move.w  czi_zoom_angle(a3),d1 ;Zoom-In-Winkel 
   moveq   #TRUE,d0           ;Langwort-Zugriff
   move.w  2(a0,d1.w*4),d0    ;sin(w)
   add.w   #czi_zoom_center,d0 ;+ Zoom-In-Mittelpunkt
-  move.l  d0,bv_zoom_distance(a3) ;retten
+  move.l  d0,bv_zoom_distance(a3) 
   addq.w  #czi_zoom_angle_speed,d1 ;nächster Zoom-In-Winkel
   cmp.w   #sine_table_length/4,d1 ;180 Grad erreicht ?
   bge.s   czi_finished       ;Ja -> verzweige
@@ -2528,7 +2529,7 @@ keyboard_handler
   beq     kh_no_keyboard_handler ;Nein verzweige
   btst    #CIACRAB_SPMODE,CIACRA(a4) ;Ausgabe ?
   bne     kh_no_keyboard_handler ;Ja -> verzweige
-  move.b  CIASDR(a4),d0      ;Tastencode holen
+  move.b  CIASDR(a4),d0      ;Tastencode 
   ror.b   #1,d0              ;Bits in richtige Position bringen
   not.b   d0                 ;Alle Bits umdrehen
   bmi.s   kh_handshake       ;Taste losgelassen ?
@@ -2837,8 +2838,8 @@ rz_init_color_registers
   ENDC
   MOVEF.W if_colors_number-1,d7 ;Anzahl der Farben
 rz_init_color_registers_loop
-  move.l  (a0)+,d0           ;24-Bit-Farbwert holen
-  move.l  d0,d1              ;retten
+  move.l  (a0)+,d0           ;24-Bit-Farbwert 
+  move.l  d0,d1              
   RGB8_TO_RGB4HI d0,d2,d3
   move.w  d0,(a1)            ;High-Bits COLORxx
   addq.w  #4,a1
@@ -3153,7 +3154,8 @@ wst_text
     DC.B " "
   ENDR
   DC.B ""
-  DC.B "¹³ YES WE ARE BACK ON THE AMIGA ### "
+  DC.B "
+¹³ YES WE ARE BACK ON THE AMIGA ### "
   REPT wst_text_characters_number/(wst_origin_character_x_size/wst_text_character_x_size)
     DC.B " "
   ENDR
@@ -3178,7 +3180,8 @@ wst_text
     DC.B " "
   ENDR
   DC.B ""
-  DC.B "¹³THE CREDITS      "
+  DC.B "
+¹³THE CREDITS      "
   DC.B "CODING AND MUSIC *DISSIDENT*     "
   DC.B "GRAPHICS *GRASS*      "
   DC.B "RELEASED @ NORDLICHT 2023"
@@ -3244,11 +3247,11 @@ cube_zoomer_out
   tst.w   czo_state(a3)      ;Cube-Zoomer-Out an ?
   bne.s   no_cube_zoomer_out ;Nein -> verzweige
   lea     sine_table(pc),a0  ;Zeiger auf Sinus-Tabelle
-  move.w  czo_zoom_angle(a3),d1 ;Zoom-Out-Winkel holen
+  move.w  czo_zoom_angle(a3),d1 ;Zoom-Out-Winkel 
   moveq   #TRUE,d0           ;Langwort-Zugriff
   move.w  2(a0,d1.w*4),d0    ;sin(w)
   add.w   #czo_zoom_center,d0 ;+ Zoom-Out-Mittelpunkt
-  move.l  d0,bv_zoom_distance(a3) ;retten
+  move.l  d0,bv_zoom_distance(a3) 
   addq.w  #czo_zoom_angle_speed,d1 ;nächster Zoom-Out-Winkel
   cmp.w   #sine_table_length/2,d1 ;180 Grad erreicht ?
   bge.s   czo_finished       ;Ja -> verzweige

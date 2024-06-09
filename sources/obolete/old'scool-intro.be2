@@ -1048,18 +1048,18 @@ wave_lores_scrolltext
   lea     wst_characters_x_positions(pc),a2 ;X-Positionen der Chars
   lea     spr_pointers_display(pc),a4 ;Zeiger auf Sprites
   lea     sine_table(pc),a5  ;Zeiger auf Sinustabelle
-  move.w  wst_y_angle(a3),d4  ;Y-Winkel holen
-  move.w  d4,d0              ;retten
+  move.w  wst_y_angle(a3),d4  ;Y-Winkel
+  move.w  d4,d0              
   addq.w  #wst_y_angle_speed,d0 ;nächster Y-Winkel
   move.w  #wst_horiz_scroll_speed,a6
   and.w   #sine_table_length-1,d0 ;Überlauf entfernen
-  move.w  d0,wst_y_angle(a3) ;Y-Winkel retten
+  move.w  d0,wst_y_angle(a3) 
   moveq   #wst_image_plane_width-4,d3
   moveq   #wst_text_characters_number-1,d7 ;Anzahl der Chars
 wst_loop1
   move.l  (a4)+,a1           ;Zeiger auf Sprite-Struktur
   move.w  (a2),d5            ;X-Position
-  move.w  d5,d0              ;retten
+  move.w  d5,d0              
   move.l  (a5,d4.w*4),d1     ;sin(w)
   MULUF.L wst_y_radius*2,d1,d2 ;y'=(yr*sin(w))/2^15
   add.w   #(display_window_HSTART-wst_text_character_x_size)*4,d0 ;X-Zentrierung
@@ -1096,7 +1096,7 @@ wst_no_new_character_image
 
 ; ** Neues Image für Character ermitteln **
 ; -----------------------------------------
-  GET_NEW_CHARACTER_IMAGE wst
+  GET_NEW_CHARACTER_IMAGE.W wst
 
 ; ** Playfield rotieren/zoomen **
 ; --------------------------
@@ -1104,9 +1104,9 @@ wst_no_new_character_image
 chunky_rotation_zoomer
   movem.l a3-a6,-(a7)
   lea     sine_table(pc),a0  
-  move.w  crz_z_rotation_angle(a3),d4 ;Rotations-Winkel holen
+  move.w  crz_z_rotation_angle(a3),d4 ;Rotations-Winkel 
   move.w  d4,d3              ;Rotations-Winkel retten
-  move.w  crz_zoom_angle(a3),d5 ;Zoom-Winkel holen
+  move.w  crz_zoom_angle(a3),d5 ;Zoom-Winkel 
   IFNE crz_table_length_256
     MOVEF.W sine_table_length-1,d6 ;Überlauf
   ENDC
@@ -1172,7 +1172,7 @@ skip
 
 ; ** Farbwerte in Copperliste kopieren **
 ; ---------------------------------------
-  move.l  a7,save_a7(a3)     ;Stackpointer retten
+  move.l  a7,save_a7(a3)     
   move.w  #cl2_extension1_SIZE,a2
   move.w  d0,a3              ;cos(w) retten
   move.w  d1,a7              ;sin(w)
@@ -1187,8 +1187,8 @@ chunky_rotation_zoomer_loop1
   move.w  a4,d5              ;Y Linke obere Ecke in Playfield
   moveq   #cl2_display_y_size-1,d6 ;Anzahl der Zeilen
 chunky_rotation_zoomer_loop2
-  move.w  d4,d3              ;X-Pos in Playfield holen
-  move.w  d5,d2              ;Y-Pos in Playfield holen
+  move.w  d4,d3              ;X-Pos in Playfield 
+  move.w  d5,d2              ;Y-Pos in Playfield 
   lsr.w   #8,d3              ;Bits in richtige Postion bringen
   add.w   d1,d4              ;nächste Pixel-Spalte in Playfield
   move.b  d3,d2              ;Bits 15-8 = Y-Offset, Bits 7-0 = X-Offset

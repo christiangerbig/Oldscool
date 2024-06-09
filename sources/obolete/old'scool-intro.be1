@@ -805,9 +805,9 @@ beam_routines
 chunky_rotation_zoomer
   movem.l a3-a6,-(a7)
   lea     sine_table(pc),a0  
-  move.w  crz_z_rotation_angle(a3),d4 ;Rotations-Winkel holen
+  move.w  crz_z_rotation_angle(a3),d4 ;Rotations-Winkel 
   move.w  d4,d3              ;Rotations-Winkel retten
-  move.w  crz_zoom_angle(a3),d5 ;Zoom-Winkel holen
+  move.w  crz_zoom_angle(a3),d5 ;Zoom-Winkel 
   IFNE crz_table_length_256
     MOVEF.W sine_table_length-1,d6 ;Überlauf
   ENDC
@@ -873,7 +873,7 @@ skip
 
 ; ** Farbwerte in Copperliste kopieren **
 ; ---------------------------------------
-  move.l  a7,save_a7(a3)     ;Stackpointer retten
+  move.l  a7,save_a7(a3)     
   move.w  #cl2_extension1_SIZE,a2
   move.w  d0,a3              ;cos(w) retten
   move.w  d1,a7              ;sin(w)
@@ -888,8 +888,8 @@ chunky_rotation_zoomer_loop1
   move.w  a4,d5              ;Y Linke obere Ecke in Playfield
   moveq   #cl2_display_y_size-1,d6 ;Anzahl der Zeilen
 chunky_rotation_zoomer_loop2
-  move.w  d4,d3              ;X-Pos in Playfield holen
-  move.w  d5,d2              ;Y-Pos in Playfield holen
+  move.w  d4,d3              ;X-Pos in Playfield 
+  move.w  d5,d2              ;Y-Pos in Playfield 
   lsr.w   #8,d3              ;Bits in richtige Postion bringen
   add.w   d1,d4              ;nächste Pixel-Spalte in Playfield
   move.b  d3,d2              ;Bits 15-8 = Y-Offset, Bits 7-0 = X-Offset
