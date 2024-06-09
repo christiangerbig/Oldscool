@@ -3080,7 +3080,8 @@ bf_address_offsets_table
 ; ** Text f�r Laufschrift **
 ; --------------------------
 wst_text
-  DC.B ASCII_CTRL_F,"偎RESISTANCE"
+  DC.B ASCII_CTRL_F,"偎"
+  DC.B "RESISTANCE"
   REPT wst_text_characters_number/(wst_origin_character_x_size/wst_text_character_x_size)
     DC.B " "
   ENDR
@@ -3088,18 +3089,17 @@ wst_text
   REPT wst_text_characters_number/(wst_origin_character_x_size/wst_text_character_x_size)
     DC.B " "
   ENDR
-  DC.B ASCII_CTRL_W
-  DC.B ASCII_CTRL_M,"像 YES WE ARE BACK ON THE AMIGA ### "
+  DC.B ASCII_CTRL_W,ASCII_CTRL_M,"像"
+  DC.B " YES WE ARE BACK ON THE AMIGA ### "
   REPT wst_text_characters_number/(wst_origin_character_x_size/wst_text_character_x_size)
     DC.B " "
   ENDR
-  DC.B ASCII_CTRL_W
-  DC.B ASCII_CTRL_S,"PRESS F1-F10 FOR DIFFERENT CUBE MOVEMENTS...  "
+  DC.B ASCII_CTRL_W,ASCII_CTRL_S
+  DC.B "PRESS F1-F10 FOR DIFFERENT CUBE MOVEMENTS...  "
   REPT wst_text_characters_number/(wst_origin_character_x_size/wst_text_character_x_size)
     DC.B " "
   ENDR
-  DC.B ASCII_CTRL_W
-  DC.B ASCII_CTRL_F,"眾"
+  DC.B ASCII_CTRL_W,ASCII_CTRL_F,"眾"
   DC.B "THE ELECRONIC KNIGHTS  "
   DC.B "DESIRE  "
   DC.B "NAH-KOLOR  "
@@ -3113,8 +3113,8 @@ wst_text
   REPT wst_text_characters_number/(wst_origin_character_x_size/wst_text_character_x_size)
     DC.B " "
   ENDR
-  DC.B ASCII_CTRL_W
-  DC.B ASCII_CTRL_M,"像THE CREDITS      "
+  DC.B ASCII_CTRL_W,ASCII_CTRL_M,"像"
+  DC.B "THE CREDITS      "
   DC.B "CODING AND MUSIC *DISSIDENT*     "
   DC.B "GRAPHICS *GRASS*      "
   DC.B "RELEASED @ NORDLICHT 2023"
