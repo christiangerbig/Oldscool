@@ -2885,14 +2885,14 @@ pf1_color_table
   REPT pf1_colors_number
     DC.L COLOR00BITS
   ENDR
-  INCLUDE "Daten:Asm-Sources.AGA/Old'scool/colortables/256x256x128-Texture.ct"
+  INCLUDE "Daten:Asm-Sources.AGA/projects/Old'scool/colortables/256x256x128-Texture.ct"
 
 ; ** Farben der Sprites **
 ; ------------------------
 spr_color_table
-  INCLUDE "Daten:Asm-Sources.AGA/Old'scool/colortables/64x56x4-Font.ct"
-  INCLUDE "Daten:Asm-Sources.AGA/Old'scool/colortables/64x56x4-Font.ct"
-  INCLUDE "Daten:Asm-Sources.AGA/Old'scool/colortables/64x56x4-Font.ct"
+  INCLUDE "Daten:Asm-Sources.AGA/projects/Old'scool/colortables/64x56x4-Font.ct"
+  INCLUDE "Daten:Asm-Sources.AGA/projects/Old'scool/colortables/64x56x4-Font.ct"
+  INCLUDE "Daten:Asm-Sources.AGA/projects/Old'scool/colortables/64x56x4-Font.ct"
   REPT 4
     DC.L COLOR00BITS
   ENDR
@@ -2962,7 +2962,7 @@ wst_characters_x_positions
 ; -----------------------------
   CNOP 0,4
 bv_color_table
-  INCLUDE "Daten:Asm-Sources.AGA/Old'scool/colortables/64-Colorgradient-Brown.ct"
+  INCLUDE "Daten:Asm-Sources.AGA/projects/Old'scool/colortables/64-Colorgradient-Brown.ct"
 
 ; ** Objektdaten **
 ; -----------------
@@ -3038,7 +3038,7 @@ bv_rotation_xyz_coordinates
 ; --------------------------------------
   CNOP 0,4
 ifi_color_table
-  INCLUDE "Daten:Asm-Sources.AGA/Old'scool/colortables/320x256x128-Title.ct"
+  INCLUDE "Daten:Asm-Sources.AGA/projects/Old'scool/colortables/320x256x128-Title.ct"
 
 ; ** Zielfarbwerte für Image-Fader-Out **
 ; ---------------------------------------
@@ -3137,13 +3137,13 @@ prg_version DC.B "$VER: RSE-Old'scool 1.0 (31.8.23)",TRUE
 ; **** PT-Replay ****Old'scool
   IFNE pt_split_module
 pt_auddata SECTION pt_audio_module,DATA_C
-    INCBIN "Daten:Asm-Sources.AGA/Old'scool/modules/mod.ClassicTune14remix"
+    INCBIN "Daten:Asm-Sources.AGA/projects/Old'scool/modules/mod.ClassicTune14remix"
   ELSE
 pt_auddata SECTION pt_audio_song,DATA
-    INCBIN "Daten:Asm-Sources.AGA/Old'scool/modules/MOD.ClassicTune14Remix.song"
+    INCBIN "Daten:Asm-Sources.AGA/projects/Old'scool/modules/MOD.ClassicTune14Remix.song"
 
 pt_audsmps SECTION pt_audio_samples,DATA_C
-    INCBIN "Daten:Asm-Sources.AGA/Old'scool/modules/MOD.ClassicTune14Remix.smps"
+    INCBIN "Daten:Asm-Sources.AGA/projects/Old'scool/modules/MOD.ClassicTune14Remix.smps"
   ENDC
 
 
@@ -3151,13 +3151,13 @@ pt_audsmps SECTION pt_audio_samples,DATA_C
 ; ---------------------------
 ; **** Background-Image ****
 bg_image_data SECTION bg_gfx,DATA
-  INCBIN "Daten:Asm-Sources.AGA/old'scool/graphics/320x256x128-Title.rawblit"
+  INCBIN "Daten:Asm-Sources.AGA/projects/Old'scool/graphics/320x256x128-Title.rawblit"
 ; **** Rotation-Zoomer ****
 rz_image_data SECTION rz_gfx,DATA
-  INCBIN "Daten:Asm-Sources.AGA/Old'scool/graphics/256x256x128-Texture.rawblit"
+  INCBIN "Daten:Asm-Sources.AGA/projects/Old'scool/graphics/256x256x128-Texture.rawblit"
 ; **** Wave-Scrolltext ****
 wst_image_data SECTION wst_gfx,DATA
-  INCBIN "Daten:Asm-Sources.AGA/Old'scool/fonts/64x56x4-Font.rawblit"
+  INCBIN "Daten:Asm-Sources.AGA/projects/Old'scool/fonts/64x56x4-Font.rawblit"
 
   END
 
