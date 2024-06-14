@@ -80,37 +80,37 @@ requires_68060             EQU FALSE
 requires_fast_memory       EQU FALSE
 requires_multiscan_monitor EQU FALSE
 
-workbench_start            EQU FALSE
-workbench_fade             EQU FALSE
-text_output                EQU FALSE
+workbench_start_enabled            EQU FALSE
+workbench_fade_enabled             EQU FALSE
+text_output_enabled                EQU FALSE
 
 pt_v3.0b
-pt_ciatiming      EQU TRUE
+pt_ciatiming_enabled      EQU TRUE
 pt_usedfx         EQU %1111010101011001
 pt_usedefx        EQU %0000100000000000
-pt_finetune       EQU FALSE
+pt_finetune_enabled       EQU FALSE
   IFD pt_v3.0b
-pt_metronome      EQU FALSE
+pt_metronome_enabled      EQU FALSE
   ENDC
-pt_track_channel_volumes    EQU FALSE
-pt_track_channel_periods EQU FALSE
-pt_music_fader    EQU TRUE
-pt_split_module   EQU TRUE
+pt_track_volumes_enabled    EQU FALSE
+pt_track_periods_enabled EQU FALSE
+pt_music_fader_enabled    EQU TRUE
+pt_split_module_enabled   EQU TRUE
 
-open_border          EQU TRUE
+open_border_enabled          EQU TRUE
 crz_table_length_256 EQU FALSE
 bv_EpRGB_check_max   EQU TRUE
 
 DMABITS EQU DMAF_BLITTER+DMAF_SPRITE+DMAF_COPPER+DMAF_RASTER+DMAF_MASTER+DMAF_SETCLR
 
-  IFEQ pt_ciatiming
+  IFEQ pt_ciatiming_enabled
 INTENABITS EQU INTF_EXTER+INTF_INTEN+INTF_SETCLR
   ELSE                         
 INTENABITS EQU INTF_VERTB+INTF_EXTER+INTF_INTEN+INTF_SETCLR
   ENDC
 
 CIAAICRBITS EQU CIAICRF_SETCLR
-  IFEQ pt_ciatiming
+  IFEQ pt_ciatiming_enabled
 CIABICRBITS EQU CIAICRF_TA+CIAICRF_TB+CIAICRF_SETCLR
   ELSE
 CIABICRBITS EQU CIAICRF_TB+CIAICRF_SETCLR
@@ -179,28 +179,28 @@ chip_memory_size EQU 0
 AGA_OS_Version EQU 39
 
 CIAACRABITS        EQU CIACRAF_LOAD+CIACRAF_RUNMODE ;oneshot
-  IFEQ pt_ciatiming
+  IFEQ pt_ciatiming_enabled
 CIABCRABITS        EQU CIACRBF_LOAD
   ENDC
 CIABCRBBITS        EQU CIACRBF_LOAD+CIACRBF_RUNMODE ;Oneshot mode
-CIAA_TA_value      EQU 60 ;85 µs
-CIAA_TB_value      EQU 0
-  IFEQ pt_ciatiming
-CIAB_TA_value      EQU 14187 ;= 0.709379 MHz * [20000 µs = 50 Hz duration for one frame on a PAL machine]
-;CIAB_TA_value      EQU 14318 ;= 0.715909 MHz * [20000 µs = 50 Hz duration for one frame on a NTSC machine]
+CIAA_TA_time      EQU 60 ;85 µs
+CIAA_TB_time      EQU 0
+  IFEQ pt_ciatiming_enabled
+CIAB_TA_time      EQU 14187 ;= 0.709379 MHz * [20000 µs = 50 Hz duration for one frame on a PAL machine]
+;CIAB_TA_time      EQU 14318 ;= 0.715909 MHz * [20000 µs = 50 Hz duration for one frame on a NTSC machine]
   ELSE
-CIAB_TA_value      EQU 0
+CIAB_TA_time      EQU 0
   ENDC
-CIAB_TB_value      EQU 362 ;= 0.709379 MHz * [511.43 µs = Lowest note period C1 with Tuning=-8 * 2 / PAL clock constant = 907*2/3546895 ticks per second]
+CIAB_TB_time      EQU 362 ;= 0.709379 MHz * [511.43 µs = Lowest note period C1 with Tuning=-8 * 2 / PAL clock constant = 907*2/3546895 ticks per second]
                       ;= 0.715909 MHz * [506.76 µs = Lowest note period C1 with Tuning=-8 * 2 / NTSC clock constant = 907*2/3579545 ticks per second]
-CIAA_TA_continuous EQU FALSE
-CIAA_TB_continuous EQU FALSE
-  IFEQ pt_ciatiming
-CIAB_TA_continuous EQU TRUE
+CIAA_TA_continuous_enabled EQU FALSE
+CIAA_TB_continuous_enabled EQU FALSE
+  IFEQ pt_ciatiming_enabled
+CIAB_TA_continuous_enabled EQU TRUE
   ELSE
-CIAB_TA_continuous EQU FALSE
+CIAB_TA_continuous_enabled EQU FALSE
   ENDC
-CIAB_TB_continuous EQU FALSE
+CIAB_TB_continuous_enabled EQU FALSE
 
 beam_position EQU VSTOP_256_lines
 
@@ -244,7 +244,7 @@ crz_display_y_scale_factor EQU 4
 cl2_display_x_size EQU visible_pixels_number+8
 cl2_display_width  EQU cl2_display_x_size/8
 cl2_display_y_size EQU visible_lines_number/crz_display_y_scale_factor
-  IFNE open_border
+  IFNE open_border_enabled
 cl1_HSTART1        EQU display_window_HSTART-(7*CMOVE_slot_period)
   ELSE
 cl1_HSTART1        EQU display_window_HSTART-(8*CMOVE_slot_period)
@@ -261,7 +261,7 @@ cl1_VSTART2        EQU beam_position&$ff
     INCLUDE "music-tracker/pt3-equals.i"
   ENDC
 
-  IFEQ pt_music_fader
+  IFEQ pt_music_fader_enabled
 pt_fade_out_delay EQU 2 ;Ticks
   ENDC
 
@@ -539,7 +539,7 @@ copperlist1_SIZE     RS.B 0
 
 cl2_extension1      RS.B 0
 
-  IFEQ open_border 
+  IFEQ open_border_enabled 
 cl2_ext1_BPL1DAT    RS.L 1
   ENDC
 cl2_ext1_BPLCON4_1  RS.L 1
@@ -592,7 +592,7 @@ cl2_extension1_SIZE RS.B 0
 
 cl2_extension2      RS.B 0
 
-  IFEQ open_border 
+  IFEQ open_border_enabled 
 cl2_ext2_BPL1DAT    RS.L 1
   ENDC
 cl2_ext2_COPJMP1    RS.L 1
@@ -861,13 +861,13 @@ save_a7 RS.L 1
   ENDC
 
 ; **** Chunky-Rotation-Zoomer ****
-crz_state            RS.W 1
-crz_zoomer_state     RS.W 1
+crz_active           RS.W 1
+crz_zoomer_active    RS.W 1
 crz_z_rotation_angle RS.W 1
 crz_zoom_angle       RS.W 1
 
 ; **** Wave-Scrolltext ****
-wst_state                       RS.W 1
+wst_active                      RS.W 1
   RS_ALIGN_LONGWORD
 wst_image                       RS.L 1
 wst_text_table_start            RS.W 1
@@ -877,7 +877,7 @@ wst_variable_y_angle_step       RS.W 1
 wst_variable_horiz_scroll_speed RS.W 1
 
 ; **** Blenk-Vectors ****
-bv_state                           RS.W 1
+bv_active                          RS.W 1
 bv_x_rotation_angle                RS.W 1
 bv_y_rotation_angle                RS.W 1
 bv_z_rotation_angle                RS.W 1
@@ -903,22 +903,22 @@ kh_key_code RS.B 1
 kh_key_flag RS.B 1
 
 ; **** Image-Fader ****
-ifi_state       RS.W 1
+ifi_active      RS.W 1
 ifi_fader_angle RS.W 1
 
-ifo_state       RS.W 1
+ifo_active      RS.W 1
 ifo_fader_angle RS.W 1
 
 ; **** Blind-Fader ****
-bfi_state                      RS.W 1
-bfo_state                      RS.W 1
+bfi_active                     RS.W 1
+bfo_active                     RS.W 1
 bf_address_offsets_table_start RS.W 1
 
 ; **** Cube-Zoomer ****
-czi_state      RS.W 1
+czi_active     RS.W 1
 czi_zoom_angle RS.W 1
 
-;czo_state      RS.W 1
+;czo_active     RS.W 1
 ;czo_zoom_angle RS.W 1
 
 
@@ -969,14 +969,14 @@ init_own_variables
 init_own_variables2
 ; **** Chunky-Rotation-Zoomer ****
   moveq   #FALSE,d1
-  move.w  d1,crz_state(a3)
-  move.w  d1,crz_zoomer_state(a3)
-  moveq   #TRUE,d0
+  move.w  d1,crz_active(a3)
+  move.w  d1,crz_zoomer_active(a3)
+  moveq   #0,d0
   move.w  d0,crz_z_rotation_angle(a3)
   move.w  #(sine_table_length/4)*3,crz_zoom_angle(a3)
 
 ; **** Wave-Scrolltext ****
-  move.w  d1,wst_state(a3)
+  move.w  d1,wst_active(a3)
   lea     wst_image_data,a0
   move.l  a0,wst_image(a3)
   move.w  d0,wst_text_table_start(a3)
@@ -989,7 +989,7 @@ init_own_variables2
   move.w  d2,wst_variable_horiz_scroll_speed(a3)
 
 ; **** Blenk-Vectors ****
-  move.w  d1,bv_state(a3)
+  move.w  d1,bv_active(a3)
   move.w  d0,bv_x_rotation_angle(a3)
   move.w  d0,bv_y_rotation_angle(a3)
   move.w  d0,bv_z_rotation_angle(a3)
@@ -1019,23 +1019,23 @@ init_own_variables2
   move.b  d0,kh_key_flag(a3)
 
 ; **** Image-Fader ****
-  move.w  d1,ifi_state(a3)
+  move.w  d1,ifi_active(a3)
   move.w  #sine_table_length/4,ifi_fader_angle(a3)
 
-  move.w  d1,ifo_state(a3)
+  move.w  d1,ifo_active(a3)
   move.w  #sine_table_length/4,ifo_fader_angle(a3)
 
 ; **** Blind-Fader ****
-  move.w  d1,bfi_state(a3)
-  move.w  d1,bfo_state(a3)
+  move.w  d1,bfi_active(a3)
+  move.w  d1,bfo_active(a3)
   move.w  d0,bf_address_offsets_table_start(a3)
 
 ; **** Cube-Zoomer ****
-  move.w  d1,czi_state(a3)
+  move.w  d1,czi_active(a3)
   move.w  d0,czi_zoom_angle(a3)
 
 
-;  move.w  d1,czo_state(a3)
+;  move.w  d1,czo_active(a3)
 ;  move.w  #sine_table_length/4,czo_zoom_angle(a3)
   rts
 
@@ -1050,7 +1050,7 @@ init_all
   bsr     pt_InitRegisters
   bsr     pt_InitAudTempStrucs
   bsr     pt_ExamineSongStruc
-  IFEQ pt_finetune
+  IFEQ pt_finetune_enabled
     bsr     pt_InitFtuPeriodTableStarts
   ENDC
   bsr     crz_convert_image_data
@@ -1074,9 +1074,9 @@ init_all
 ; ------------------------------
   CNOP 0,4
 init_CIA_timers
-  moveq   #CIAA_TA_value&$ff,d0
+  moveq   #CIAA_TA_time&$ff,d0
   move.b  d0,CIATALO(a4)     ;CIA-A-Timer-A Low-Bits
-  moveq   #CIAA_TA_value>>8,d0
+  moveq   #CIAA_TA_time>>8,d0
   move.b  d0,CIATAHI(a4)     ;CIA-A-Timer-A High-Bits
   moveq   #CIAACRABITS,d0
   move.b  d0,CIACRA(a4)
@@ -1118,7 +1118,7 @@ init_color_registers
 ; -----------------------------------------------------------------------------------
    PT_EXAMINE_SONG_STRUCTURE
 
-  IFEQ pt_finetune
+  IFEQ pt_finetune_enabled
 ; ** FineTuning-Offset-Tabelle initialisieren **
 ; ----------------------------------------------
     PT_INIT_FINETUNING_PERIOD_TABLE_STARTS
@@ -1138,7 +1138,7 @@ init_color_registers
 ; --------------------------------------
   INIT_CHARACTERS_X_POSITIONS wst,SHIRES
 
-; ** 24 Bit-Farbwerte RGB in RGB4 Hi/Lo-Werte umwandeln **
+; ** RGB8-Farbwerte in RGB4 Hi/Lo-Werte umwandeln **
 ; --------------------------------------------------------
   CNOP 0,4
 bv_convert_RGB8_to_RGB4
@@ -1314,12 +1314,12 @@ init_second_copperlist
 
 cl2_init_BPLCON4_registers
   move.l  #(BPLCON4<<16)+BPLCON4BITS,d0
-  IFEQ open_border 
+  IFEQ open_border_enabled 
     move.l  #BPL1DAT<<16,d1
   ENDC
   moveq   #cl2_display_y_size-1,d7
 cl2_init_BPLCON4_registers_loop1
-  IFEQ open_border 
+  IFEQ open_border_enabled 
     move.l  d1,(a0)+         ;BPL1DAT
   ENDC
   moveq   #cl2_display_width-1,d6 ;Anzahl der Spalten
@@ -1332,7 +1332,7 @@ cl2_init_BPLCON4_registers_loop2
 
   CNOP 0,4
 cl2_init_noop
-  IFEQ open_border 
+  IFEQ open_border_enabled 
     COPMOVEQ TRUE,BPL1DAT
   ENDC
   COPMOVEQ TRUE,COPJMP1
@@ -1404,7 +1404,7 @@ beam_routines
 ; --------------------------
   CNOP 0,4
 image_fader_in
-  tst.w   ifi_state(a3)      ;Image-Fader-In an ?
+  tst.w   ifi_active(a3)     ;Image-Fader-In an ?
   bne.s   no_image_fader_in  ;Nein -> verzweige
   movem.l a3-a6,-(a7)
   move.w  ifi_fader_angle(a3),d1 ;Fader-Winkel 
@@ -1439,7 +1439,7 @@ ifi_no_fader_angle_restart
   movem.l (a7)+,a3-a6
   bne.s   no_image_fader_in  ;Nein -> verzweige
 ifi_finished
-  not.w   ifi_state(a3)      ;Image-Fader-In aus
+  not.w   ifi_active(a3)     ;Image-Fader-In aus
 no_image_fader_in
   rts
 
@@ -1447,7 +1447,7 @@ no_image_fader_in
 ; --------------------------
   CNOP 0,4
 image_fader_out
-  tst.w   ifo_state(a3)      ;Image-Fader-Out an ?
+  tst.w   ifo_active(a3)     ;Image-Fader-Out an ?
   bne.s   no_image_fader_out ;Nein -> verzweige
   movem.l a3-a6,-(a7)
   move.w  ifo_fader_angle(a3),d1 ;Fader-Winkel 
@@ -1482,7 +1482,7 @@ ifo_no_fader_angle_restart
   movem.l (a7)+,a3-a6
   bne.s   no_image_fader_out ;Nein -> verzweige
 ifo_finished
-  not.w   ifo_state(a3)      ;Image-Fader-Out aus
+  not.w   ifo_active(a3)     ;Image-Fader-Out aus
 no_image_fader_out
   rts
 
@@ -1602,9 +1602,9 @@ if_increase_blue
 
   CNOP 0,4
 copy_color_table
-  tst.w   ifi_state(a3)      ;Image-Fader-In aktiv ?
+  tst.w   ifi_active(a3)     ;Image-Fader-In aktiv ?
   beq.s   cct_do_it          ;Ja -> verzweige
-  tst.w   ifo_state(a3)      ;Image-Fader-Out aktiv ?
+  tst.w   ifo_active(a3)     ;Image-Fader-Out aktiv ?
   bne.s   no_copy_color_table ;Nein -> verzweige
 cct_do_it
   move.l  cl1_display(a3),a0 ;Quelle
@@ -1612,7 +1612,7 @@ cct_do_it
   move.l  cl1_construction2(a3),a1 ;Ziel
   ADDF.W  cl1_COLOR00_high1+2,a1
   IFGT pf1_colors_number-32
-    moveq   #TRUE,d0         ;Farbregisterzähler
+    moveq   #0,d0         ;Farbregisterzähler
   ENDC
   MOVEF.W pf1_colors_number-1,d7 ;Anzahl der Farben
 copy_color_table_loop
@@ -1636,7 +1636,7 @@ no_copy_color_table
   CNOP 0,4
 bfi_blind_fader_in
   move.l  a4,-(a7)
-  tst.w   bfi_state(a3)     ;Blind-Fader-In an ?
+  tst.w   bfi_active(a3)    ;Blind-Fader-In an ?
   bne.s   bfi_no_blind_fader_in ;Nein -> verzweige
   lea     bf_address_offsets_table(pc),a0 ;Tabelle mit Registeroffsets
   IFNE cl2_size1
@@ -1666,7 +1666,7 @@ bfi_blind_fader_in
   cmp.w   #(bf_table_length/2)+1,d0 ;Ende der Tabelle erreicht ?
   ble.s   bfi_not_finished   ;Nein -> verzweige
 bfi_finished
-  not.w   bfi_state(a3)      ;Blind-Fader-In aus
+  not.w   bfi_active(a3)     ;Blind-Fader-In aus
   bra.s   bfi_no_blind_fader_in
   CNOP 0,4
 bfi_not_finished
@@ -1704,7 +1704,7 @@ bfi_no_blind_fader_in
   CNOP 0,4
 bfo_blind_fader_out
   move.l  a4,-(a7)
-  tst.w   bfo_state(a3)     ;Blind-Fader-Out an ?
+  tst.w   bfo_active(a3)    ;Blind-Fader-Out an ?
   bne.s   bfo_no_blind_fader_out ;FALSE -> verzweige
   lea     bf_address_offsets_table(pc),a0 ;Tabelle mit Registeroffsets
   IFNE cl2_size1
@@ -1732,13 +1732,13 @@ bfo_blind_fader_out
   subq.w  #bf_speed,d0      ;Startwert verringern
   bpl.s   bfo_not_finished  ;Wenn positiv -> verzweige
 bfo_finished
-  not.w   bfo_state(a3)     ;Blind-Fader-Out aus
+  not.w   bfo_active(a3)    ;Blind-Fader-Out aus
   bsr     init_own_variables2
   bsr     wst_init_characters_x_positions
   bsr     init_color_registers2
   bsr     set_noop_screen
   bsr     cl1_set_branches_pointers
-  moveq   #TRUE,d0
+  moveq   #0,d0
   move.w  d0,COPJMP1-DMACONR(a6)
   bra.s   bfo_no_blind_fader_out
   CNOP 0,4
@@ -1882,7 +1882,7 @@ set_noop_screen_loop1
 ; -----------------
   CNOP 0,4
 wave_scrolltext
-  tst.w   wst_state(a3)      ;Wave-Scrolltext an ?
+  tst.w   wst_active(a3)     ;Wave-Scrolltext an ?
   bne     no_wave_scrolltext ;Nein -> verzweige
   movem.l a4-a6,-(a7)
   lea     wst_characters_x_positions(pc),a2 ;X-Positionen der Chars
@@ -1962,48 +1962,48 @@ wst_check_control_codes
   CNOP 0,4
 wst_set_standard_scroll
   move.w  #sine_table_length/2,wst_y_angle(a3) ;Y-Winkel = 180°
-  moveq   #TRUE,d0          ;Rückgabewert TRUE = Steuerungscode gefunden
+  moveq   #0,d0          ;Rückgabewert TRUE = Steuerungscode gefunden
   move.w  d0,wst_variable_y_angle_speed(a3) ;Y-Winkel-Geschwindigkeit = Null
   rts
   CNOP 0,4
 wst_clear_y_angle_step
-  moveq   #TRUE,d0          ;Rückgabewert TRUE = Steuerungscode gefunden
+  moveq   #0,d0          ;Rückgabewert TRUE = Steuerungscode gefunden
   move.w  d0,wst_variable_y_angle_step(a3) ;Y-Winkel-Schrittweite = Null
   rts
   CNOP 0,4
 wst_set_y_angle_step
   moveq   #wst_y_angle_step,d0
   move.w  d0,wst_variable_y_angle_step(a3) ;Y-Winkel-Schrittweite setzen
-  moveq   #TRUE,d0          ;Rückgabewert TRUE = Steuerungscode gefunden
+  moveq   #0,d0          ;Rückgabewert TRUE = Steuerungscode gefunden
   rts
   CNOP 0,4
 wst_set_y_angle_speed
   moveq   #wst_y_angle_speed,d0
   move.w  d0,wst_variable_y_angle_speed(a3) ;Y-Winkel-Geschwindigkeit setzen
-  moveq   #TRUE,d0          ;Rückgabewert TRUE = Steuerungscode gefunden
+  moveq   #0,d0          ;Rückgabewert TRUE = Steuerungscode gefunden
   rts
   CNOP 0,4
 wst_set_horiz_scroll_speed_slow
   moveq   #wst_horiz_scroll_speed_slow,d2
   move.w  d2,wst_variable_horiz_scroll_speed(a3)
-  moveq   #TRUE,d0          ;Rückgabewert TRUE = Steuerungscode gefunden
+  moveq   #0,d0          ;Rückgabewert TRUE = Steuerungscode gefunden
   rts
   CNOP 0,4
 wst_set_horiz_scroll_speed_medium
   moveq   #wst_horiz_scroll_speed,d2
   move.w  d2,wst_variable_horiz_scroll_speed(a3)
-  moveq   #TRUE,d0          ;Rückgabewert TRUE = Steuerungscode gefunden
+  moveq   #0,d0          ;Rückgabewert TRUE = Steuerungscode gefunden
   rts
   CNOP 0,4
 wst_set_horiz_scroll_speed_fast
   moveq   #wst_horiz_scroll_speed_fast,d2
   move.w  d2,wst_variable_horiz_scroll_speed(a3)
-  moveq   #TRUE,d0          ;Rückgabewert TRUE = Steuerungscode gefunden
+  moveq   #0,d0          ;Rückgabewert TRUE = Steuerungscode gefunden
   rts
   CNOP 0,4
 wst_stop_horiz_scrolltext
-  not.w   wst_state(a3)
-  moveq   #TRUE,d0          ;Rückgabewert TRUE = Steuerungscode gefunden
+  not.w   wst_active(a3)
+  moveq   #0,d0          ;Rückgabewert TRUE = Steuerungscode gefunden
   rts
 
 
@@ -2012,11 +2012,11 @@ wst_stop_horiz_scrolltext
 ; ------------------------
   CNOP 0,4
 cube_zoomer_in
-  tst.w   czi_state(a3)      ;Cube-Zoomer-In an ?
+  tst.w   czi_active(a3)     ;Cube-Zoomer-In an ?
   bne.s   no_cube_zoomer_in  ;Nein -> verzweige
   lea     sine_table(pc),a0  
   move.w  czi_zoom_angle(a3),d1 ;Zoom-In-Winkel 
-  moveq   #TRUE,d0           ;Langwort-Zugriff
+  moveq   #0,d0           ;Langwort-Zugriff
   move.w  2(a0,d1.w*4),d0    ;sin(w)
   add.w   #czi_zoom_centre,d0 ;+ Zoom-In-Mittelpunkt
   move.l  d0,bv_zoom_distance(a3) 
@@ -2027,7 +2027,7 @@ cube_zoomer_in
   rts
   CNOP 0,4
 czi_finished
-  not.w   czi_state(a3)      ;Cube-Zoomer-In aus
+  not.w   czi_active(a3)     ;Cube-Zoomer-In aus
 no_cube_zoomer_in
   rts
 
@@ -2035,11 +2035,11 @@ no_cube_zoomer_in
 ; ----------------------
 ;  CNOP 0,4
 ;cube_zoomer_out
-;  tst.w   czo_state(a3)      ;Cube-Zoomer-Out an ?
+;  tst.w   czo_active(a3)     ;Cube-Zoomer-Out an ?
 ;  bne.s   no_cube_zoomer_out ;Nein -> verzweige
 ;  lea     sine_table(pc),a0  
 ;  move.w  czo_zoom_angle(a3),d1 ;Zoom-Out-Winkel 
-;  moveq   #TRUE,d0           ;Langwort-Zugriff
+;  moveq   #0,d0           ;Langwort-Zugriff
 ;  move.w  2(a0,d1.w*4),d0    ;sin(w)
 ;  add.w   #czo_zoom_centre,d0 ;+ Zoom-Out-Mittelpunkt
 ;  move.l  d0,bv_zoom_distance(a3) 
@@ -2050,7 +2050,7 @@ no_cube_zoomer_in
 ;  rts
 ;  CNOP 0,4
 ;czo_finished
-;  not.w   czo_state(a3)      ;Cube-Zoomer-Out aus
+;  not.w   czo_active(a3)     ;Cube-Zoomer-Out aus
 ;no_cube_zoomer_out
 ;  rts
 
@@ -2063,7 +2063,7 @@ bv_clear_image
   move.l  (a0),a0
   move.l  #BC0F_DEST<<16,BLTCON0-DMACONR(a6) ;Minterm Löschen
   move.l  a0,BLTDPT-DMACONR(a6)
-  moveq   #TRUE,d0
+  moveq   #0,d0
   move.w  d0,BLTDMOD-DMACONR(a6) ;D-Mod
   move.w  #(bv_clear_blit_y_size*bv_clear_blit_depth*64)+(bv_clear_blit_x_size/16),BLTSIZE-DMACONR(a6)
   rts
@@ -2210,7 +2210,7 @@ bv_rotatation_loop
 ; -------------------
   CNOP 0,4
 bv_draw_lines
-  tst.w   bv_state(a3)
+  tst.w   bv_active(a3)
   bne     bv_no_draw_lines
   movem.l a3-a5,-(a7)
   bsr     bv_init_line_blit
@@ -2390,7 +2390,7 @@ bv_fill_image
   ADDF.W  (extra_pf_plane_width1*extra_pf1_y_size*extra_pf1_depth)-2,a0 ;Ende des Playfieldes
   move.l  a0,BLTAPT-DMACONR(a6) ;Quelle
   move.l  a0,BLTDPT-DMACONR(a6) ;Ziel
-  moveq   #TRUE,d0
+  moveq   #0,d0
   move.l  d0,BLTAMOD-DMACONR(a6) ;A+D-Mod
   move.w  #(bv_fill_blit_y_size*bv_fill_blit_depth*64)+(bv_fill_blit_x_size/16),BLTSIZE-DMACONR(a6)
   rts
@@ -2547,7 +2547,7 @@ bv_wobble_sprites_loop2
 ; --------------------------
   CNOP 0,4
 chunky_rotation_zoomer
-  tst.w   crz_state(a3)
+  tst.w   crz_active(a3)
   bne     no_chunky_rotation_zoomer
   movem.l a3-a6,-(a7)
   lea     sine_table(pc),a0  
@@ -2572,12 +2572,12 @@ chunky_rotation_zoomer
   ENDC
   move.w  2(a0,d4.w*4),d0     ;cos(w)
   IFEQ crz_table_length_256
-    tst.w   crz_zoomer_state(a3) ;Zoomer an?
+    tst.w   crz_zoomer_active(a3) ;Zoomer an?
     bne.s   crz_no_zoomer     ;Nein -> verzweige
     addq.b  #crz_zoom_angle_speed,d5 ;nächster Zoom-Winkel
 crz_no_zoomer
   ELSE
-    tst.w   crz_zoomer_state(a3) ;Zoomer an?
+    tst.w   crz_zoomer_active(a3) ;Zoomer an?
     bne.s   crz_no_zoomer    ;Nein -> verzweige
     addq.w  #crz_zoom_angle_speed,d5 ;nächster Zoom-Winkel
     and.w   d6,d5            ;Überlauf entfernen
@@ -2684,7 +2684,7 @@ kh_reset_serial_port
 kh_delay_loop
   btst    #CIACRAB_START,CIACRA(a4)
   bne.s   kh_delay_loop
-  moveq   #TRUE,d0
+  moveq   #0,d0
   move.b  d0,CIASDR(a4)      ;Tastaturleitung auf High setzen
   moveq   #~CIACRAF_SPMODE,d0
   and.b   d0,CIACRA(a4)      ;Serieller-Port = Eingabe
@@ -2833,21 +2833,21 @@ swap_images
 
   INCLUDE "int-autovectors-handlers.i"
 
-  IFEQ pt_ciatiming
+  IFEQ pt_ciatiming_enabled
 ; ** CIA-B timer A interrupt server **
 ; ------------------------------------
   CNOP 0,4
 CIAB_TA_int_server
   ENDC
 
-  IFNE pt_ciatiming
+  IFNE pt_ciatiming_enabled
 ; ** Vertical blank interrupt server **
 ; -------------------------------------
   CNOP 0,4
 VERTB_int_server
   ENDC
 
-  IFEQ pt_music_fader
+  IFEQ pt_music_fader_enabled
     bsr.s   pt_fade_out_music
     bra.s   pt_PlayMusic
 
@@ -2859,7 +2859,7 @@ VERTB_int_server
 
 ; ** PT-replay routine **
 ; -----------------------
-  IFEQ pt_music_fader
+  IFEQ pt_music_fader_enabled
     CNOP 0,4
   ENDC
   IFD pt_v2.3a
@@ -2895,15 +2895,15 @@ pt_trigger_fx
   rts
   CNOP 0,4
 pt_restart_intro
-  clr.w   bfo_state(a3)      ;Blind-Fader-Out an
+  clr.w   bfo_active(a3)     ;Blind-Fader-Out an
   rts
   CNOP 0,4
 pt_horiz_scrolltext_on
-  clr.w   wst_state(a3)      ;Wave-Scrolltext an
+  clr.w   wst_active(a3)     ;Wave-Scrolltext an
   rts
   CNOP 0,4
 pt_horiz_scrolltext_off
-  not.w   wst_state(a3)      ;Wave-Scrolltext aus
+  not.w   wst_active(a3)     ;Wave-Scrolltext aus
   rts
   CNOP 0,4
 pt_fade_in_image_on
@@ -2913,11 +2913,11 @@ pt_fade_in_image_on
   move.l  cl1_display(a3),a0 ;CL
   move.w  #BPLCON0BITS2,cl1_BPLCON0+2(a0)
   move.l  (a7)+,a0
-  clr.w   ifi_state(a3)      ;Image-Fader-In an
+  clr.w   ifi_active(a3)     ;Image-Fader-In an
   rts
   CNOP 0,4
 pt_fade_out_image_on
-  clr.w   ifo_state(a3)      ;Image-Fader-Out an
+  clr.w   ifo_active(a3)     ;Image-Fader-Out an
   rts
   CNOP 0,4
 pt_fade_in_chunky_rotation_zoomer_on
@@ -2929,27 +2929,27 @@ pt_fade_in_chunky_rotation_zoomer_on
   move.l  cl1_display(a3),a0 ;CL
   move.w  #BPLCON0BITS,cl1_BPLCON0+2(a0)
   movem.l (a7)+,d0-d7/a0-a6
-  moveq   #TRUE,d0
-  move.w  d0,crz_state(a3)   ;Chunky-Rotation-Zoomer an
-  move.w  d0,bfi_state(a3)   ;Blind-Fader-In an
+  moveq   #0,d0
+  move.w  d0,crz_active(a3)  ;Chunky-Rotation-Zoomer an
+  move.w  d0,bfi_active(a3)  ;Blind-Fader-In an
   rts
   CNOP 0,4
 pt_cube_zoomer_in_on
-  moveq   #TRUE,d0
-  move.w  d0,bv_state(a3)    ;Cube an
-  move.w  d0,czi_state(a3)   ;Cube-Zoomer-In an
+  moveq   #0,d0
+  move.w  d0,bv_active(a3)   ;Cube an
+  move.w  d0,czi_active(a3)  ;Cube-Zoomer-In an
   rts
 ;  CNOP 0,4
 ;pt_cube_zoomer_out_on
-;  clr.w  czo_state(a3)       ;Cube-Zoomer-Out an
+;  clr.w  czo_active(a3)      ;Cube-Zoomer-Out an
 ;  rts
   CNOP 0,4
 pt_zoomer_on
-  clr.w  crz_zoomer_state(a3) ;Zoomer an
+  clr.w  crz_zoomer_active(a3) ;Zoomer an
   rts
   CNOP 0,4
 pt_zoomer_off
-  not.w  crz_zoomer_state(a3) ;Zoomer aus
+  not.w  crz_zoomer_active(a3) ;Zoomer aus
   rts
 
   CNOP 0,4
@@ -3369,7 +3369,7 @@ prg_version DC.B "$VER: old'scool-intro 1.3 beta (30.7.23)",TRUE
 ; --------------------------
 
 ; **** PT-Replay ****
-  IFNE pt_split_module
+  IFNE pt_split_module_enabled
 pt_auddata SECTION audio,DATA_C
     INCBIN "Daten:Asm-Sources.AGA/old'scool-intro/module/mod.ClassicTune14remix"
   ELSE

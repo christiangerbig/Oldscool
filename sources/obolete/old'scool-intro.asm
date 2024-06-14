@@ -60,39 +60,39 @@ requires_68060           EQU FALSE
 requires_fast_memory     EQU FALSE
 requires_multiscan_monitor EQU FALSE
 
-workbench_start          EQU FALSE
-workbench_fade           EQU FALSE
-text_output              EQU FALSE
+workbench_start_enabled          EQU FALSE
+workbench_fade_enabled           EQU FALSE
+text_output_enabled              EQU FALSE
 
 pt_v3.0b
-pt_ciatiming             EQU TRUE
+pt_ciatiming_enabled             EQU TRUE
 pt_usedfx                EQU %1111010001011001
 pt_usedefx               EQU %0000100000000000
-pt_finetune              EQU FALSE
+pt_finetune_enabled              EQU FALSE
   IFD pt_v3.0b
-pt_metronome             EQU FALSE
+pt_metronome_enabled             EQU FALSE
   ENDC
-pt_track_channel_volumes           EQU FALSE
-pt_track_channel_periods        EQU FALSE
-pt_music_fader           EQU TRUE
-pt_split_module             EQU TRUE
+pt_track_volumes_enabled           EQU FALSE
+pt_track_periods_enabled        EQU FALSE
+pt_music_fader_enabled           EQU TRUE
+pt_split_module_enabled             EQU TRUE
 
 DMABITS                  EQU DMAF_COPPER+DMAF_MASTER+DMAF_SETCLR
 
-  IFEQ pt_ciatiming
+  IFEQ pt_ciatiming_enabled
 INTENABITS               EQU INTF_EXTER+INTF_INTEN+INTF_SETCLR
   ELSE
 INTENABITS               EQU INTF_VERTB+INTF_EXTER+INTF_INTEN+INTF_SETCLR
   ENDC
 
 CIAAICRBITS              EQU CIAICRF_SETCLR
-  IFEQ pt_ciatiming
+  IFEQ pt_ciatiming_enabled
 CIABICRBITS              EQU CIAICRF_TA+CIAICRF_TB+CIAICRF_SETCLR
   ELSE
 CIABICRBITS              EQU CIAICRF_TB+CIAICRF_SETCLR
   ENDC
 
-COPCONBITS               EQU TRUE
+COPCONBITS               EQU 0
 
 pf1_x_size1              EQU 0
 pf1_y_size1              EQU 0
@@ -143,35 +143,35 @@ chip_memory_size            EQU 0
 
 AGA_OS_Version           EQU 39
 
-  IFEQ pt_ciatiming
+  IFEQ pt_ciatiming_enabled
 CIABCRABITS              EQU CIACRBF_LOAD
   ENDC
 CIABCRBBITS              EQU CIACRBF_LOAD+CIACRBF_RUNMODE ;Oneshot mode
-CIAA_TA_value            EQU 0
-CIAA_TB_value            EQU 0
-  IFEQ pt_ciatiming
-CIAB_TA_value            EQU 14187 ;= 0.709379 MHz * [20000 µs = 50 Hz duration for one frame on a PAL machine]
-;CIAB_TA_value            EQU 14318 ;= 0.715909 MHz * [20000 µs = 50 Hz duration for one frame on a NTSC machine]
+CIAA_TA_time            EQU 0
+CIAA_TB_time            EQU 0
+  IFEQ pt_ciatiming_enabled
+CIAB_TA_time            EQU 14187 ;= 0.709379 MHz * [20000 µs = 50 Hz duration for one frame on a PAL machine]
+;CIAB_TA_time            EQU 14318 ;= 0.715909 MHz * [20000 µs = 50 Hz duration for one frame on a NTSC machine]
   ELSE
-CIAB_TA_value            EQU 0
+CIAB_TA_time            EQU 0
   ENDC
-CIAB_TB_value            EQU 362 ;= 0.709379 MHz * [511.43 µs = Lowest note period C1 with Tuning=-8 * 2 / PAL clock constant = 907*2/3546895 ticks per second]
+CIAB_TB_time            EQU 362 ;= 0.709379 MHz * [511.43 µs = Lowest note period C1 with Tuning=-8 * 2 / PAL clock constant = 907*2/3546895 ticks per second]
                                  ;= 0.715909 MHz * [506.76 µs = Lowest note period C1 with Tuning=-8 * 2 / NTSC clock constant = 907*2/3579545 ticks per second]
-CIAA_TA_continuous       EQU FALSE
-CIAA_TB_continuous       EQU FALSE
-  IFEQ pt_ciatiming
-CIAB_TA_continuous       EQU TRUE
+CIAA_TA_continuous_enabled       EQU FALSE
+CIAA_TB_continuous_enabled       EQU FALSE
+  IFEQ pt_ciatiming_enabled
+CIAB_TA_continuous_enabled       EQU TRUE
   ELSE
-CIAB_TA_continuous       EQU FALSE
+CIAB_TA_continuous_enabled       EQU FALSE
   ENDC
-CIAB_TB_continuous       EQU FALSE
+CIAB_TB_continuous_enabled       EQU FALSE
 
 beam_position            EQU $136
 
 BPLCON0BITS              EQU BPLCON0F_ECSENA+((pf_depth>>3)*BPLCON0F_BPU3)+(BPLCON0F_COLOR)+((pf_depth&$07)*BPLCON0F_BPU0) ;lores
-BPLCON3BITS1             EQU TRUE
+BPLCON3BITS1             EQU 0
 BPLCON3BITS2             EQU BPLCON3BITS1+BPLCON3F_LOCT
-BPLCON4BITS              EQU TRUE
+BPLCON4BITS              EQU 0
 COLOR00BITS              EQU $001122
 
 cl1_HSTART               EQU $00
@@ -185,7 +185,7 @@ cl1_VSTART               EQU beam_position&$ff
     INCLUDE "music-tracker/pt3-equals.i"
   ENDC
 
-  IFEQ pt_music_fader
+  IFEQ pt_music_fader_enabled
 pt_fade_out_delay        EQU 2 ;Ticks
   ENDC
 
@@ -395,7 +395,7 @@ init_all
   bsr     pt_InitRegisters
   bsr     pt_InitAudTempStrucs
   bsr     pt_ExamineSongStruc
-  IFEQ pt_finetune
+  IFEQ pt_finetune_enabled
     bsr     pt_InitFtuPeriodTableStarts
   ENDC
   bsr     init_first_copperlist
@@ -435,7 +435,7 @@ init_color_registers
 ; -----------------------------------------------------------------------------------
    PT_EXAMINE_SONG_STRUCTURE
 
-  IFEQ pt_finetune
+  IFEQ pt_finetune_enabled
 ; ** FineTuning-Offset-Tabelle initialisieren **
 ; ----------------------------------------------
     PT_INIT_FINETUNING_PERIOD_TABLE_STARTS
@@ -495,21 +495,21 @@ no_sync_routines
   CNOP 0,4
 beam_routines
   bsr     wait_copint
-  IFEQ pt_music_fader
+  IFEQ pt_music_fader_enabled
     bsr.s   pt_mouse_handler
   ENDC
   btst    #CIAB_GAMEPORT0,CIAPRA(a4) ;Auf linke Maustaste warten
   bne.s   beam_routines
   rts
 
-  IFEQ pt_music_fader
+  IFEQ pt_music_fader_enabled
 ; ** Mouse-Handler **
 ; -------------------
     CNOP 0,4
 pt_mouse_handler
     btst    #POTINPB_DATLY,POTINP-DMACONR(a6) ;Rechte Mustaste gedrückt?
     bne.s   pt_no_mouse_handler ;Nein -> verzweige
-    clr.w   pt_fade_out_music_state(a3) ;Fader an
+    clr.w   pt_fade_out_music_active(a3) ;Fader an
 pt_no_mouse_handler
     rts
   ENDC
@@ -520,21 +520,21 @@ pt_no_mouse_handler
   
   INCLUDE "int-autovectors-handlers.i"
 
-  IFEQ pt_ciatiming
+  IFEQ pt_ciatiming_enabled
 ; ** CIA-B timer A interrupt server **
 ; ------------------------------------
   CNOP 0,4
 CIAB_TA_int_server
   ENDC
 
-  IFNE pt_ciatiming
+  IFNE pt_ciatiming_enabled
 ; ** Vertical blank interrupt server **
 ; -------------------------------------
   CNOP 0,4
 VERTB_int_server
   ENDC
 
-  IFEQ pt_music_fader
+  IFEQ pt_music_fader_enabled
     bsr.s   pt_fade_out_music
     bra.s   pt_PlayMusic
 
@@ -546,7 +546,7 @@ VERTB_int_server
 
 ; ** PT-replay routine **
 ; -----------------------
-  IFEQ pt_music_fader
+  IFEQ pt_music_fader_enabled
     CNOP 0,4
   ENDC
   IFD pt_v2.3a
@@ -659,7 +659,7 @@ prg_version DC.B "$VER: old'scool-intro 1.0 beta (10.7.23)",TRUE
 ; --------------------------
 
 ; **** PT-Replay ****
-  IFNE pt_split_module
+  IFNE pt_split_module_enabled
 pt_auddata SECTION audio,DATA_C
     INCBIN "Daten:Asm-Sources.AGA/old'scool-intro/module/mod.ClassicTune14remix"
   ELSE

@@ -60,40 +60,40 @@ requires_68060 EQU FALSE
 requires_fast_memory EQU FALSE
 requires_multiscan_monitor EQU FALSE
 
-workbench_start EQU FALSE
-workbench_fade EQU FALSE
-text_output EQU FALSE
+workbench_start_enabled EQU FALSE
+workbench_fade_enabled EQU FALSE
+text_output_enabled EQU FALSE
 
 pt_v3.0b
-pt_ciatiming EQU TRUE
+pt_ciatiming_enabled EQU TRUE
 pt_usedfx EQU %1111010001011001
 pt_usedefx EQU %0000100000000000
-pt_finetune EQU FALSE
+pt_finetune_enabled EQU FALSE
   IFD pt_v3.0b
-pt_metronome EQU FALSE
+pt_metronome_enabled EQU FALSE
   ENDC
-pt_track_channel_volumes EQU FALSE
-pt_track_channel_periods EQU FALSE
-pt_music_fader EQU TRUE
-pt_split_module EQU TRUE
+pt_track_volumes_enabled EQU FALSE
+pt_track_periods_enabled EQU FALSE
+pt_music_fader_enabled EQU TRUE
+pt_split_module_enabled EQU TRUE
 
-open_border EQU -1;TRUE
+open_border_enabled EQU -1;TRUE
 crz_table_length_256 EQU FALSE
 
-  IFNE open_border 
+  IFNE open_border_enabled 
 DMABITS EQU DMAF_BLITTER+DMAF_SPRITE+DMAF_COPPER+DMAF_RASTER+DMAF_MASTER+DMAF_SETCLR
   ELSE
 DMABITS EQU DMAF_BLITTER+DMAF_SPRITE+DMAF_COPPER+DMAF_MASTER+DMAF_SETCLR
   ENDC
 
-  IFEQ pt_ciatiming
+  IFEQ pt_ciatiming_enabled
 INTENABITS EQU INTF_EXTER+INTF_INTEN+INTF_SETCLR
   ELSE                         
 INTENABITS EQU INTF_VERTB+INTF_EXTER+INTF_INTEN+INTF_SETCLR
   ENDC
 
 CIAAICRBITS EQU CIAICRF_SETCLR
-  IFEQ pt_ciatiming
+  IFEQ pt_ciatiming_enabled
 CIABICRBITS EQU CIAICRF_TA+CIAICRF_TB+CIAICRF_SETCLR
   ELSE
 CIABICRBITS EQU CIAICRF_TB+CIAICRF_SETCLR
@@ -107,7 +107,7 @@ pf1_depth1 EQU 0
 pf1_x_size2 EQU 0
 pf1_y_size2 EQU 0
 pf1_depth2 EQU 0
-  IFNE open_border 
+  IFNE open_border_enabled 
 pf1_x_size3 EQU 32
 pf1_y_size3 EQU 1
 pf1_depth3 EQU 1
@@ -158,39 +158,39 @@ chip_memory_size EQU 0
 
 AGA_OS_Version EQU 39
 
-  IFEQ pt_ciatiming
+  IFEQ pt_ciatiming_enabled
 CIABCRABITS EQU CIACRBF_LOAD
   ENDC
 CIABCRBBITS EQU CIACRBF_LOAD+CIACRBF_RUNMODE ;Oneshot mode
-CIAA_TA_value EQU 0
-CIAA_TB_value EQU 0
-  IFEQ pt_ciatiming
-CIAB_TA_value EQU 14187 ;= 0.709379 MHz * [20000 탎 = 50 Hz duration for one frame on a PAL machine]
-;CIAB_TA_value EQU 14318 ;= 0.715909 MHz * [20000 탎 = 50 Hz duration for one frame on a NTSC machine]
+CIAA_TA_time EQU 0
+CIAA_TB_time EQU 0
+  IFEQ pt_ciatiming_enabled
+CIAB_TA_time EQU 14187 ;= 0.709379 MHz * [20000 탎 = 50 Hz duration for one frame on a PAL machine]
+;CIAB_TA_time EQU 14318 ;= 0.715909 MHz * [20000 탎 = 50 Hz duration for one frame on a NTSC machine]
   ELSE
-CIAB_TA_value EQU 0
+CIAB_TA_time EQU 0
   ENDC
-CIAB_TB_value EQU 362 ;= 0.709379 MHz * [511.43 탎 = Lowest note period C1 with Tuning=-8 * 2 / PAL clock constant = 907*2/3546895 ticks per second]
+CIAB_TB_time EQU 362 ;= 0.709379 MHz * [511.43 탎 = Lowest note period C1 with Tuning=-8 * 2 / PAL clock constant = 907*2/3546895 ticks per second]
                       ;= 0.715909 MHz * [506.76 탎 = Lowest note period C1 with Tuning=-8 * 2 / NTSC clock constant = 907*2/3579545 ticks per second]
-CIAA_TA_continuous EQU FALSE
-CIAA_TB_continuous EQU FALSE
-  IFEQ pt_ciatiming
-CIAB_TA_continuous EQU TRUE
+CIAA_TA_continuous_enabled EQU FALSE
+CIAA_TB_continuous_enabled EQU FALSE
+  IFEQ pt_ciatiming_enabled
+CIAB_TA_continuous_enabled EQU TRUE
   ELSE
-CIAB_TA_continuous EQU FALSE
+CIAB_TA_continuous_enabled EQU FALSE
   ENDC
-CIAB_TB_continuous EQU FALSE
+CIAB_TB_continuous_enabled EQU FALSE
 
 beam_position EQU $136
 
-  IFNE open_border 
+  IFNE open_border_enabled 
 pixel_per_line EQU 32
   ENDC
 visible_pixels_number EQU 320
 visible_lines_number EQU 256
 MINROW EQU VSTART_256_lines
 
-  IFNE open_border 
+  IFNE open_border_enabled 
 pf_pixel_per_datafetch EQU 16 ;1x
 DDFSTRTBITS EQU DDFSTART_320_pixel
 DDFSTOPBITS EQU DDFSTOP_standard_min
@@ -204,7 +204,7 @@ display_window_HSTOP EQU HSTOP_320_pixel
 display_window_VSTOP EQU VSTOP_256_lines
 DIWSTOPBITS EQU ((display_window_VSTOP&$ff)*DIWSTOPF_V0)+(display_window_HSTOP&$ff)
 
-  IFNE open_border 
+  IFNE open_border_enabled 
 pf1_plane_width EQU pf1_x_size3/8
 data_fetch_width EQU pixel_per_line/8
 pf1_plane_moduli EQU -(pf1_plane_width-(pf1_plane_width-data_fetch_width))
@@ -225,7 +225,7 @@ crz_disp_y_scale_factor EQU 4
 cl2_display_x_size EQU visible_pixels_number+8
 cl2_display_width  EQU cl2_display_x_size/8
 cl2_display_y_size EQU visible_lines_number/crz_disp_y_scale_factor
-  IFNE open_border
+  IFNE open_border_enabled
 cl1_HSTART1        EQU display_window_HSTART-(5*CMOVE_slot_period)
   ELSE
 cl1_HSTART1        EQU display_window_HSTART-(6*CMOVE_slot_period)
@@ -242,7 +242,7 @@ cl1_VSTART2        EQU beam_position&$ff
     INCLUDE "music-tracker/pt3-equals.i"
   ENDC
 
-  IFEQ pt_music_fader
+  IFEQ pt_music_fader_enabled
 pt_fade_out_delay EQU 2 ;Ticks
   ENDC
 
@@ -409,7 +409,7 @@ copperlist1_SIZE     RS.B 0
 
 cl2_extension1      RS.B 0
 
-  IFEQ open_border 
+  IFEQ open_border_enabled 
 cl2_ext1_BPL1DAT    RS.L 1
   ENDC
 cl2_ext1_BPLCON4_1  RS.L 1
@@ -737,7 +737,7 @@ init_own_variables
   ENDC
 
 ; **** Chunky-Rotation-Zoomer ****
-  moveq   #TRUE,d0
+  moveq   #0,d0
   move.w  d0,crz_z_rotation_angle(a3)
   move.w  #(sine_table_length/4)*3,crz_zoom_angle(a3)
 
@@ -759,7 +759,7 @@ init_all
   bsr     pt_InitRegisters
   bsr     pt_InitAudTempStrucs
   bsr     pt_ExamineSongStruc
-  IFEQ pt_finetune
+  IFEQ pt_finetune_enabled
     bsr     pt_InitFtuPeriodTableStarts
   ENDC
   bsr     crz_convert_image_data
@@ -832,7 +832,7 @@ init_color_registers
 ; -----------------------------------------------------------------------------------
    PT_EXAMINE_SONG_STRUCTURE
 
-  IFEQ pt_finetune
+  IFEQ pt_finetune_enabled
 ; ** FineTuning-Offset-Tabelle initialisieren **
 ; ----------------------------------------------
     PT_INIT_FINETUNING_PERIOD_TABLE_STARTS
@@ -860,7 +860,7 @@ init_first_copperlist
   move.l  cl1_construction2(a3),a0 ;CL
   bsr.s   cl1_init_playfield_registers
   bsr.s   cl1_init_sprite_pointers
-  IFNE open_border 
+  IFNE open_border_enabled 
     bsr.s   cl1_init_bitplane_pointers
     bsr     cl1_init_branches_pointers
     bsr     cl1_init_copint
@@ -874,7 +874,7 @@ init_first_copperlist
     bra     cl1_set_sprite_pointers
   ENDC
 
-  IFNE open_border 
+  IFNE open_border_enabled 
     COP_INIT_PLAYFIELD_REGISTERS cl1
     COP_INIT_SPRITE_POINTERS cl1
   ELSE
@@ -883,7 +883,7 @@ init_first_copperlist
   ENDC
   rts
 
-  IFNE open_border 
+  IFNE open_border_enabled 
     COP_INIT_BITPLANE_POINTERS cl1
   ENDC
 
@@ -918,7 +918,7 @@ cl1_init_branches_pointers_loop2
 
   COP_SET_SPRITE_POINTERS cl1,construction2,spr_number
 
-  IFNE open_border 
+  IFNE open_border_enabled 
     COP_SET_BITPLANE_POINTERS cl1,construction2,pf1_depth3
   ENDC
 
@@ -976,12 +976,12 @@ init_second_copperlist
 
 cl2_init_BPLCON4_registers
   move.l  #(BPLCON4<<16)+BPLCON4BITS,d0
-  IFEQ open_border 
+  IFEQ open_border_enabled 
     move.w  #BPL1DAT,d1
   ENDC
   moveq   #cl2_display_y_size-1,d7
 cl2_init_BPLCON4_registers_loop1
-  IFEQ open_border 
+  IFEQ open_border_enabled 
     move.w  d1,(a0)
     addq.w  #4,a0
   ENDC
@@ -1210,21 +1210,21 @@ chunky_rotation_zoomer_loop2
   
   INCLUDE "int-autovectors-handlers.i"
 
-  IFEQ pt_ciatiming
+  IFEQ pt_ciatiming_enabled
 ; ** CIA-B timer A interrupt server **
 ; ------------------------------------
   CNOP 0,4
 CIAB_TA_int_server
   ENDC
 
-  IFNE pt_ciatiming
+  IFNE pt_ciatiming_enabled
 ; ** Vertical blank interrupt server **
 ; -------------------------------------
   CNOP 0,4
 VERTB_int_server
   ENDC
 
-  IFEQ pt_music_fader
+  IFEQ pt_music_fader_enabled
     bsr.s   pt_fade_out_music
     bra.s   pt_PlayMusic
 
@@ -1236,7 +1236,7 @@ VERTB_int_server
 
 ; ** PT-replay routine **
 ; -----------------------
-  IFEQ pt_music_fader
+  IFEQ pt_music_fader_enabled
     CNOP 0,4
   ENDC
   IFD pt_v2.3a
@@ -1406,7 +1406,7 @@ prg_version DC.B "$VER: old'scool-intro 1.0 beta (10.7.23)",TRUE
 ; --------------------------
 
 ; **** PT-Replay ****
-  IFNE pt_split_module
+  IFNE pt_split_module_enabled
 pt_auddata SECTION audio,DATA_C
     INCBIN "Daten:Asm-Sources.AGA/old'scool-intro/module/mod.ClassicTune14remix"
   ELSE
