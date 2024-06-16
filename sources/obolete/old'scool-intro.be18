@@ -107,9 +107,9 @@ requires_68060             EQU FALSE
 requires_fast_memory       EQU FALSE
 requires_multiscan_monitor EQU FALSE
 
-workbench_start_enabled            EQU FALSE
-workbench_fade_enabled             EQU TRUE
-text_output_enabled                EQU FALSE
+workbench_start_enabled    EQU FALSE
+workbench_fade_enabled     EQU TRUE
+text_output_enabled        EQU FALSE
 
 pt_v3.0b
 pt_ciatiming_enabled      EQU TRUE
@@ -206,7 +206,7 @@ extra_memory_sizeEQU 256*256
 
 chip_memory_size EQU 0
 
-AGA_OS_Version EQU 39
+OS_VERSION_AGA EQU 39
 
 CIAACRBBITS        EQU CIACRBF_LOAD+CIACRBF_RUNMODE ;oneshot
   IFEQ pt_ciatiming_enabled
@@ -884,7 +884,7 @@ save_a7 RS.L 1
     INCLUDE "music-tracker/pt3-variables-offsets.i"
   ENDC
 
-pt_trigger_fx_active RS.W 1
+pt_effects_handler_active RS.W 1
 
 ; **** Chunky-Rotation-Zoomer ****
 crz_active           RS.W 1
@@ -993,7 +993,7 @@ init_own_variables
   IFD pt_v3.0b
     PT3_INIT_VARIABLES
   ENDC
-  move.w  d0,pt_trigger_fx_active(a3)
+  move.w  d0,pt_effects_handler_active(a3)
 
 init_own_variables2
 ; **** Chunky-Rotation-Zoomer ****
@@ -2835,7 +2835,7 @@ mh_no_mouse_handler
 mh_quit_intro
   move.w  #wst_stop_text-wst_text,wst_text_table_start(a3) ;Scrolltext aus
   moveq   #FALSE,d0
-  move.w  d0,pt_trigger_fx_active(a3) ;FX-Abfrage aus
+  move.w  d0,pt_effects_handler_active(a3) ;FX-Abfrage aus
   moveq   #0,d0
   move.w  d0,pt_fade_out_music_active(a3) ;Musik ausblenden
 mh_check_part_title
@@ -2917,13 +2917,13 @@ VERTB_int_server
     PT2_REPLAY
   ENDC
   IFD pt_v3.0b
-    PT3_REPLAY pt_trigger_fx
+    PT3_REPLAY pt_effects_handler
   ENDC
 
 ;--> 8xy "Not used/custom" <--
   CNOP 0,4
-pt_trigger_fx
-  tst.w   pt_trigger_fx_active(a3) ;Check anabled?
+pt_effects_handler
+  tst.w   pt_effects_handler_active(a3) ;Check anabled?
   bne.s   pt_no_trigger_fx   ;No -> skip
   move.b  n_cmdlo(a2),d0     ;Get command data x = Effekt y = TRUE/FALSE
   beq.s   pt_restart_intro

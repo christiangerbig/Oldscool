@@ -60,24 +60,24 @@ requires_68060             EQU FALSE
 requires_fast_memory       EQU FALSE
 requires_multiscan_monitor EQU FALSE
 
-workbench_start_enabled            EQU FALSE
-workbench_fade_enabled             EQU FALSE
-text_output_enabled                EQU FALSE
+workbench_start_enabled    EQU FALSE
+workbench_fade_enabled     EQU FALSE
+text_output_enabled        EQU FALSE
 
 pt_v3.0b
-pt_ciatiming_enabled               EQU TRUE
+pt_ciatiming_enabled       EQU TRUE
 pt_usedfx                  EQU %1111010001011001
 pt_usedefx                 EQU %0000100000000000
-pt_finetune_enabled                EQU FALSE
+pt_finetune_enabled        EQU FALSE
   IFD pt_v3.0b
-pt_metronome_enabled               EQU FALSE
+pt_metronome_enabled       EQU FALSE
   ENDC
-pt_track_volumes_enabled             EQU FALSE
-pt_track_periods_enabled          EQU FALSE
-pt_music_fader_enabled             EQU TRUE
-pt_split_module_enabled               EQU TRUE
+pt_track_volumes_enabled     EQU FALSE
+pt_track_periods_enabled  EQU FALSE
+pt_music_fader_enabled     EQU TRUE
+pt_split_module_enabled       EQU TRUE
 
-open_border_enabled                EQU TRUE
+open_border_enabled        EQU TRUE
 crz_table_length_256       EQU FALSE
 
   IFNE open_border_enabled 
@@ -153,9 +153,6 @@ disk_memory_size                  EQU 0
 extra_memory_size             EQU 0
 
 chip_memory_size              EQU 0
-
-AGA_OS_Version             EQU 39
-
   IFEQ pt_ciatiming_enabled
 CIABCRABITS               EQU CIACRBF_LOAD
   ENDC
@@ -170,14 +167,14 @@ CIAB_TA_time              EQU 0
   ENDC
 CIAB_TB_time              EQU 362 ;= 0.709379 MHz * [511.43 µs = Lowest note period C1 with Tuning=-8 * 2 / PAL clock constant = 907*2/3546895 ticks per second]
                                  ;= 0.715909 MHz * [506.76 µs = Lowest note period C1 with Tuning=-8 * 2 / NTSC clock constant = 907*2/3579545 ticks per second]
-CIAA_TA_continuous_enabled         EQU FALSE
-CIAA_TB_continuous_enabled         EQU FALSE
+CIAA_TA_continuous_enabled EQU FALSE
+CIAA_TB_continuous_enabled EQU FALSE
   IFEQ pt_ciatiming_enabled
-CIAB_TA_continuous_enabled         EQU TRUE
+CIAB_TA_continuous_enabled EQU TRUE
   ELSE
-CIAB_TA_continuous_enabled         EQU FALSE
+CIAB_TA_continuous_enabled EQU FALSE
   ENDC
-CIAB_TB_continuous_enabled         EQU FALSE
+CIAB_TB_continuous_enabled EQU FALSE
 
 beam_position              EQU $136
 

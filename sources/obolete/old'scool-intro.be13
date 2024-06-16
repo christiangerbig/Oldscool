@@ -80,9 +80,9 @@ requires_68060             EQU FALSE
 requires_fast_memory       EQU FALSE
 requires_multiscan_monitor EQU FALSE
 
-workbench_start_enabled            EQU FALSE
-workbench_fade_enabled             EQU FALSE
-text_output_enabled                EQU FALSE
+workbench_start_enabled    EQU FALSE
+workbench_fade_enabled     EQU FALSE
+text_output_enabled        EQU FALSE
 
 pt_v3.0b
 pt_ciatiming_enabled      EQU TRUE
@@ -97,7 +97,7 @@ pt_track_periods_enabled EQU FALSE
 pt_music_fader_enabled    EQU TRUE
 pt_split_module_enabled   EQU TRUE
 
-open_border_enabled          EQU TRUE
+open_border_enabled  EQU TRUE
 crz_table_length_256 EQU FALSE
 bv_EpRGB_check_max   EQU TRUE
 
@@ -176,7 +176,7 @@ extra_memory_sizeEQU 256*256
 
 chip_memory_size EQU 0
 
-AGA_OS_Version EQU 39
+OS_VERSION_AGA EQU 39
 
 CIAACRABITS        EQU CIACRAF_LOAD+CIACRAF_RUNMODE ;oneshot
   IFEQ pt_ciatiming_enabled
@@ -2866,12 +2866,12 @@ VERTB_int_server
     PT2_REPLAY
   ENDC
   IFD pt_v3.0b
-    PT3_REPLAY pt_trigger_fx
+    PT3_REPLAY pt_effects_handler
   ENDC
 
 ;--> 8xy "Not used/custom" <--
   CNOP 0,4
-pt_trigger_fx
+pt_effects_handler
   move.b  n_cmdlo(a2),d0 ;Get command data x = Effekt y = TRUE/FALSE
   beq.s   pt_restart_intro
   cmp.b   #$10,d0
