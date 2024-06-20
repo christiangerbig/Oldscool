@@ -993,10 +993,7 @@ bv_object_info_lines_number RS.W 1
 bv_object_info_SIZE         RS.B 0
 
 
-; ## Beginn des Initialisierungsprogramms ##
-; ------------------------------------------
-
-  INCLUDE "sys-init.i"
+  INCLUDE "sys-wrapper.i"
 
 ; ** Eigene Variablen initialisieren **
 ; -------------------------------------
@@ -1367,12 +1364,6 @@ cl2_init_noop
   rts
 
   COPY_COPPERLIST cl2,2
-
-
-; ** CIA-Timer starten **
-; -----------------------
-
-  INCLUDE "continuous-timers-start.i"
 
 
 ; ## Hauptprogramm ##
@@ -2850,18 +2841,6 @@ EXTER_int_server
   CNOP 0,4
 NMI_int_server
   rts
-
-
-; ** Timer stoppen **
-; -------------------
-
-  INCLUDE "continuous-timers-stop.i"
-
-
-; ## System wieder in Ausganszustand zurücksetzen ##
-; --------------------------------------------------
-
-  INCLUDE "sys-return.i"
 
 
 ; ## Hilfsroutinen ##
