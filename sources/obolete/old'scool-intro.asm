@@ -188,54 +188,6 @@ pt_fade_out_delay        EQU 2 ;Ticks
   ENDC
 
 
-; ** CIA-ICR-Register-Bits-Namen **
-; ---------------------------------
-; CIAICR_TA
-; CIAICR_TB
-; CIAICR_ALRM
-; CIAICR_SP
-; CIAICR_FLG
-; CIAICR_IR
-; CIAICR_SETCLR
-
-
-; ** DMACON-Register-Bits-Namen **
-; --------------------------------
-; DMA_SETCLR
-; DMA_AUDIO (alle 4 Audio-Kanäle)
-; DMA_AUD0
-; DMA_AUD1
-; DMA_AUD2
-; DMA_AUD3
-; DMA_DISK
-; DMA_SPRITE
-; DMA_BLITTER
-; DMA_COPPER
-; DMA_RASTER
-; DMA_MASTER
-; DMA_BLITHOG
-; DMA_ALL (alle DMA-Kanäle)
-
-
-; ** INTENA-Register-Bits-Namen **
-; --------------------------------
-; INT_SETCLR
-; INT_INTEN
-; INT_EXTER
-; INT_DSKSYNC
-; INT_RBF
-; INT_AUD3
-; INT_AUD2
-; INT_AUD1
-; INT_AUD0
-; INT_BLIT
-; INT_VERTB
-; INT_COPER
-; INT_PORTS
-; INT_SOFTINT
-; INT_DSKBLK
-; INT_TBE
-
 
 ; ** Struktur, die alle Exception-Vektoren-Offsets enthält **
 ; -----------------------------------------------------------
@@ -345,7 +297,7 @@ spr7_y_size2     EQU 0
     INCLUDE "music-tracker/pt3-variables-offsets.i"
   ENDC
 
-variables_SIZE RS.B 0
+variables_size RS.B 0
 
 
 ; **** PT-Replay ****
@@ -444,19 +396,19 @@ init_first_copperlist
   move.l  cl1_display(a3),a0 ;Darstellen-CL
   bsr.s   cl1_init_playfield_registers
   bsr     cl1_init_copper_interrupt
-  COP_LIST_END
+  COP_LISTEND
   rts
 
   COP_INIT_PLAYFIELD_REGISTERS cl1,BLANK
 
-  COP_INIT_COPPER_INTERRUPT cl1,cl1_HSTART,cl1_VSTART,YWRAP
+  COP_INIT_COPINT cl1,cl1_HSTART,cl1_VSTART,YWRAP
 
 ; ** 2. Copperliste initialisieren **
 ; -----------------------------------
   CNOP 0,4
 init_second_copperlist
   move.l  cl2_display(a3),a0 ;Darstellen-CL
-  COP_LIST_END
+  COP_LISTEND
   rts
 
 
