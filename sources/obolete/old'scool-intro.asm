@@ -19,7 +19,6 @@
 
 
 ; ** Library-Includes V.3.x nachladen **
-; --------------------------------------
   INCDIR "Daten:include3.5/"
 
   INCLUDE "exec/exec.i"
@@ -51,8 +50,6 @@
 
 
 ; ** Konstanten **
-; ----------------
-
   INCLUDE "equals.i"
 
 requires_68030           EQU FALSE  
@@ -190,25 +187,19 @@ pt_fade_out_delay        EQU 2 ;Ticks
 
 
 ; ** Struktur, die alle Exception-Vektoren-Offsets enthält **
-; -----------------------------------------------------------
-
   INCLUDE "except-vectors-offsets.i"
 
 
 ; ** Struktur, die alle Eigenschaften des Extra-Playfields enthält **
-; -------------------------------------------------------------------
-
   INCLUDE "extra-pf-attributes-structure.i"
 
 
 ; ** Struktur, die alle Eigenschaften der Sprites enthält **
-; ----------------------------------------------------------
-
   INCLUDE "sprite-attributes-structure.i"
 
 
 ; ** Struktur, die alle Registeroffsets der ersten Copperliste enthält **
-; -----------------------------------------------------------------------
+
   RSRESET
 
 cl1_begin        RS.B 0
@@ -222,31 +213,29 @@ cl1_INTREQ       RS.L 1
 
 cl1_end          RS.L 1
 
-copperlist1_SIZE RS.B 0
+copperlist1_size RS.B 0
 
 
 ; ** Struktur, die alle Registeroffsets der zweiten Copperliste enthält **
-; ------------------------------------------------------------------------
+
   RSRESET
 
 cl2_begin        RS.B 0
 
 cl2_end          RS.L 1
 
-copperlist2_SIZE RS.B 0
+copperlist2_size RS.B 0
 
 
 ; ** Konstanten für die größe der Copperlisten **
-; -----------------------------------------------
 cl1_size1        EQU 0
 cl1_size2        EQU 0
-cl1_size3        EQU copperlist1_SIZE
+cl1_size3        EQU copperlist1_size
 cl2_size1        EQU 0
 cl2_size2        EQU 0
-cl2_size3        EQU copperlist2_SIZE
+cl2_size3        EQU copperlist2_size
 
 ; ** Konstanten für die Größe der Spritestrukturen **
-; ---------------------------------------------------
 spr0_x_size1     EQU spr_x_size1
 spr0_y_size1     EQU 0
 spr1_x_size1     EQU spr_x_size1
@@ -282,12 +271,9 @@ spr7_x_size2     EQU spr_x_size2
 spr7_y_size2     EQU 0
 
 ; ** Struktur, die alle Variablenoffsets enthält **
-; -------------------------------------------------
-
   INCLUDE "variables-offsets.i"
 
 ; ** Relative offsets for variables **
-; ------------------------------------
 
 ; **** PT-Replay ****
   IFD pt_v2.3a
@@ -302,24 +288,19 @@ variables_size RS.B 0
 
 ; **** PT-Replay ****
 ; ** PT-Song-Structure **
-; -----------------------
   INCLUDE "music-tracker/pt-song-structure.i"
 
 ; ** Temporary channel structure **
-; ---------------------------------
   INCLUDE "music-tracker/pt-temp-channel-structure.i"
 
 
 ; ## Makrobefehle ##
-; ------------------
-
   INCLUDE "macros.i"
 
 
   INCLUDE "sys-wrapper.i"
 
 ; ** Eigene Variablen initialisieren **
-; -------------------------------------
   CNOP 0,4
 init_own_variables
 
@@ -333,7 +314,6 @@ init_own_variables
   rts
 
 ; ** Alle Initialisierungsroutinen ausführen **
-; ---------------------------------------------
   CNOP 0,4
 init_all
   bsr.s   pt_DetectSysFrequ
@@ -349,18 +329,15 @@ init_all
   bra     init_second_copperlist
 
 ; ** Detect system frequency NTSC/PAL **
-; --------------------------------------
   PT_DETECT_SYS_FREQUENCY
 
 ; ** CIA-Timer initialisieren **
-; ------------------------------
   CNOP 0,4
 init_CIA_timers
   PT_INIT_TIMERS
   rts
 
 ; ** Farbregister initialisieren **
-; ---------------------------------
   CNOP 0,4
 init_color_registers
   CPU_SELECT_COLOR_HIGH_BANK 0
@@ -371,26 +348,22 @@ init_color_registers
   rts
 
 ; ** Audioregister initialisieren **
-; ----------------------------------
    PT_INIT_REGISTERS
 
 ; ** Temporäre Audio-Kanal-Struktur initialisieren **
-; ---------------------------------------------------
    PT_INIT_AUDIO_TEMP_STRUCTURES
 
 ; ** Höchstes Pattern ermitteln und Tabelle mit Zeigern auf Samples initialisieren **
-; -----------------------------------------------------------------------------------
+
    PT_EXAMINE_SONG_STRUCTURE
 
   IFEQ pt_finetune_enabled
 ; ** FineTuning-Offset-Tabelle initialisieren **
-; ----------------------------------------------
     PT_INIT_FINETUNING_PERIOD_TABLE_STARTS
   ENDC
 
 
 ; ** 1. Copperliste initialisieren **
-; -----------------------------------
   CNOP 0,4
 init_first_copperlist
   move.l  cl1_display(a3),a0 ;Darstellen-CL
@@ -404,7 +377,6 @@ init_first_copperlist
   COP_INIT_COPINT cl1,cl1_HSTART,cl1_VSTART,YWRAP
 
 ; ** 2. Copperliste initialisieren **
-; -----------------------------------
   CNOP 0,4
 init_second_copperlist
   move.l  cl2_display(a3),a0 ;Darstellen-CL
@@ -413,7 +385,6 @@ init_second_copperlist
 
 
 ; ## Hauptprogramm ##
-; -------------------
 ; a3 ... Basisadresse aller Variablen
 ; a4 ... CIA-A-Base
 ; a5 ... CIA-B-Base
@@ -425,14 +396,12 @@ main_routine
 
 
 ; ## Routinen, die nicht mit der Bildwiederholfrequenz gekoppelt sind ##
-; ----------------------------------------------------------------------
   CNOP 0,4
 no_sync_routines
   rts
 
 
 ; ## Rasterstahl-Routinen ##
-; --------------------------
   CNOP 0,4
 beam_routines
   bsr     wait_copint
@@ -445,7 +414,6 @@ beam_routines
 
   IFEQ pt_music_fader_enabled
 ; ** Mouse-Handler **
-; -------------------
     CNOP 0,4
 pt_mouse_handler
     btst    #POTINPB_DATLY,POTINP-DMACONR(a6) ;Rechte Mustaste gedrückt?
@@ -457,20 +425,16 @@ pt_no_mouse_handler
 
 
 ; ## Interrupt-Routinen ##
-; ------------------------
-  
   INCLUDE "int-autovectors-handlers.i"
 
   IFEQ pt_ciatiming_enabled
 ; ** CIA-B timer A interrupt server **
-; ------------------------------------
   CNOP 0,4
 ciab_ta_int_server
   ENDC
 
   IFNE pt_ciatiming_enabled
 ; ** Vertical blank interrupt server **
-; -------------------------------------
   CNOP 0,4
 VERTB_int_server
   ENDC
@@ -480,13 +444,11 @@ VERTB_int_server
     bra.s   pt_PlayMusic
 
 ; ** Musik ausblenden **
-; ----------------------
   PT_FADE_OUT
 
   ENDC
 
 ; ** PT-replay routine **
-; -----------------------
   IFEQ pt_music_fader_enabled
     CNOP 0,4
   ENDC
@@ -503,37 +465,29 @@ ciab_tb_int_server
   PT_TIMER_INTERRUPT_SERVER
 
 ; ** Level-6-Interrupt-Server **
-; ------------------------------
   CNOP 0,4
 EXTER_int_server
   rts
 
 ; ** Level-7-Interrupt-Server **
-; ------------------------------
   CNOP 0,4
 NMI_int_server
   rts
 
 
 ; ## Hilfsroutinen ##
-; -------------------
-
   INCLUDE "help-routines.i"
 
 
 ; ## Speicherstellen für Tabellen und Strukturen ##
-; -------------------------------------------------
-
   INCLUDE "sys-structures.i"
 
 ; ** Farben des ersten Playfields **
-; ----------------------------------
   CNOP 0,4
 pf1_color_table
   DC.L color00_bits
 
 ; ** Tables for effect commands **
-; --------------------------------
 ; ** "Invert Loop" **
   INCLUDE "music-tracker/pt-invert-table.i"
 
@@ -549,43 +503,31 @@ pf1_color_table
   ENDC
 
 ; ** Temporary channel structures **
-; ----------------------------------
   INCLUDE "music-tracker/pt-temp-channel-data-tables.i"
 
 ; ** Pointers to samples **
-; -------------------------
   INCLUDE "music-tracker/pt-sample-starts-table.i"
 
 ; ** Pointers to priod tables for different tuning **
-; ---------------------------------------------------
   INCLUDE "music-tracker/pt-finetune-starts-table.i"
 
 
 ; ## Speicherstellen allgemein ##
-; -------------------------------
-
   INCLUDE "sys-variables.i"
 
 
 ; ## Speicherstellen für Namen ##
-; -------------------------------
-
   INCLUDE "sys-names.i"
 
 
 ; ## Speicherstellen für Texte ##
-; -------------------------------
-
   INCLUDE "error-texts.i"
 
-; ** Programmversion für Version-Befehl **
-; ----------------------------------------
-program_version DC.B "$VER: old'scool-intro 1.0 beta (10.7.23)",TRUE
+program_version DC.B "$VER: old'scool-intro 1.0 beta (10.7.23)",0
   EVEN
 
 
 ; ## Audiodaten nachladen ##
-; --------------------------
 
 ; **** PT-Replay ****
   IFNE pt_split_module_enabled
