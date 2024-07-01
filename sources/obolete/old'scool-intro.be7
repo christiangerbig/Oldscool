@@ -1620,7 +1620,7 @@ bv_no_sign_bit
 bv_check_plane1
   btst    #0,d7              ;Plane 0 ?
   beq.s   bv_check_plane2    ;Nein -> verzweige
-  WAIT_BLITTER
+  WAITBLIT
   move.l  d0,BLTCON0-DMACONR(a6) ;BLTCON0 & BLTCON1
   move.w  d3,BLTAPTL-DMACONR(a6) ;(4*dy)-(2*dx)
   move.l  d1,BLTCPT-DMACONR(a6) ;Playfield lesen
@@ -1630,7 +1630,7 @@ bv_check_plane1
 bv_check_plane2
   btst    #1,d7              ;Plane 1 ?
   beq.s   bv_no_line         ;Nein -> verzweige
-  WAIT_BLITTER
+  WAITBLIT
   move.l  d0,BLTCON0-DMACONR(a6) ;BLTCON0 & BLTCON1
   moveq   #extra_pf_plane_width1,d5
   move.w  d3,BLTAPTL-DMACONR(a6) ;(4*dy)-(2*dx)
@@ -1653,7 +1653,7 @@ bv_no_face_visible
   CNOP 0,4
 bv_init_line_blit
   move.w  #DMAF_BLITHOG+DMAF_SETCLR,DMACON-DMACONR(a6)
-  WAIT_BLITTER
+  WAITBLIT
   move.l  #$ffff8000,BLTBDAT-DMACONR(a6) ;Textur der Linie, Standartwert
   moveq   #FALSE,d0
   move.l  d0,BLTAFWM-DMACONR(a6) ;Keine Ausmask.
@@ -1666,7 +1666,7 @@ bv_init_line_blit
   CNOP 0,4
 bv_fill_image
   move.l  extra_pf2(a3),a0   ;Playfield
-  WAIT_BLITTER
+  WAITBLIT
   move.l  (a0),a0
   move.l  #((BC0F_SRCA+BC0F_DEST+ANBNC+ANBC+ABNC+ABC)<<16)+(BLTCON1F_DESC+BLTCON1F_EFE),BLTCON0-DMACONR(a6) ;Minterm D=A, Füll-Modus, Rückwärts
   ADDF.W  (extra_pf_plane_width1*extra_pf1_y_size*extra_pf1_depth)-2,a0 ;Ende des Playfieldes
@@ -1797,7 +1797,7 @@ bv_rotatation_loop
   CNOP 0,4
 bv_clear_image
   move.l  extra_pf1(a3),a0
-  WAIT_BLITTER
+  WAITBLIT
   move.l  (a0),a0
   move.l  #BC0F_DEST<<16,BLTCON0-DMACONR(a6) ;Minterm Löschen
   move.l  a0,BLTDPT-DMACONR(a6)
