@@ -52,9 +52,9 @@
 ; ** Konstanten **
   INCLUDE "equals.i"
 
-requires_68030           EQU FALSE  
-requires_68040           EQU FALSE
-requires_68060           EQU FALSE
+requires_030_cpu         EQU FALSE  
+requires_040_cpu         EQU FALSE
+requires_060_cpu         EQU FALSE
 requires_fast_memory     EQU FALSE
 requires_multiscan_monitor EQU FALSE
 
