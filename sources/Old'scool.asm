@@ -85,6 +85,9 @@
   MC68040
 
 
+DEF_PT_VERSION_3.0B
+
+
 ; ** Library-Includes V.3.x nachladen **
   INCDIR "Daten:include3.5/"
 
@@ -129,16 +132,15 @@ workbench_start_enabled         EQU FALSE
 workbench_fade_enabled          EQU TRUE
 text_output_enabled             EQU FALSE
 
-pt_v3.0b
-  IFD pt_v2.3a
+  IFD DEF_PT_VERSION_2.3A
     INCLUDE "music-tracker/pt2-equals.i"
   ENDC
-  IFD pt_v3.0b
+  IFD DEF_PT_VERSION_3.0B
     INCLUDE "music-tracker/pt3-equals.i"
   ENDC
 pt_ciatiming_enabled            EQU TRUE
 pt_finetune_enabled             EQU FALSE
-  IFD pt_v3.0b
+  IFD DEF_PT_VERSION_3.0B
 pt_metronome_enabled            EQU FALSE
   ENDC
 pt_mute_enabled                 EQU FALSE
@@ -214,10 +216,10 @@ spr_even_color_table_select     EQU 8
 spr_used_number                 EQU 6
 spr_swap_number                 EQU 2
 
-  IFD pt_v2.3a
+  IFD DEF_PT_VERSION_2.3A
 audio_memory_size               EQU 0
   ENDC
-  IFD pt_v3.0b
+  IFD DEF_PT_VERSION_3.0B
 audio_memory_size               EQU 2
   ENDC
 
@@ -282,6 +284,8 @@ bplcon3_bits1                   EQU BPLCON3F_SPRES0
 bplcon3_bits2                   EQU bplcon3_bits1+BPLCON3F_LOCT
 bplcon4_bits                    EQU (BPLCON4F_OSPRM4*spr_odd_color_table_select)+(BPLCON4F_ESPRM4*spr_even_color_table_select)
 diwhigh_bits                 EQU DIWHIGHF_HSTOP1+(((display_window_hstop&$100)>>8)*DIWHIGHF_HSTOP8)+(((display_window_vstop&$700)>>8)*DIWHIGHF_VSTOP8)+DIWHIGHF_hstart1+(((display_window_hstart&$100)>>8)*DIWHIGHF_HSTART8)+((display_window_vstart&$700)>>8)
+
+
 fmode_bits                      EQU FMODEF_BPL32+FMODEF_BPAGEM+FMODEF_SPR32+FMODEF_SPAGEM
 color00_bits                    EQU $090909
 
@@ -853,10 +857,10 @@ spr7_y_size2 EQU sprite7_size/(spr_pixel_per_datafetch/4)
 save_a7                            RS.L 1
 
 ; **** PT-Replay ****
-  IFD pt_v2.3a
+  IFD DEF_PT_VERSION_2.3A
     INCLUDE "music-tracker/pt2-variables-offsets.i"
   ENDC
-  IFD pt_v3.0b
+  IFD DEF_PT_VERSION_3.0B
     INCLUDE "music-tracker/pt3-variables-offsets.i"
   ENDC
 
@@ -964,10 +968,10 @@ bv_object_info_size         RS.B 0
 init_own_variables
 
 ; **** PT-Replay ****
-  IFD pt_v2.3a
+  IFD DEF_PT_VERSION_2.3A
     PT2_INIT_VARIABLES
   ENDC
-  IFD pt_v3.0b
+  IFD DEF_PT_VERSION_3.0B
     PT3_INIT_VARIABLES
   ENDC
 
@@ -2572,10 +2576,10 @@ VERTB_int_server
   ENDC
 
 ; ** PT-replay routine **
-  IFD pt_v2.3a pt_effects_handler
+  IFD DEF_PT_VERSION_2.3A pt_effects_handler
     PT2_REPLAY
   ENDC
-  IFD pt_v3.0b
+  IFD DEF_PT_VERSION_3.0B
     PT3_REPLAY pt_effects_handler
   ENDC
 
@@ -2798,10 +2802,10 @@ sine_table
   INCLUDE "music-tracker/pt-vibrato-tremolo-table.i"
 
 ; ** "Arpeggio/Tone Portamento" **
-  IFD pt_v2.3a
+  IFD DEF_PT_VERSION_2.3A
     INCLUDE "music-tracker/pt2-period-table.i"
   ENDC
-  IFD pt_v3.0b
+  IFD DEF_PT_VERSION_3.0B
     INCLUDE "music-tracker/pt3-period-table.i"
   ENDC
 
