@@ -18,7 +18,6 @@
   MC68040
 
 
-; ** Library-Includes V.3.x nachladen **
   INCDIR "Daten:include3.5/"
 
   INCLUDE "exec/exec.i"
@@ -49,7 +48,6 @@
   INCDIR "Daten:Asm-Sources.AGA/normsource-includes/"
 
 
-; ** Konstanten **
   INCLUDE "equals.i"
 
 requires_030_cpu         EQU FALSE  
@@ -62,12 +60,12 @@ workbench_start_enabled  EQU FALSE
 workbench_fade_enabled         EQU FALSE
 text_output_enabled      EQU FALSE
 
-DEF_PT_VERSION_3.0B
+PROTRACKER_VERSION_3.0B     SET 1
 pt_ciatiming_enabled     EQU TRUE
 pt_usedfx                EQU %1111010001011001
 pt_usedefx               EQU %0000100000000000
 pt_finetune_enabled      EQU FALSE
-  IFD DEF_PT_VERSION_3.0B
+  IFD PROTRACKER_VERSION_3.0B
 pt_metronome_enabled     EQU FALSE
   ENDC
 pt_track_volumes_enabled   EQU FALSE
@@ -126,10 +124,10 @@ spr_y_size2              EQU 0
 spr_depth                EQU 0
 spr_colors_number        EQU 0
 
-  IFD DEF_PT_VERSION_2.3A
+  IFD PROTRACKER_VERSION_2.3A 
 audio_memory_size               EQU 0
   ENDC
-  IFD DEF_PT_VERSION_3.0B
+  IFD PROTRACKER_VERSION_3.0B
 audio_memory_size               EQU 2
   ENDC
 
@@ -173,10 +171,10 @@ cl1_hstart               EQU $00
 cl1_vstart               EQU beam_position&$ff
 
 ; **** PT-Replay ****
-  IFD DEF_PT_VERSION_2.3A
+  IFD PROTRACKER_VERSION_2.3A 
     INCLUDE "music-tracker/pt2-equals.i"
   ENDC
-  IFD DEF_PT_VERSION_3.0B
+  IFD PROTRACKER_VERSION_3.0B
     INCLUDE "music-tracker/pt3-equals.i"
   ENDC
 
@@ -186,19 +184,15 @@ pt_fade_out_delay        EQU 2 ;Ticks
 
 
 
-; ** Struktur, die alle Exception-Vektoren-Offsets enthält **
   INCLUDE "except-vectors-offsets.i"
 
 
-; ** Struktur, die alle Eigenschaften des Extra-Playfields enthält **
   INCLUDE "extra-pf-attributes-structure.i"
 
 
-; ** Struktur, die alle Eigenschaften der Sprites enthält **
   INCLUDE "sprite-attributes-structure.i"
 
 
-; ** Struktur, die alle Registeroffsets der ersten Copperliste enthält **
 
   RSRESET
 
@@ -216,7 +210,6 @@ cl1_end          RS.L 1
 copperlist1_size RS.B 0
 
 
-; ** Struktur, die alle Registeroffsets der zweiten Copperliste enthält **
 
   RSRESET
 
@@ -270,16 +263,18 @@ spr6_y_size2     EQU 0
 spr7_x_size2     EQU spr_x_size2
 spr7_y_size2     EQU 0
 
-; ** Struktur, die alle Variablenoffsets enthält **
+
+  RSRESET
+
   INCLUDE "variables-offsets.i"
 
 ; ** Relative offsets for variables **
 
 ; **** PT-Replay ****
-  IFD DEF_PT_VERSION_2.3A
+  IFD PROTRACKER_VERSION_2.3A 
     INCLUDE "music-tracker/pt2-variables-offsets.i"
   ENDC
-  IFD DEF_PT_VERSION_3.0B
+  IFD PROTRACKER_VERSION_3.0B
     INCLUDE "music-tracker/pt3-variables-offsets.i"
   ENDC
 
@@ -300,15 +295,14 @@ variables_size RS.B 0
 
   INCLUDE "sys-wrapper.i"
 
-; ** Eigene Variablen initialisieren **
   CNOP 0,4
 init_own_variables
 
 ; **** PT-Replay ****
-  IFD DEF_PT_VERSION_2.3A
+  IFD PROTRACKER_VERSION_2.3A 
     PT2_INIT_VARIABLES
   ENDC
-  IFD DEF_PT_VERSION_3.0B
+  IFD PROTRACKER_VERSION_3.0B
     PT3_INIT_VARIABLES
   ENDC
   rts
@@ -337,7 +331,6 @@ init_CIA_timers
   PT_INIT_TIMERS
   rts
 
-; ** Farbregister initialisieren **
   CNOP 0,4
 init_color_registers
   CPU_SELECT_COLOR_HIGH_BANK 0
@@ -363,7 +356,6 @@ init_color_registers
   ENDC
 
 
-; ** 1. Copperliste initialisieren **
   CNOP 0,4
 init_first_copperlist
   move.l  cl1_display(a3),a0 ;Darstellen-CL
@@ -376,7 +368,6 @@ init_first_copperlist
 
   COP_INIT_COPINT cl1,cl1_HSTART,cl1_VSTART,YWRAP
 
-; ** 2. Copperliste initialisieren **
   CNOP 0,4
 init_second_copperlist
   move.l  cl2_display(a3),a0 ;Darstellen-CL
@@ -384,24 +375,17 @@ init_second_copperlist
   rts
 
 
-; ## Hauptprogramm ##
-; a3 ... Basisadresse aller Variablen
-; a4 ... CIA-A-Base
-; a5 ... CIA-B-Base
-; a6 ... DMACONR
   CNOP 0,4
 main_routine
   bsr.s   no_sync_routines
   bra.s   beam_routines
 
 
-; ## Routinen, die nicht mit der Bildwiederholfrequenz gekoppelt sind ##
   CNOP 0,4
 no_sync_routines
   rts
 
 
-; ## Rasterstahl-Routinen ##
   CNOP 0,4
 beam_routines
   bsr     wait_copint
@@ -424,7 +408,6 @@ pt_no_mouse_handler
   ENDC
 
 
-; ## Interrupt-Routinen ##
   INCLUDE "int-autovectors-handlers.i"
 
   IFEQ pt_ciatiming_enabled
@@ -444,7 +427,7 @@ VERTB_int_server
     bra.s   pt_PlayMusic
 
 ; ** Musik ausblenden **
-  PT_FADE_OUT
+  PT_FADE_OUT_VOLUME
 
   ENDC
 
@@ -452,10 +435,10 @@ VERTB_int_server
   IFEQ pt_music_fader_enabled
     CNOP 0,4
   ENDC
-  IFD DEF_PT_VERSION_2.3A
+  IFD PROTRACKER_VERSION_2.3A 
     PT2_REPLAY
   ENDC
-  IFD DEF_PT_VERSION_3.0B
+  IFD PROTRACKER_VERSION_3.0B
     PT3_REPLAY
   ENDC
 
@@ -475,14 +458,12 @@ NMI_int_server
   rts
 
 
-; ## Hilfsroutinen ##
   INCLUDE "help-routines.i"
 
 
-; ## Speicherstellen für Tabellen und Strukturen ##
   INCLUDE "sys-structures.i"
 
-; ** Farben des ersten Playfields **
+
   CNOP 0,4
 pf1_color_table
   DC.L color00_bits
@@ -495,10 +476,10 @@ pf1_color_table
   INCLUDE "music-tracker/pt-vibrato-tremolo-table.i"
 
 ; ** "Arpeggio/Tone Portamento" **
-  IFD DEF_PT_VERSION_2.3A
+  IFD PROTRACKER_VERSION_2.3A 
     INCLUDE "music-tracker/pt2-period-table.i"
   ENDC
-  IFD DEF_PT_VERSION_3.0B
+  IFD PROTRACKER_VERSION_3.0B
     INCLUDE "music-tracker/pt3-period-table.i"
   ENDC
 
@@ -512,15 +493,12 @@ pf1_color_table
   INCLUDE "music-tracker/pt-finetune-starts-table.i"
 
 
-; ## Speicherstellen allgemein ##
   INCLUDE "sys-variables.i"
 
 
-; ## Speicherstellen für Namen ##
   INCLUDE "sys-names.i"
 
 
-; ## Speicherstellen für Texte ##
   INCLUDE "error-texts.i"
 
 program_version DC.B "$VER: old'scool-intro 1.0 beta (10.7.23)",0
