@@ -1229,7 +1229,7 @@ cl1_set_branches_pointers
   add.l   #cl2_extension2_entry,d0
   moveq   #cl1_extension1_size,d4
   bsr.s   cl1_set_jump_entry_pointers
-  move.l  cl1_display(a3),a0 ;Darstellen-CL1
+  move.l  cl1_display(a3),a0 1
   move.l  cl2_display(a3),d0 ;Einsprungadresse = Darstellen-CL2
   add.l   #cl2_extension2_entry,d0
 
@@ -2668,7 +2668,7 @@ rz_set_branches_pointers
   MOVEF.L cl2_extension1_size,d3
   moveq   #cl1_extension1_size,d4
   bsr.s   rz_set_jump_entry_pointers
-  move.l  cl1_display(a3),a0 ;Darstellen-CL1
+  move.l  cl1_display(a3),a0 1
   move.l  cl2_display(a3),d0 ;Einsprungadresse = Darstellen-CL2
 
 ; ** Routine set-jump-entry_pointers **

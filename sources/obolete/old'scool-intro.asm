@@ -358,7 +358,7 @@ init_color_registers
 
   CNOP 0,4
 init_first_copperlist
-  move.l  cl1_display(a3),a0 ;Darstellen-CL
+  move.l  cl1_display(a3),a0 
   bsr.s   cl1_init_playfield_registers
   bsr     cl1_init_copper_interrupt
   COP_LISTEND
@@ -370,7 +370,7 @@ init_first_copperlist
 
   CNOP 0,4
 init_second_copperlist
-  move.l  cl2_display(a3),a0 ;Darstellen-CL
+  move.l  cl2_display(a3),a0 
   COP_LISTEND
   rts
 
