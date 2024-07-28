@@ -1479,8 +1479,7 @@ wst_set_horiz_scroll_speed_fast
   rts
   CNOP 0,4
 wst_stop_scrolltext
-  moveq   #FALSE,d0
-  move.w  d0,wst_enabled(a3) ;Scrolltext aus
+  move.w  #FALSE,wst_enabled(a3) ;Scrolltext aus
   moveq   #0,d0          ;Rückgabewert TRUE = Steuerungscode gefunden
   rts
 
@@ -2008,8 +2007,7 @@ ifi_save_fader_angle
   movem.l (a7)+,a4-a6
   move.w  d6,if_colors_counter(a3) ;Image-Fader-In fertig ?
   bne.s   no_image_fader_in  ;Nein -> verzweige
-  moveq   #FALSE,d0
-  move.w  d0,ifi_active(a3)  ;Image-Fader-In aus
+  move.w  #FALSE,ifi_active(a3)  ;Image-Fader-In aus
 no_image_fader_in
   rts
 
@@ -2072,8 +2070,7 @@ blind_fader_in
   ble.s   bfi_not_finished   ;Nein -> verzweige
 bfi_finished
   move.l  (a7)+,a4
-  moveq   #FALSE,d0
-  move.w  d0,bfi_active(a3)  ;Blind-Fader-In aus
+  move.w  #FALSE,bfi_active(a3)  ;Blind-Fader-In aus
   bra.s   bfi_no_blind_fader_in
   CNOP 0,4
 bfi_not_finished
@@ -2326,8 +2323,7 @@ cube_zoomer_in
   rts
   CNOP 0,4
 czi_finished
-  moveq   #FALSE,d0
-  move.w  d0,czi_active(a3)  ;Cube-Zoomer-In aus
+  move.w  #FALSE,czi_active(a3)  ;Cube-Zoomer-In aus
 no_cube_zoomer_in
   rts
 
@@ -2483,10 +2479,8 @@ mouse_handler
   CNOP 0,4
 mh_quit
   move.w  #wst_stop_text-wst_text,wst_text_table_start(a3) ;Scrolltext beenden
-  moveq   #FALSE,d0
-  move.w  d0,pt_effects_handler_active(a3) ;FX-Abfrage aus
-  moveq   #0,d0
-  move.w  d0,pt_fade_out_music_active(a3) ;Musik ausblenden
+  move.w  #FALSE,pt_effects_handler_active(a3) ;FX-Abfrage aus
+  clr.w   pt_fade_out_music_active(a3) ;Musik ausblenden
 mh_check_part_title
   tst.w   part_title_active(a3) ;Titel-Part aktiv ?
   bne.s   mh_check_part_main ;Nein -> verzweige
@@ -2496,8 +2490,7 @@ mh_check_part_title
   move.w  d0,if_copy_colors_active(a3) ;Kopieren der Farben an
   tst.w   ifi_active(a3)     ;Image-Fader-In aktiv ?
   bne.s   mh_skip1           ;Nein -> verzweige
-  moveq   #FALSE,d0
-  move.w  d0,ifi_active(a3)  ;Image-Fader-In aus
+  move.w  #FALSE,ifi_active(a3)  ;Image-Fader-In aus
 mh_skip1
   rts
   CNOP 0,4
@@ -2507,8 +2500,7 @@ mh_check_part_main
   clr.w   bfo_active(a3)     ;Blind-Fader-Out an
   tst.w   bfi_active(a3)     ;Blind-Fader-In aktiv ?
   bne.s   mh_skip2           ;Nein -> verzweige
-  moveq   #FALSE,d0
-  move.w  d0,bfi_active(a3)  ;Blind-Fader-In aus
+  move.w  #FALSE,bfi_active(a3)  ;Blind-Fader-In aus
 mh_skip2
   rts
 
@@ -2623,8 +2615,7 @@ pt_start_zoomer
   rts
   CNOP 0,4
 pt_stop_zoomer
-  moveq  #FALSE,d0
-  move.w d0,rz_zoomer_active(a3) ;Zoomer aus
+  move.w #FALSE,rz_zoomer_active(a3) ;Zoomer aus
   rts
 
   CNOP 0,4
@@ -2996,7 +2987,6 @@ cube_zoomer_out
   rts
   CNOP 0,4
 czo_finished
-  moveq   #FALSE,d0
-  move.w  d0,czo_active(a3)  ;Cube-Zoomer-Out aus
+  move.w  #FALSE,czo_active(a3)  ;Cube-Zoomer-Out aus
 no_cube_zoomer_out
   rts
