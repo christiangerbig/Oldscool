@@ -57,7 +57,7 @@ requires_fast_memory       EQU FALSE
 requires_multiscan_monitor EQU FALSE
 
 workbench_start_enabled    EQU FALSE
-workbench_fade_enabled     EQU FALSE
+screen_fader_enabled     EQU FALSE
 text_output_enabled        EQU FALSE
 
 PROTRACKER_VERSION_3.0B     SET 1
@@ -118,7 +118,7 @@ pf2_colors_number EQU 0
 pf_colors_number  EQU pf1_colors_number+pf2_colors_number
 pf_depth          EQU pf1_depth3+pf2_depth3
 
-extra_pf_number  EQU 3
+pf_extra_number  EQU 3
 extra_pf1_x_size EQU 128
 extra_pf1_y_size EQU 128
 extra_pf1_depth  EQU 2
@@ -200,9 +200,9 @@ diwstop_bits          EQU ((display_window_vstop&$ff)*DIWSTOPF_V0)+(display_wind
 pf1_plane_width       EQU pf1_x_size3/8
 data_fetch_width      EQU pixel_per_line/8
 pf1_plane_moduli      EQU (pf1_plane_width*(pf1_depth3-1))+pf1_plane_width-data_fetch_width
-extra_pf_plane_width1 EQU extra_pf1_x_size/8
-extra_pf_plane_width2 EQU extra_pf2_x_size/8
-extra_pf_plane_width3 EQU extra_pf3_x_size/8
+pf_extra_plane_width1 EQU extra_pf1_x_size/8
+pf_extra_plane_width2 EQU extra_pf2_x_size/8
+pf_extra_plane_width3 EQU extra_pf3_x_size/8
 
 bplcon0_bits EQU BPLCON0F_ECSENA+BPLCON0F_COLOR
 bplcon0_bits2 EQU BPLCON0F_ECSENA+((pf_depth>>3)*BPLCON0F_BPU3)+(BPLCON0F_COLOR)+((pf_depth&$07)*BPLCON0F_BPU0) 
@@ -431,10 +431,10 @@ segments_number1     EQU 1
   INCLUDE "except-vectors-offsets.i"
 
 
-  INCLUDE "extra-pf-attributes-structure.i"
+  INCLUDE "extra-pf-attributes.i"
 
 
-  INCLUDE "sprite-attributes-structure.i"
+  INCLUDE "sprite-attributes.i"
 
 
 
@@ -811,10 +811,10 @@ variables_size RS.B 0
 
 ; **** PT-Replay ****
 ; ** PT-Song-Structure **
-  INCLUDE "music-tracker/pt-song-structure.i"
+  INCLUDE "music-tracker/pt-song.i"
 
 ; ** Temporary channel structure **
-  INCLUDE "music-tracker/pt-temp-channel-structure.i"
+  INCLUDE "music-tracker/pt-temp-channel.i"
 
 ; **** Blenk-Vectors ****
 ; ** Objekt-Info-Struktur **
@@ -1617,7 +1617,7 @@ bv_no_high
 bv_no_octant4
   sub.w   d1,d3              ;dy=y2-y1
   ror.l   #4,d0              ;Shift-Bits in richtige Position bringen
-  MULUF.W (extra_pf_plane_width1*extra_pf1_depth)/2,d1,d4 ;Y-Offset in Playfield
+  MULUF.W (pf_extra_plane_width1*extra_pf1_depth)/2,d1,d4 ;Y-Offset in Playfield
   add.w   d0,d1              ;Y + X-Offset
   cmp.w   d2,d3              
   ble.s   bv_no_octant5      ;Wenn dy <= dx -> verzweige
@@ -1658,7 +1658,7 @@ bv_check_plane2
   beq.s   bv_no_line         ;Nein -> verzweige
   WAITBLIT
   move.l  d0,BLTCON0-DMACONR(a6) ;BLTCON0 & BLTCON1
-  moveq   #extra_pf_plane_width1,d5
+  moveq   #pf_extra_plane_width1,d5
   move.w  d3,BLTAPTL-DMACONR(a6) ;(4*dy)-(2*dx)
   add.l   d5,d1              ;nächste Plane
   move.l  d1,BLTCPT-DMACONR(a6) ;Playfield lesen
@@ -1683,7 +1683,7 @@ bv_init_line_blit
   move.l  #$ffff8000,BLTBDAT-DMACONR(a6) ;Textur der Linie, Standartwert
   moveq   #FALSE,d0
   move.l  d0,BLTAFWM-DMACONR(a6) ;Keine Ausmask.
-  moveq   #extra_pf_plane_width1*extra_pf1_depth,d0
+  moveq   #pf_extra_plane_width1*extra_pf1_depth,d0
   move.w  d0,BLTCMOD-DMACONR(a6)
   move.w  d0,BLTDMOD-DMACONR(a6)
   rts
@@ -1695,7 +1695,7 @@ bv_fill_image
   WAITBLIT
   move.l  (a0),a0
   move.l  #((BC0F_SRCA+BC0F_DEST+ANBNC+ANBC+ABNC+ABC)<<16)+(BLTCON1F_DESC+BLTCON1F_EFE),BLTCON0-DMACONR(a6) ;Minterm D=A, Füll-Modus, Rückwärts
-  ADDF.W  (extra_pf_plane_width1*extra_pf1_y_size*extra_pf1_depth)-2,a0 ;Ende des Playfieldes
+  ADDF.W  (pf_extra_plane_width1*extra_pf1_y_size*extra_pf1_depth)-2,a0 ;Ende des Playfieldes
   move.l  a0,BLTAPT-DMACONR(a6) ;Quelle
   move.l  a0,BLTDPT-DMACONR(a6) ;Ziel
   moveq   #0,d0
@@ -1840,7 +1840,7 @@ bv_clear_image
 ;  moveq   #TRUE,d2
 ;  move.l  (a7),a7
 ;  moveq   #TRUE,d3
-;  ADDF.W  extra_pf_plane_width1*extra_pf1_y_size*extra_pf1_depth,a7 ;Ende des Playfieldes
+;  ADDF.W  pf_extra_plane_width1*extra_pf1_y_size*extra_pf1_depth,a7 ;Ende des Playfieldes
 ;  moveq   #TRUE,d4
 ;  moveq   #TRUE,d5
 ;  moveq   #TRUE,d6
@@ -1853,7 +1853,7 @@ bv_clear_image
 ;  move.l  d0,a6
 ;  moveq   #2-1,d7            ;Anzahl der Durchläufe (Ausnahme wegen Longword-Alignement)
 ;bv_clear_image_loop
-;  REPT ((extra_pf_plane_width1*extra_pf1_y_size*extra_pf1_depth)/56)/2
+;  REPT ((pf_extra_plane_width1*extra_pf1_y_size*extra_pf1_depth)/56)/2
 ;  movem.l d0-d6/a0-a6,-(a7)  ;56 Bytes löschen
 ;  ENDR
 ;  dbf     d7,bv_clear_image_loop

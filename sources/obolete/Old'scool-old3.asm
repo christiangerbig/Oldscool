@@ -124,7 +124,7 @@ requires_fast_memory            EQU FALSE
 requires_multiscan_monitor      EQU FALSE
 
 workbench_start_enabled EQU FALSE
-workbench_fade_enabled          EQU TRUE
+screen_fader_enabled          EQU TRUE
 text_output_enabled     EQU FALSE
 
 PROTRACKER_VERSION_3.0B     SET 1
@@ -190,7 +190,7 @@ pf2_colors_number               EQU 0
 pf_colors_number                EQU pf1_colors_number+pf2_colors_number
 pf_depth                        EQU pf1_depth3+pf2_depth3
 
-extra_pf_number                 EQU 3
+pf_extra_number                 EQU 3
 extra_pf1_x_size                EQU 128
 extra_pf1_y_size                EQU 128
 extra_pf1_depth                 EQU 2
@@ -503,10 +503,10 @@ extra_memory_size               EQU rz_image_x_size*rz_image_y_size*BYTE_SIZE
   INCLUDE "except-vectors-offsets.i"
 
 
-  INCLUDE "extra-pf-attributes-structure.i"
+  INCLUDE "extra-pf-attributes.i"
 
 
-  INCLUDE "sprite-attributes-structure.i"
+  INCLUDE "sprite-attributes.i"
 
 
 
@@ -931,10 +931,10 @@ variables_size                     RS.B 0
 
 ; **** PT-Replay ****
 ; ** PT-Song-Structure **
-  INCLUDE "music-tracker/pt-song-structure.i"
+  INCLUDE "music-tracker/pt-song.i"
 
 ; ** Temporary channel structure **
-  INCLUDE "music-tracker/pt-temp-channel-structure.i"
+  INCLUDE "music-tracker/pt-temp-channel.i"
 
 ; **** Blenk-Vectors ****
 ; ** Objekt-Info-Struktur **
