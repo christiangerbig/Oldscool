@@ -402,7 +402,7 @@ beam_routines
 pt_mouse_handler
     btst    #POTINPB_DATLY,POTINP-DMACONR(a6) ;Rechte Mustaste gedrückt?
     bne.s   pt_no_mouse_handler ;Nein -> verzweige
-    clr.w   pt_fade_out_music_active(a3) ;Fader an
+    clr.w   pt_music_fader_active(a3) ;Fader an
 pt_no_mouse_handler
     rts
   ENDC
@@ -423,7 +423,7 @@ VERTB_int_server
   ENDC
 
   IFEQ pt_music_fader_enabled
-    bsr.s   pt_fade_out_music
+    bsr.s   pt_music_fader
     bra.s   pt_PlayMusic
 
 ; ** Musik ausblenden **

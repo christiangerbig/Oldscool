@@ -2139,7 +2139,7 @@ bfo_finished
   moveq   #FALSE,d0
   move.w  d0,bfo_active(a3)  ;Blind-Fader-Out aus
   move.w  d0,part_main_active(a3) ;Main-Part deaktivieren
-  tst.w   pt_fade_out_music_active(a3) ;Wird die Musik ausgeblendet ?
+  tst.w   pt_music_fader_active(a3) ;Wird die Musik ausgeblendet ?
   beq.s   bfo_no_blind_fader_out ;Ja -> verzweige
 bfo_restart_intro
   bsr     init_own_variables2
@@ -2480,7 +2480,7 @@ mouse_handler
 mh_quit
   move.w  #wst_stop_text-wst_text,wst_text_table_start(a3) ;Scrolltext beenden
   move.w  #FALSE,pt_effects_handler_active(a3) ;FX-Abfrage aus
-  clr.w   pt_fade_out_music_active(a3) ;Musik ausblenden
+  clr.w   pt_music_fader_active(a3) ;Musik ausblenden
 mh_check_part_title
   tst.w   part_title_active(a3) ;Titel-Part aktiv ?
   bne.s   mh_check_part_main ;Nein -> verzweige
@@ -2520,7 +2520,7 @@ VERTB_int_server
   ENDC
 
   IFEQ pt_music_fader_enabled
-    bsr.s   pt_fade_out_music
+    bsr.s   pt_music_fader
     bra.s   pt_PlayMusic
 
 ; ** Musik ausblenden **

@@ -895,7 +895,7 @@ czi_active     RS.W 1
 czi_zoom_angle RS.W 1
 
 ; **** Main ****
-intro_active         RS.W 1
+fx_active         RS.W 1
 part_title_active    RS.W 1
 part_main_active     RS.W 1
 
@@ -1006,7 +1006,7 @@ init_own_variables2
   move.w  d0,czi_zoom_angle(a3)
 
 ; **** Main ****
-  move.w  d1,intro_active(a3)
+  move.w  d1,fx_active(a3)
   move.w  d1,part_title_active(a3)
   move.w  d1,part_main_active(a3)
   rts
@@ -1330,7 +1330,7 @@ beam_routines
   bsr     swap_images
   bsr     bfi_blind_fader_in
   bsr     bfo_blind_fader_out
-  tst.w   intro_active(a3)   ;Intro beendet ?
+  tst.w   fx_active(a3)   ;Intro beendet ?
   bne.s   beam_routines      ;Nein -> verzweige
   rts
 
@@ -1673,7 +1673,7 @@ bfo_finished
   moveq   #FALSE,d0
   move.w  d0,bfo_active(a3)  ;Blind-Fader-Out aus
   move.w  d0,part_main_active(a3)
-  tst.w   pt_fade_out_music_active(a3)
+  tst.w   pt_music_fader_active(a3)
   beq.s   bfo_no_blind_fader_out
   bsr     init_own_variables2
   bsr     wst_init_characters_x_positions
@@ -2721,7 +2721,7 @@ mh_quit_intro
   moveq   #FALSE,d0
   move.w  d0,pt_effects_handler_active(a3) ;FX-Abfrage aus
   moveq   #0,d0
-  move.w  d0,pt_fade_out_music_active(a3) ;Musik ausblenden
+  move.w  d0,pt_music_fader_active(a3) ;Musik ausblenden
 mh_check_part_title
   tst.w   part_title_active(a3)
   bne.s   mh_check_part_main
@@ -2776,11 +2776,11 @@ VERTB_int_server
   ENDC
 
   IFEQ pt_music_fader_enabled
-    bsr.s   pt_fade_out_music
+    bsr.s   pt_music_fader
     bra.s   pt_PlayMusic
 
 ; ** Musik ausblenden **
-  PT_FADE_OUT_VOLUME intro_active
+  PT_FADE_OUT_VOLUME fx_active
 
   ENDC
 
