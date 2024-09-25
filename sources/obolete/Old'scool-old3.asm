@@ -952,7 +952,7 @@ bv_object_info_size         RS.B 0
   INCLUDE "sys-wrapper.i"
 
   CNOP 0,4
-init_own_variables
+init_main_variables
 
 ; **** PT-Replay ****
   IFD PROTRACKER_VERSION_2.3A 
@@ -964,7 +964,7 @@ init_own_variables
 
   move.w  d0,pt_effects_handler_active(a3)
 
-init_own_variables2
+init_main_variables2
 ; **** Rotation-Zoomer ****
   moveq   #FALSE,d1
   move.w  d1,rz_active(a3)
@@ -1047,7 +1047,7 @@ init_own_variables2
 
 ; ** Alle Initialisierungsroutinen ausführen **
   CNOP 0,4
-init_all
+init_main
   bsr.s   pt_DetectSysFrequ
   bsr.s   init_CIA_timers
   bsr     init_sprites
@@ -1305,7 +1305,7 @@ cl2_init_noop
 
 
   CNOP 0,4
-main_routine
+main
   bsr.s   no_sync_routines
   bra.s   beam_routines
 
@@ -2224,7 +2224,7 @@ bfo_finished
   tst.w   pt_music_fader_active(a3) ;Wird die Musik ausgeblendet ?
   beq.s   bfo_no_blind_fader_out ;Ja -> verzweige
 bfo_restart_intro
-  bsr     init_own_variables2
+  bsr     init_main_variables2
   bsr     wst_init_characters_x_positions
   bsr     init_color_registers2
   bsr     set_noop_screen

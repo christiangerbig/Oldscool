@@ -901,7 +901,7 @@ bv_object_info_size         RS.B 0
   INCLUDE "sys-wrapper.i"
 
   CNOP 0,4
-init_own_variables
+init_main_variables
 
 ; **** PT-Replay ****
   IFD PROTRACKER_VERSION_2.3A 
@@ -911,7 +911,7 @@ init_own_variables
     PT3_INIT_VARIABLES
   ENDC
 
-init_own_variables2
+init_main_variables2
 ; **** Chunky-Rotation-Zoomer ****
   moveq   #FALSE,d1
   move.w  d1,crz_active(a3)
@@ -986,7 +986,7 @@ init_own_variables2
 
 ; ** Alle Initialisierungsroutinen ausführen **
   CNOP 0,4
-init_all
+init_main
   bsr.s   pt_DetectSysFrequ
   bsr.s   init_CIA_timers
   bsr     init_sprites
@@ -1270,7 +1270,7 @@ cl2_init_noop
 
 
   CNOP 0,4
-main_routine
+main
   bsr.s   no_sync_routines
   bra.s   beam_routines
 
@@ -1641,7 +1641,7 @@ bfo_blind_fader_out
   bpl.s   bfo_not_finished  ;Wenn positiv -> verzweige
 bfo_finished
   not.w   bfo_active(a3)    ;Blind-Fader-Out aus
-  bsr     init_own_variables2
+  bsr     init_main_variables2
   bsr     wst_init_characters_x_positions
   bsr     init_color_registers2
   bsr     set_noop_screen

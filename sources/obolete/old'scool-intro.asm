@@ -296,7 +296,7 @@ variables_size RS.B 0
   INCLUDE "sys-wrapper.i"
 
   CNOP 0,4
-init_own_variables
+init_main_variables
 
 ; **** PT-Replay ****
   IFD PROTRACKER_VERSION_2.3A 
@@ -309,7 +309,7 @@ init_own_variables
 
 ; ** Alle Initialisierungsroutinen ausführen **
   CNOP 0,4
-init_all
+init_main
   bsr.s   pt_DetectSysFrequ
   bsr.s   init_CIA_timers
   bsr.s   init_color_registers
@@ -376,7 +376,7 @@ init_second_copperlist
 
 
   CNOP 0,4
-main_routine
+main
   bsr.s   no_sync_routines
   bra.s   beam_routines
 
