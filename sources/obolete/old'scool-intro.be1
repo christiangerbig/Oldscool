@@ -467,7 +467,7 @@ init_main_variables
 init_main
   bsr.s   pt_DetectSysFrequ
   bsr.s   init_CIA_timers
-  bsr.s   init_color_registers
+  bsr.s   init_colors
   bsr     pt_InitRegisters
   bsr     pt_InitAudTempStrucs
   bsr     pt_ExamineSongStruc
@@ -477,7 +477,7 @@ init_main
   bsr     crz_convert_image_data
   bsr     init_first_copperlist
   bsr     copy_first_copperlist
-  bsr     cl1_set_branches_pointers
+  bsr     cl1_set_branches_ptrs
   bsr     init_second_copperlist
   bra     copy_second_copperlist
 
@@ -491,9 +491,9 @@ init_CIA_timers
   rts
 
   CNOP 0,4
-init_color_registers
+init_colors
   CPU_SELECT_COLOR_HIGH_BANK 0
-  CPU_INIT_COLOR_HIGH COLOR00,32,pf1_color_table
+  CPU_INIT_COLOR_HIGH COLOR00,32,pf1_rgb8_color_table
   CPU_SELECT_COLOR_HIGH_BANK 1
   CPU_INIT_COLOR_HIGH COLOR00,32
   CPU_SELECT_COLOR_HIGH_BANK 2
@@ -502,7 +502,7 @@ init_color_registers
   CPU_INIT_COLOR_HIGH COLOR00,32
 
   CPU_SELECT_COLOR_LOW_BANK 0
-  CPU_INIT_COLOR_LOW COLOR00,32,pf1_color_table
+  CPU_INIT_COLOR_LOW COLOR00,32,pf1_rgb8_color_table
   CPU_SELECT_COLOR_LOW_BANK 1
   CPU_INIT_COLOR_LOW COLOR00,32
   CPU_SELECT_COLOR_LOW_BANK 2
@@ -533,15 +533,15 @@ init_color_registers
   CNOP 0,4
 init_first_copperlist
   move.l  cl1_construction2(a3),a0 
-  bsr.s   cl1_init_playfield_registers
+  bsr.s   cl1_init_playfield_props
   IFNE open_border_enabled 
-    bsr.s   cl1_init_bitplane_pointers
+    bsr.s   cl1_init_plane_ptrs
     bsr.s   cl1_init_branches
     bsr     cl1_init_copper_interrupt
     COP_LISTEND
-    bra     cl1_set_bitplane_pointers
+    bra     cl1_set_plane_ptrs
   ELSE
-    bsr.s   cl1_init_branches_pointers
+    bsr.s   cl1_init_branches_ptrs
     bsr.s   cl1_init_copper_interrupt
     COP_LISTEND
     rts
@@ -559,20 +559,20 @@ init_first_copperlist
   ENDC
 
   CNOP 0,4
-cl1_init_branches_pointers
+cl1_init_branches_ptrs
   move.l  #(((cl1_vstart1<<24)+(((cl1_hstart1/4)*2)<<16))|$10000)|$fffe,d0 ;WAIT-Befehl
   moveq   #2,d1              ;X-Verschiebung $00020000
   swap    d1
   moveq   #1,d2
   ror.l   #8,d2              ;Y-Additionswert $01000000
   moveq   #cl2_display_y_size-1,d7 ;Anzahl der Zeilen
-cl1_init_branches_pointers_loop1
+cl1_init_branches_ptrs_loop1
   move.w  #COP2LCH,(a0)
   addq.w  #4,a0
   move.w  #COP2LCL,(a0)
   addq.w  #4,a0
   moveq   #crz_disp_y_scale_factor-1,d6 ;Anzahl der Abschnitte für Y-Skalierung
-cl1_init_branches_pointers_loop2
+cl1_init_branches_ptrs_loop2
   move.l  d0,(a0)+           ;WAIT x,y
   move.w  #COP1LCH,(a0)
   addq.w  #4,a0
@@ -581,8 +581,8 @@ cl1_init_branches_pointers_loop2
   eor.l   d1,d0              ;X-Shift
   add.l   d2,d0              ;nächste Zeile
   COP_MOVEQ TRUE,COPJMP2
-  dbf     d6,cl1_init_branches_pointers_loop2
-  dbf     d7,cl1_init_branches_pointers_loop1
+  dbf     d6,cl1_init_branches_ptrs_loop2
+  dbf     d7,cl1_init_branches_ptrs_loop1
   rts
 
   COP_INIT_COPINT cl1,cl1_hstart2,cl1_vstart2
@@ -594,23 +594,23 @@ cl1_init_branches_pointers_loop2
   COPY_COPPERLIST cl1,2
 
   CNOP 0,4
-cl1_set_branches_pointers
+cl1_set_branches_ptrs
   move.l  cl1_construction2(a3),a0 1
   moveq   #cl1_subextension1_size,d2
   move.l  cl2_construction2(a3),d0 ;Einsprungadresse = Aufbau-CL2
   MOVEF.L cl2_extension1_size,d3
   moveq   #cl1_extension1_size,d4
-  bsr.s   cl1_set_jump_entry_pointers
+  bsr.s   cl1_set_jump_entry_ptrs
   move.l  cl1_display(a3),a0 1
   move.l  cl2_display(a3),d0 ;Einsprungadresse = Darstellen-CL2
 
-; ** Routine set-jump-entry_pointers **
+; ** Routine set-jump-entry_ptrs **
 ; a0 ... Copperliste1
 ; d0 ... Einsprungadresse Copperliste2
 ; d2 ... cl1_subextension1_size
 ; d3 ... cl2_extension1_size
 ; d4 ... cl1_extension1_size
-cl1_set_jump_entry_pointers
+cl1_set_jump_entry_ptrs
   moveq   #cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subextension1_size,d1 ;Offset Rücksprungadresse CL1
   add.l   a0,d1              ;+ Rücksprungadresse CL1
   lea     cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subext1_COP1LCH+2(a0),a1
@@ -641,23 +641,23 @@ cl1_set_branches_loop2
 init_second_copperlist
   move.l  cl2_construction2(a3),a0 
 
-cl2_init_bplcon4_registers
+cl2_init_bplcon4
   move.l  #(BPLCON4<<16)+bplcon4_bits,d0
   IFEQ open_border_enabled 
     move.w  #BPL1DAT,d1
   ENDC
   moveq   #cl2_display_y_size-1,d7
-cl2_init_bplcon4_registers_loop1
+cl2_init_bplcon4_loop1
   IFEQ open_border_enabled 
     move.w  d1,(a0)
     addq.w  #4,a0
   ENDC
   moveq   #cl2_display_width-1,d6 ;Anzahl der Spalten
-cl2_init_bplcon4_registers_loop2
+cl2_init_bplcon4_loop2
   move.l  d0,(a0)+           ;BPLCON4
-  dbf     d6,cl2_init_bplcon4_registers_loop2
+  dbf     d6,cl2_init_bplcon4_loop2
   COP_MOVEQ TRUE,COPJMP1
-  dbf     d7,cl2_init_bplcon4_registers_loop1
+  dbf     d7,cl2_init_bplcon4_loop1
   rts
 
   COPY_COPPERLIST cl2,2
@@ -847,7 +847,7 @@ NMI_int_server
 
 
   CNOP 0,4
-pf1_color_table
+pf1_rgb8_color_table
   INCLUDE "Daten:Asm-Sources.AGA/old'scool-intro/colourtables/256x256x128-Tunnel.ct"
 
 ; ** Sinus / Cosinustabelle **

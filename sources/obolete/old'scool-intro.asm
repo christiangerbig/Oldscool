@@ -312,7 +312,7 @@ init_main_variables
 init_main
   bsr.s   pt_DetectSysFrequ
   bsr.s   init_CIA_timers
-  bsr.s   init_color_registers
+  bsr.s   init_colors
   bsr     pt_InitRegisters
   bsr     pt_InitAudTempStrucs
   bsr     pt_ExamineSongStruc
@@ -332,12 +332,12 @@ init_CIA_timers
   rts
 
   CNOP 0,4
-init_color_registers
+init_colors
   CPU_SELECT_COLOR_HIGH_BANK 0
-  CPU_INIT_COLOR_HIGH COLOR00,1,pf1_color_table
+  CPU_INIT_COLOR_HIGH COLOR00,1,pf1_rgb8_color_table
 
   CPU_SELECT_COLOR_LOW_BANK 0
-  CPU_INIT_COLOR_LOW COLOR00,1,pf1_color_table
+  CPU_INIT_COLOR_LOW COLOR00,1,pf1_rgb8_color_table
   rts
 
 ; ** Audioregister initialisieren **
@@ -359,7 +359,7 @@ init_color_registers
   CNOP 0,4
 init_first_copperlist
   move.l  cl1_display(a3),a0 
-  bsr.s   cl1_init_playfield_registers
+  bsr.s   cl1_init_playfield_props
   bsr     cl1_init_copper_interrupt
   COP_LISTEND
   rts
@@ -465,7 +465,7 @@ NMI_int_server
 
 
   CNOP 0,4
-pf1_color_table
+pf1_rgb8_color_table
   DC.L color00_bits
 
 ; ** Tables for effect commands **

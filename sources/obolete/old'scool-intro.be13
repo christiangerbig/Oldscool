@@ -172,7 +172,7 @@ extra_memory_sizeEQU 256*256
 
 chip_memory_size EQU 0
 
-OS_VERSION_AGA EQU 39
+OS3_VERSION EQU 39
 
 ciaa_cra_bits      EQU CIACRAF_LOAD+CIACRAF_RUNMODE ;oneshot
   IFEQ pt_ciatiming_enabled
@@ -999,7 +999,7 @@ init_main
   bsr.s   pt_DetectSysFrequ
   bsr.s   init_CIA_timers
   bsr     init_sprites
-  bsr     init_color_registers
+  bsr     init_colors
   bsr     pt_InitRegisters
   bsr     pt_InitAudTempStrucs
   bsr     pt_ExamineSongStruc
@@ -1011,10 +1011,10 @@ init_main
   bsr     wst_init_characters_x_positions
   bsr     bv_convert_RGB8_to_RGB4
   bsr     bv_init_object1_info_table
-  bsr     bg_copy_image_to_bitplane
+  bsr     bg_copy_image_to_plane
   bsr     init_first_copperlist
   bsr     copy_first_copperlist
-  bsr     cl1_set_branches_pointers
+  bsr     cl1_set_branches_ptrs
   bsr     init_second_copperlist
   bra     copy_second_copperlist
 
@@ -1038,7 +1038,7 @@ init_CIA_timers
 ; ** Sprites initialisieren **
   CNOP 0,4
 init_sprites
-  bsr.s   spr_init_pointers_table
+  bsr.s   spr_init_ptrs_table
   bra     spr_copy_structures
 
 ; ** Tabelle mit Zeigern auf Sprites initialisieren **
@@ -1049,7 +1049,7 @@ init_sprites
   COPY_SPRITE_STRUCTURES
 
   CNOP 0,4
-init_color_registers
+init_colors
   rts
 
 ; **** PT-Replay ****
@@ -1084,7 +1084,7 @@ init_color_registers
   CNOP 0,4
 bv_convert_RGB8_to_RGB4
   lea     bv_color_table(pc),a0 ;Zeiger auf Farbtabelle
-  move.w  #$0f0f,d3
+  move.w  #GB_NIBBLES_MASK,d3
   move.w  #segments_number1-1,d7 ;Anzahl der Segemente
 bv_convert_RGB8_to_RGB4_loop1
   move.w  #color_values_number1-1,d6 ;Anzahl der Einträge in der Zieltabelle
@@ -1122,22 +1122,22 @@ bv_init_object1_info_table_loop
   CNOP 0,4
 init_first_copperlist
   move.l  cl1_construction2(a3),a0 ;CL
-  bsr.s   cl1_init_playfield_registers
-  bsr.s   cl1_init_sprite_pointers
-  bsr.s   cl1_init_color_registers
-  bsr     cl1_init_bitplane_pointers
-  bsr     cl1_init_branches_pointers
+  bsr.s   cl1_init_playfield_props
+  bsr.s   cl1_init_sprite_ptrs
+  bsr.s   cl1_init_colors
+  bsr     cl1_init_plane_ptrs
+  bsr     cl1_init_branches_ptrs
   bsr     cl1_init_copper_interrupt
   COP_LISTEND
-  bsr     cl1_set_sprite_pointers
-  bra     cl1_set_bitplane_pointers
+  bsr     cl1_set_sprite_ptrs
+  bra     cl1_set_plane_ptrs
 
   COP_INIT_PLAYFIELD_REGISTERS cl1
   COP_INIT_SPRITE_POINTERS cl1
 
   CNOP 0,4
-cl1_init_color_registers
-  COP_INIT_COLOR_HIGH COLOR00,32,pf1_color_table
+cl1_init_colors
+  COP_INIT_COLOR_HIGH COLOR00,32,pf1_rgb8_color_table
   COP_SELECT_COLOR_HIGH_BANK 1
   COP_INIT_COLOR_HIGH COLOR00,32
   COP_SELECT_COLOR_HIGH_BANK 2
@@ -1145,10 +1145,10 @@ cl1_init_color_registers
   COP_SELECT_COLOR_HIGH_BANK 3
   COP_INIT_COLOR_HIGH COLOR00,32
   COP_SELECT_COLOR_HIGH_BANK 4
-  COP_INIT_COLOR_HIGH COLOR00,16,spr_color_table
+  COP_INIT_COLOR_HIGH COLOR00,16,spr_rgb8_color_table
 
   COP_SELECT_COLOR_LOW_BANK 0
-  COP_INIT_COLOR_LOW COLOR00,32,pf1_color_table
+  COP_INIT_COLOR_LOW COLOR00,32,pf1_rgb8_color_table
   COP_SELECT_COLOR_LOW_BANK 1
   COP_INIT_COLOR_LOW COLOR00,32
   COP_SELECT_COLOR_LOW_BANK 2
@@ -1156,26 +1156,26 @@ cl1_init_color_registers
   COP_SELECT_COLOR_LOW_BANK 3
   COP_INIT_COLOR_LOW COLOR00,32
   COP_SELECT_COLOR_LOW_BANK 4
-  COP_INIT_COLOR_LOW COLOR00,16,spr_color_table
+  COP_INIT_COLOR_LOW COLOR00,16,spr_rgb8_color_table
   rts
 
   COP_INIT_BITPLANE_POINTERS cl1
 
   CNOP 0,4
-cl1_init_branches_pointers
+cl1_init_branches_ptrs
   move.l  #(((cl1_vstart1<<24)+(((cl1_hstart1/4)*2)<<16))|$10000)|$fffe,d0 ;WAIT-Befehl
   moveq   #2,d1              ;X-Verschiebung $00020000
   swap    d1
   moveq   #1,d2
   ror.l   #8,d2              ;Y-Additionswert $01000000
   moveq   #cl2_display_y_size-1,d7 ;Anzahl der Zeilen
-cl1_init_branches_pointers_loop1
+cl1_init_branches_ptrs_loop1
   move.w  #COP2LCH,(a0)
   addq.w  #4,a0
   move.w  #COP2LCL,(a0)
   addq.w  #4,a0
   moveq   #crz_display_y_scale_factor-1,d6 ;Anzahl der Abschnitte für Y-Skalierung
-cl1_init_branches_pointers_loop2
+cl1_init_branches_ptrs_loop2
   move.l  d0,(a0)+           ;WAIT x,y
   COP_MOVEQ TRUE,SPR6POS
   COP_MOVEQ TRUE,SPR7POS
@@ -1186,8 +1186,8 @@ cl1_init_branches_pointers_loop2
   eor.l   d1,d0              ;X-Shift
   add.l   d2,d0              ;nächste Zeile
   COP_MOVEQ TRUE,COPJMP2
-  dbf     d6,cl1_init_branches_pointers_loop2
-  dbf     d7,cl1_init_branches_pointers_loop1
+  dbf     d6,cl1_init_branches_ptrs_loop2
+  dbf     d7,cl1_init_branches_ptrs_loop1
   rts
 
   COP_INIT_COPINT cl1,cl1_hstart2,cl1_vstart2
@@ -1199,23 +1199,23 @@ cl1_init_branches_pointers_loop2
   COPY_COPPERLIST cl1,2
 
   CNOP 0,4
-cl1_set_branches_pointers
+cl1_set_branches_ptrs
   move.l  cl1_construction2(a3),a0 1
   moveq   #cl1_subextension1_size,d2
   move.l  cl2_construction2(a3),d0 ;Einsprungadresse = Aufbau-CL2
   add.l   #cl2_extension2_entry,d0
   moveq   #cl1_extension1_size,d4
-  bsr.s   cl1_set_jump_entry_pointers
+  bsr.s   cl1_set_jump_entry_ptrs
   move.l  cl1_display(a3),a0 1
   move.l  cl2_display(a3),d0 ;Einsprungadresse = Darstellen-CL2
   add.l   #cl2_extension2_entry,d0
 
-; ** Routine set-jump-entry_pointers **
+; ** Routine set-jump-entry_ptrs **
 ; a0 ... Copperliste1
 ; d0 ... Einsprungadresse Copperliste2
 ; d2 ... cl1_subextension1_size
 ; d4 ... cl1_extension1_size
-cl1_set_jump_entry_pointers
+cl1_set_jump_entry_ptrs
   MOVEF.L cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subextension1_size,d1 ;Offset Rücksprungadresse CL1
   add.l   a0,d1              ;+ Rücksprungadresse CL1
   lea     cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subext1_COP1LCH+2(a0),a1
@@ -1244,25 +1244,25 @@ cl1_set_branches_loop2
   CNOP 0,4
 init_second_copperlist
   move.l  cl2_construction2(a3),a0 
-  bsr     cl2_init_bplcon4_registers
+  bsr     cl2_init_bplcon4
   bra     cl2_init_noop
 
-cl2_init_bplcon4_registers
+cl2_init_bplcon4
   move.l  #(BPLCON4<<16)+bplcon4_bits,d0
   IFEQ open_border_enabled 
     move.l  #BPL1DAT<<16,d1
   ENDC
   moveq   #cl2_display_y_size-1,d7
-cl2_init_bplcon4_registers_loop1
+cl2_init_bplcon4_loop1
   IFEQ open_border_enabled 
     move.l  d1,(a0)+         ;BPL1DAT
   ENDC
   moveq   #cl2_display_width-1,d6 ;Anzahl der Spalten
-cl2_init_bplcon4_registers_loop2
+cl2_init_bplcon4_loop2
   move.l  d0,(a0)+           ;BPLCON4
-  dbf     d6,cl2_init_bplcon4_registers_loop2
+  dbf     d6,cl2_init_bplcon4_loop2
   COP_MOVEQ TRUE,COPJMP1
-  dbf     d7,cl2_init_bplcon4_registers_loop1
+  dbf     d7,cl2_init_bplcon4_loop1
   rts
 
   CNOP 0,4
@@ -1650,9 +1650,9 @@ bfo_finished
   not.w   bfo_active(a3)    ;Blind-Fader-Out aus
   bsr     init_main_variables2
   bsr     wst_init_characters_x_positions
-  bsr     init_color_registers2
+  bsr     init_colors2
   bsr     set_noop_screen
-  bsr     cl1_set_branches_pointers
+  bsr     cl1_set_branches_ptrs
   moveq   #0,d0
   move.w  d0,COPJMP1-DMACONR(a6)
   bra.s   bfo_no_blind_fader_out
@@ -1689,7 +1689,7 @@ bfo_no_blind_fader_out
   rts
 
   CNOP 0,4
-init_color_registers2
+init_colors2
 ; ***** Playfield *****
   lea     ifo_color_table(pc),a0 ;Farbwerte
   move.l  cl1_construction2(a3),a1 ;CL
@@ -1701,7 +1701,7 @@ init_color_registers2
     moveq   #TRUE,d4         ;Farbregisterzähler
   ENDC
   moveq   #bg_image_colors_number-1,d7 ;Anzahl der Farben
-init_color_registers2_loop
+init_colors2_loop
   move.l  (a0)+,d0           ;RGB8-Farbwert 
   move.l  d0,d1              
   RGB8_TO_RGB4_HIGH d0,d2,d3
@@ -1719,9 +1719,9 @@ init_color_registers2_loop
     addq.w  #4,a2            ;BPLCON3 überspringen
 no_color_bank_restart
   ENDC
-  dbf     d7,init_color_registers2_loop
+  dbf     d7,init_colors2_loop
 ; **** Sprites ****
-  lea     spr_color_table(pc),a0 ;Farbwerte
+  lea     spr_rgb8_color_table(pc),a0 ;Farbwerte
   move.l  cl1_construction2(a3),a1 ;CL
   ADDF.W  cl1_COLOR00_high5+2,a1
   move.l  cl1_display(a3),a2 ;CL
@@ -1731,7 +1731,7 @@ no_color_bank_restart
     moveq   #TRUE,d4         ;Farbregisterzähler
   ENDC
   moveq   #spr_colors_number-1,d7 ;Anzahl der Farben
-init_color_registers2_loop2
+init_colors2_loop2
   move.l  (a0)+,d0           ;RGB8-Farbwert 
   move.l  d0,d1              
   RGB8_TO_RGB4_HIGH d0,d2,d3
@@ -1749,7 +1749,7 @@ init_color_registers2_loop2
     addq.w  #4,a2            ;BPLCON3 überspringen
 no_color_bank_restart2
   ENDC
-  dbf     d7,init_color_registers2_loop2
+  dbf     d7,init_colors2_loop2
   rts
 
   CNOP 0,4
@@ -1800,7 +1800,7 @@ wave_scrolltext
   bne     no_wave_scrolltext ;Nein -> verzweige
   movem.l a4-a6,-(a7)
   lea     wst_characters_x_positions(pc),a2 ;X-Positionen der Chars
-  lea     spr_pointers_display(pc),a4 ;Zeiger auf Sprites
+  lea     spr_ptrs_display(pc),a4 ;Zeiger auf Sprites
   lea     sine_table(pc),a5  ;Zeiger auf Sinustabelle
   move.w  wst_y_angle(a3),d4  ;Y-Winkel
   move.w  d4,d0              
@@ -1997,7 +1997,7 @@ bv_move_lightsource
 bv_rotation
   movem.l a4-a6,-(a7)
   lea     bv_3d_object(pc),a0 ;Koordinaten der Linien
-  lea     bv_xyz_rotation_coordinates(pc),a1 ;Koord.-Tab.
+  lea     bv_xyz_rotation_coords(pc),a1 ;Koord.-Tab.
   lea     sine_table(pc),a2   
   move.w  #sine_table_length/4,a6 ;90 Grad
   move.w  bv_x_rotation_angle(a3),d0 ;X-Winkel
@@ -2118,7 +2118,7 @@ bv_draw_lines
   bsr     bv_init_line_blit
   lea     bv_object1_info_table(pc),a0 ;Zeiger auf Info-Daten zum Objekt
   move.l  a7,save_a7(a3)     ;Alten Stackpointer retten
-  lea     bv_xyz_rotation_coordinates(pc),a1 ;Zeiger auf XYZ-Koordinaten
+  lea     bv_xyz_rotation_coords(pc),a1 ;Zeiger auf XYZ-Koordinaten
   move.l  extra_pf2(a3),a2   ;Plane0
   move.l  cl1_construction2(a3),a4 ;CL
   ADDF.W  cl1_COLOR12_high5+2,a4 ;Farbregister
@@ -2297,7 +2297,7 @@ bv_copy_image
   move.l  a4,-(a7)
   move.l  extra_pf3(a3),a0
   move.l  (a0),a0            ;Puffer
-  lea     spr_pointers_construction+(6*4)(pc),a2 ;Aufbau-Sprites
+  lea     spr_ptrs_construction+(6*4)(pc),a2 ;Aufbau-Sprites
   move.l  (a2)+,a1           ;Sprite6
   ADDF.W  (spr_pixel_per_datafetch/4),a1 ;Header überspringen
   move.l  (a2),a2            ;Sprite7
@@ -2321,7 +2321,7 @@ bv_copy_image_loop
   CNOP 0,4
 bv_move_sprites
   movem.l a3-a6,-(a7)
-  lea     spr_pointers_construction+(6*4)(pc),a1 ;Zeiger auf Sprites
+  lea     spr_ptrs_construction+(6*4)(pc),a1 ;Zeiger auf Sprites
   move.w  #bv_sprite_x_max,a2
   move.w  #bv_sprite_y_max,a4
   move.w  bv_sprite_x_coordinate(a3),d3 ;X-Koord
@@ -2387,7 +2387,7 @@ bv_move_sprites_loop
   CNOP 0,4
 bv_wobble_sprites
   movem.l a4-a6,-(a7)
-  lea     spr_pointers_construction+(6*4)(pc),a0 ;Zeiger auf Sprites
+  lea     spr_ptrs_construction+(6*4)(pc),a0 ;Zeiger auf Sprites
   move.l  (a0)+,a2           ;Sprite6-Struktur
   move.w  (a2),a5            ;SPR6POS
   move.l  (a0),a2            ;Sprite7-Struktur
@@ -2800,8 +2800,8 @@ pt_fade_out_image_on
   CNOP 0,4
 pt_fade_in_chunky_rotation_zoomer_on
   movem.l d0-d7/a0-a6,-(a7)
-  bsr.s   crz_init_color_registers
-  bsr     crz_set_branches_pointers
+  bsr.s   crz_init_colors
+  bsr     crz_set_branches_ptrs
   move.l  cl1_construction2(a3),a0 ;CL
   move.w  #bplcon0_bits,cl1_BPLCON0+2(a0)
   move.l  cl1_display(a3),a0 ;CL
@@ -2831,8 +2831,8 @@ pt_zoomer_off
   rts
 
   CNOP 0,4
-crz_init_color_registers
-  lea     pf1_color_table+(bg_image_colors_number*4),a0
+crz_init_colors
+  lea     pf1_rgb8_color_table+(bg_image_colors_number*4),a0
   move.l  cl1_construction2(a3),a1 ;CL
   ADDF.W  cl1_COLOR00_high1+2,a1
   move.l  cl1_display(a3),a2 ;CL
@@ -2842,7 +2842,7 @@ crz_init_color_registers
     moveq   #TRUE,d4         ;Farbregisterzähler
   ENDC
   MOVEF.W pf1_colors_number-1,d7 ;Anzahl der Farben
-crz_init_color_registers_loop
+crz_init_colors_loop
   move.l  (a0)+,d0           ;RGB8-Farbwert 
   move.l  d0,d1              
   RGB8_TO_RGB4_HIGH d0,d2,d3
@@ -2860,27 +2860,27 @@ crz_init_color_registers_loop
     addq.w  #4,a2            ;BPLCON3 überspringen
 crz_no_color_bank_restart
   ENDC
-  dbf     d7,crz_init_color_registers_loop
+  dbf     d7,crz_init_colors_loop
   rts
 
   CNOP 0,4
-crz_set_branches_pointers
+crz_set_branches_ptrs
   move.l  cl1_construction2(a3),a0 1
   moveq   #cl1_subextension1_size,d2
   move.l  cl2_construction2(a3),d0 ;Einsprungadresse = Aufbau-CL2
   MOVEF.L cl2_extension1_size,d3
   moveq   #cl1_extension1_size,d4
-  bsr.s   crz_set_jump_entry_pointers
+  bsr.s   crz_set_jump_entry_ptrs
   move.l  cl1_display(a3),a0 1
   move.l  cl2_display(a3),d0 ;Einsprungadresse = Darstellen-CL2
 
-; ** Routine set-jump-entry_pointers **
+; ** Routine set-jump-entry_ptrs **
 ; a0 ... Copperliste1
 ; d0 ... Einsprungadresse Copperliste2
 ; d2 ... cl1_subextension1_size
 ; d3 ... cl2_extension1_size
 ; d4 ... cl1_extension1_size
-crz_set_jump_entry_pointers
+crz_set_jump_entry_ptrs
   MOVEF.L cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subextension1_size,d1 ;Offset Rücksprungadresse CL1
   add.l   a0,d1              ;+ Rücksprungadresse CL1
   lea     cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subext1_COP1LCH+2(a0),a1
@@ -2930,14 +2930,14 @@ NMI_int_server
 
 
   CNOP 0,4
-pf1_color_table
+pf1_rgb8_color_table
   REPT bg_image_colors_number
     DC.L color00_bits
   ENDR
   INCLUDE "Daten:Asm-Sources.AGA/old'scool-intro/colourtables/256x256x128-texture_blur.ct"
 
 ; ** Farben der Sprites **
-spr_color_table
+spr_rgb8_color_table
   DC.L $000000,$fffffe,$8b888b,$373735
   DC.L $000000,$fffffe,$8b888b,$373735
   DC.L $000000,$fffffe,$8b888b,$373735
@@ -2946,10 +2946,10 @@ spr_color_table
   ENDR
 
 ; ** Adressen der Sprites **
-spr_pointers_construction
+spr_ptrs_construction
   DS.L spr_number
 
-spr_pointers_display
+spr_ptrs_display
   DS.L spr_number
 
 ; ** Sinus / Cosinustabelle **
@@ -3091,7 +3091,7 @@ bv_object1_edge_table
   DC.W 3*3,2*3,6*3,7*3,3*3   ;Fläche unten
 
 ; ** Koordinaten der Linien **
-bv_xyz_rotation_coordinates
+bv_xyz_rotation_coords
   DS.W bv_object1_edge_points_number*3
 
 ; **** Image-Fader ****
