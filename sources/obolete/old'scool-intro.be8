@@ -4,8 +4,8 @@
 ; # Datum:    10.07.2023          #
 ; # Version:  1.0 beta            #
 ; # CPU:      68020+              #
-; # FASTMEM:  -                   #
-; # Chipset:  AGA                 #
+; # Fast-Memory: -                #
+; # Chipset:  AGA PAL             #
 ; # OS:       3.0+                #
 ; #################################
 
