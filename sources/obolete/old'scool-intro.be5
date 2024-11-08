@@ -45,7 +45,7 @@
   INCLUDE "hardware/dmabits.i"
   INCLUDE "hardware/intbits.i"
 
-  INCDIR "Daten:Asm-Sources.AGA/normsource-includes/"
+  INCDIR "Daten:Asm-Sources.AGA/custom-includes/"
 
 
   INCLUDE "equals.i"
@@ -807,7 +807,7 @@ variables_size RS.B 0
 
 bv_object_info              RS.B 0
 
-bv_object_info_edge_table   RS.L 1
+bv_object_info_edges   RS.L 1
 bv_object_info_face_color   RS.W 1
 bv_object_info_lines_number RS.W 1
 
@@ -979,7 +979,7 @@ init_colors
   CNOP 0,4
 bv_convert_RGB8_to_RGB4
   lea     bv_color_table(pc),a0 ;Zeiger auf Farbtabelle
-  move.w  #GB_NIBBLES_MASK,d3
+  move.w  #RB_NIBBLES_MASK,d3
   move.w  #segments_number1-1,d7 ;Anzahl der Segemente
 bv_convert_RGB8_to_RGB4_loop1
   move.w  #color_values_number1-1,d6 ;Anzahl der Einträge in der Zieltabelle
@@ -997,8 +997,8 @@ bv_convert_RGB8_to_RGB4_loop2
 ; ** Object-Info-Tabelle initialisieren **
   CNOP 0,4
 bv_init_object1_info_table
-  lea     bv_object1_info_table+bv_object_info_edge_table(pc),a0 ;Zeiger auf Object-Info-Tabelle
-  lea     bv_object1_edge_table(pc),a1 ;Zeiger auf Tebelle mit Eckpunkten
+  lea     bv_object1_info_table+bv_object_info_edges(pc),a0 ;Zeiger auf Object-Info-Tabelle
+  lea     bv_object1_edges(pc),a1 ;Zeiger auf Tebelle mit Eckpunkten
   move.w  #bv_object_info_size,a2
   moveq   #bv_object1_faces_number-1,d7 ;Anzahl der Flächen
 bv_init_object1_info_table_loop
@@ -1356,7 +1356,7 @@ skip
   muls.w  d0,d2              ;Ax*cos(w)
   moveq   #crz_Ay,d3         ;Y links oben
   muls.w  d1,d3              ;Ay*sin(w)
-  lea     crz_switch_table(pc),a0 ;Zeiger auf Tabelle mit Switchwerten
+  lea     crz_bplam_table(pc),a0 ;Zeiger auf Tabelle mit Switchwerten
   add.l   d3,d2              ;Ax'=Ax*cos(w)+Ay*sin(w)
   moveq   #crz_Bx,d3         ;X rechts oben
   muls.w  d1,d3              ;Bx*sin(w)
@@ -2319,7 +2319,7 @@ bv_object1_info_table
   
 ; ** Eckpunkte der Flächen **
   CNOP 0,2
-bv_object1_edge_table
+bv_object1_edges
   DC.W 0*3,1*3,2*3,3*3,0*3   ;Fläche vorne
   DC.W 5*3,4*3,7*3,6*3,5*3   ;Fläche hinten
   DC.W 4*3,0*3,3*3,7*3,4*3   ;Fläche links
@@ -2367,7 +2367,7 @@ wst_text
 
 ; **** Chunky-Rotation-Zoomer ****
 ; ** Tabelle mit Switchwerten des Playfieldes **
-crz_switch_table
+crz_bplam_table
   DS.B crz_image_x_size*crz_image_y_size
 
 program_version DC.B "$VER: old'scool-intro 1.0 beta (10.7.23)",0

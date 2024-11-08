@@ -45,7 +45,7 @@
   INCLUDE "hardware/dmabits.i"
   INCLUDE "hardware/intbits.i"
 
-  INCDIR "Daten:Asm-Sources.AGA/normsource-includes/"
+  INCDIR "Daten:Asm-Sources.AGA/custom-includes/"
 
 
   INCLUDE "equals.i"
@@ -741,7 +741,7 @@ skip
   muls.w  d0,d2              ;Ax*cos(w)
   moveq   #crz_Ay,d3         ;Y links oben
   muls.w  d1,d3              ;Ay*sin(w)
-  lea     crz_switch_table(pc),a0 ;Zeiger auf Tabelle mit Switchwerten
+  lea     crz_bplam_table(pc),a0 ;Zeiger auf Tabelle mit Switchwerten
   add.l   d3,d2              ;Ax'=Ax*cos(w)+Ay*sin(w)
   moveq   #crz_Bx,d3         ;X rechts oben
   muls.w  d1,d3              ;Bx*sin(w)
@@ -890,7 +890,7 @@ sine_table
 
 ; **** Chunky-Rotation-Zoomer ****
 ; ** Tabelle mit Switchwerten des Playfieldes **
-crz_switch_table
+crz_bplam_table
   DS.B crz_image_x_size*crz_image_y_size
 
 program_version DC.B "$VER: old'scool-intro 1.0 beta (10.7.23)",0

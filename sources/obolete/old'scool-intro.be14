@@ -69,7 +69,7 @@
   INCLUDE "hardware/dmabits.i"
   INCLUDE "hardware/intbits.i"
 
-  INCDIR "Daten:Asm-Sources.AGA/normsource-includes/"
+  INCDIR "Daten:Asm-Sources.AGA/custom-includes/"
 
 
   INCLUDE "equals.i"
@@ -904,7 +904,7 @@ variables_size RS.B 0
 
 bv_object_info              RS.B 0
 
-bv_object_info_edge_table   RS.L 1
+bv_object_info_edges   RS.L 1
 bv_object_info_face_color   RS.W 1
 bv_object_info_lines_number RS.W 1
 
@@ -1088,7 +1088,7 @@ init_colors
   CNOP 0,4
 bv_convert_RGB8_to_RGB4
   lea     bv_color_table(pc),a0 ;Zeiger auf Farbtabelle
-  move.w  #GB_NIBBLES_MASK,d3
+  move.w  #RB_NIBBLES_MASK,d3
   move.w  #segments_number1-1,d7 ;Anzahl der Segemente
 bv_convert_RGB8_to_RGB4_loop1
   move.w  #color_values_number1-1,d6 ;Anzahl der Einträge in der Zieltabelle
@@ -1106,8 +1106,8 @@ bv_convert_RGB8_to_RGB4_loop2
 ; ** Object-Info-Tabelle initialisieren **
   CNOP 0,4
 bv_init_object1_info_table
-  lea     bv_object1_info_table+bv_object_info_edge_table(pc),a0 ;Zeiger auf Object-Info-Tabelle
-  lea     bv_object1_edge_table(pc),a1 ;Zeiger auf Tebelle mit Eckpunkten
+  lea     bv_object1_info_table+bv_object_info_edges(pc),a0 ;Zeiger auf Object-Info-Tabelle
+  lea     bv_object1_edges(pc),a1 ;Zeiger auf Tebelle mit Eckpunkten
   move.w  #bv_object_info_size,a2
   moveq   #bv_object1_faces_number-1,d7 ;Anzahl der Flächen
 bv_init_object1_info_table_loop
@@ -1329,14 +1329,14 @@ image_fader_in
   tst.w   ifi_active(a3)     ;Image-Fader-In an ?
   bne.s   no_image_fader_in  ;Nein -> verzweige
   movem.l a3-a6,-(a7)
-  move.w  ifi_fader_angle(a3),d1 ;Fader-Winkel 
+  move.w  ifi_fader_angle(a3),d1 ;Winkel 
   cmp.w   #sine_table_length/2,d1 ;Y-Winkel <= 180 Grad ?
   ble.s   ifi_no_fader_angle_restart ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d1 ;180 Grad
 ifi_no_fader_angle_restart
   lea     sine_table(pc),a0  
   move.w  2(a0,d1.w*2),d0    ;sin(w)
-  addq.w  #ifi_fader_angle_speed,d1 ;nächster Fader-Winkel
+  addq.w  #ifi_fader_angle_speed,d1 ;nächster Winkel
   MULSF.W ifi_fader_radius*2,d0,d2 ;y'=(yr*sin(w))/2^15
   move.w  d1,ifi_fader_angle(a3) 
   swap    d0
@@ -1371,14 +1371,14 @@ image_fader_out
   tst.w   ifo_active(a3)     ;Image-Fader-Out an ?
   bne.s   no_image_fader_out ;Nein -> verzweige
   movem.l a3-a6,-(a7)
-  move.w  ifo_fader_angle(a3),d1 ;Fader-Winkel 
+  move.w  ifo_fader_angle(a3),d1 ;Winkel 
   cmp.w   #sine_table_length/2,d1 ;Y-Winkel <= 180 Grad ?
   ble.s   ifo_no_fader_angle_restart ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d1 ;180 Grad
 ifo_no_fader_angle_restart
   lea     sine_table(pc),a0  
   move.w  2(a0,d1.w*2),d0    ;sin(w)
-  addq.w  #ifo_fader_angle_speed,d1 ;nächster Fader-Winkel
+  addq.w  #ifo_fader_angle_speed,d1 ;nächster Winkel
   MULSF.W ifo_fader_radius*2,d0,d2 ;y'=(yr*sin(w))/2^15
   move.w  d1,ifo_fader_angle(a3) 
   swap    d0
@@ -3054,7 +3054,7 @@ bv_object1_info_table
   
 ; ** Eckpunkte der Flächen **
   CNOP 0,2
-bv_object1_edge_table
+bv_object1_edges
   DC.W 0*3,1*3,2*3,3*3,0*3   ;Fläche vorne
   DC.W 5*3,4*3,7*3,6*3,5*3   ;Fläche hinten
   DC.W 4*3,0*3,3*3,7*3,4*3   ;Fläche links

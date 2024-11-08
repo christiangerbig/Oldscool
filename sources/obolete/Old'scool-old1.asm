@@ -112,7 +112,7 @@
   INCLUDE "hardware/dmabits.i"
   INCLUDE "hardware/intbits.i"
 
-  INCDIR "Daten:Asm-Sources.AGA/normsource-includes/"
+  INCDIR "Daten:Asm-Sources.AGA/custom-includes/"
 
 
   INCLUDE "equals.i"
@@ -911,7 +911,7 @@ kh_key_code                        RS.B 1
 kh_key_flag                        RS.B 1
 
 ; **** Main ****
-fx_active                          RS.W 1
+stop_fx_active                          RS.W 1
 part_title_active                  RS.W 1
 part_main_active                   RS.W 1
 
@@ -931,7 +931,7 @@ variables_size                     RS.B 0
 
 bv_object_info              RS.B 0
 
-bv_object_info_edge_table   RS.L 1
+bv_object_info_edges   RS.L 1
 bv_object_info_face_color   RS.W 1
 bv_object_info_lines_number RS.W 1
 
@@ -1025,7 +1025,7 @@ init_main_variables2
   move.b  d0,kh_key_flag(a3)
 
 ; **** Main ****
-  move.w  d1,fx_active(a3)
+  move.w  d1,stop_fx_active(a3)
   move.w  d1,part_title_active(a3)
   move.w  d1,part_main_active(a3)
   rts
@@ -1118,8 +1118,8 @@ init_sprites
 ; ** Object-Info-Tabelle initialisieren **
   CNOP 0,4
 bv_init_object1_info_table
-  lea     bv_object1_info_table+bv_object_info_edge_table(pc),a0 ;Zeiger auf Object-Info-Tabelle
-  lea     bv_object1_edge_table(pc),a1 ;Zeiger auf Tebelle mit Eckpunkten
+  lea     bv_object1_info_table+bv_object_info_edges(pc),a0 ;Zeiger auf Object-Info-Tabelle
+  lea     bv_object1_edges(pc),a1 ;Zeiger auf Tebelle mit Eckpunkten
   move.w  #bv_object_info_size,a2
   moveq   #bv_object1_faces_number-1,d7 ;Anzahl der Flächen
 bv_init_object1_info_table_loop
@@ -1325,7 +1325,7 @@ beam_routines
   bsr     if_copy_color_table
   bsr     blind_fader_in
   bsr     blind_fader_out
-  tst.w   fx_active(a3)      ;Effekte beendet ?
+  tst.w   stop_fx_active(a3)      ;Effekte beendet ?
   bne.s   beam_routines      ;Nein -> verzweige
   rts
 
@@ -1991,9 +1991,9 @@ image_fader_in
   tst.w   ifi_active(a3)     ;Image-Fader-In an ?
   bne.s   no_image_fader_in  ;Nein -> verzweige
   movem.l a4-a6,-(a7)
-  move.w  ifi_fader_angle(a3),d2 ;Fader-Winkel 
+  move.w  ifi_fader_angle(a3),d2 ;Winkel 
   move.w  d2,d0
-  ADDF.W  ifi_fader_angle_speed,d0 ;nächster Fader-Winkel
+  ADDF.W  ifi_fader_angle_speed,d0 ;nächster Winkel
   cmp.w   #sine_table_length/2,d0 ;Y-Winkel <= 180 Grad ?
   ble.s   ifi_no_restart_fader_angle ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d0 ;180 Grad
@@ -2029,9 +2029,9 @@ image_fader_out
   tst.w   ifo_active(a3)     ;Image-Fader-Out an ?
   bne.s   no_image_fader_out ;Nein -> verzweige
   movem.l a4-a6,-(a7)
-  move.w  ifo_fader_angle(a3),d2 ;Fader-Winkel 
+  move.w  ifo_fader_angle(a3),d2 ;Winkel 
   move.w  d2,d0
-  ADDF.W  ifo_fader_angle_speed,d0 ;nächster Fader-Winkel
+  ADDF.W  ifo_fader_angle_speed,d0 ;nächster Winkel
   cmp.w   #sine_table_length/2,d0 ;Y-Winkel <= 180 Grad ?
   ble.s   ifo_no_restart_fader_angle ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d0 ;180 Grad
@@ -2072,7 +2072,7 @@ if_copy_color_table
   ENDC
   tst.w   if_copy_colors_active(a3) ;Kopieren der Farbwerte beendet ?
   bne.s   if_no_copy_color_table ;Ja -> verzweige
-  move.w  #GB_NIBBLES_MASK,d3          ;Maske RGB-Nibbles
+  move.w  #RB_NIBBLES_MASK,d3          ;Maske RGB-Nibbles
   IFGT pf1_colors_number-32
     moveq   #TRUE,d4         ;Color-Bank Farbregisterzähler
   ENDC
@@ -2612,7 +2612,7 @@ VERTB_int_server
     bra.s   pt_PlayMusic
 
 ; ** Musik ausblenden **
-    PT_FADE_OUT_VOLUME fx_active
+    PT_FADE_OUT_VOLUME stop_fx_active
 
     CNOP 0,4
   ENDC
@@ -2927,7 +2927,7 @@ bv_object1_info_table
   
 ; ** Eckpunkte der Flächen **
   CNOP 0,2
-bv_object1_edge_table
+bv_object1_edges
   DC.W 0*3,1*3,2*3,3*3,0*3   ;Fläche vorne
   DC.W 5*3,4*3,7*3,6*3,5*3   ;Fläche hinten
   DC.W 4*3,0*3,3*3,7*3,4*3   ;Fläche links

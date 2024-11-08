@@ -114,7 +114,7 @@
   INCLUDE "hardware/intbits.i"
 
 
-  INCDIR "Daten:Asm-Sources.AGA/normsource-includes/"
+  INCDIR "Daten:Asm-Sources.AGA/custom-includes/"
 
 
 PROTRACKER_VERSION_3.0B         SET 1
@@ -131,7 +131,7 @@ requires_060_cpu                EQU FALSE
 requires_fast_memory            EQU FALSE
 requires_multiscan_monitor      EQU FALSE
 
-workbench_start_enabled         EQU 0 ;FALSE
+workbench_start_enabled         EQU FALSE
 screen_fader_enabled            EQU TRUE
 text_output_enabled             EQU FALSE
 
@@ -916,7 +916,7 @@ kh_key_code                        RS.B 1
 kh_key_flag                        RS.B 1
 
 ; **** Main ****
-fx_active                          RS.W 1
+stop_fx_active                          RS.W 1
 part_title_active                  RS.W 1
 part_main_active                   RS.W 1
 
@@ -936,7 +936,7 @@ variables_size                     RS.B 0
 
 bv_object_info              RS.B 0
 
-bv_object_info_edge_table   RS.L 1
+bv_object_info_edges   RS.L 1
 bv_object_info_face_color   RS.W 1
 bv_object_info_lines_number RS.W 1
 
@@ -1034,7 +1034,7 @@ init_main_variables2
   move.b  d0,kh_key_flag(a3)
 
 ; **** Main ****
-  move.w  d1,fx_active(a3)
+  move.w  d1,stop_fx_active(a3)
   move.w  d1,part_title_active(a3)
   move.w  d1,part_main_active(a3)
   rts
@@ -1053,7 +1053,7 @@ init_main
   bsr     wst_init_characters_offsets
   bsr     wst_init_characters_x_positions
   bsr     bv_convert_color_table
-  bsr     bv_init_object_info_table
+  bsr     bv_init_object_info
   bsr     bg_copy_image_to_plane
   bsr     init_sprites
   bsr     init_CIA_timers
@@ -1095,18 +1095,18 @@ init_main
 
 ; ** Object-Info-Tabelle initialisieren **
   CNOP 0,4
-bv_init_object_info_table
-  lea     bv_object_info_table+bv_object_info_edge_table(pc),a0 ;Zeiger auf Object-Info-Tabelle
-  lea     bv_object_edge_table(pc),a1 ;Zeiger auf Tebelle mit Eckpunkten
+bv_init_object_info
+  lea     bv_object_info+bv_object_info_edges(pc),a0 ;Zeiger auf Object-Info-Tabelle
+  lea     bv_object_edges(pc),a1 ;Zeiger auf Tebelle mit Eckpunkten
   move.w  #bv_object_info_size,a2
   moveq   #bv_object_faces_number-1,d7 ;Anzahl der Flächen
-bv_init_object_info_table_loop
+bv_init_object_info_loop
   move.w  bv_object_info_lines_number(a0),d0
   addq.w  #2,d0              ;Anzahl der Linien + 1 = Anzahl der Eckpunkte
   move.l  a1,(a0)            ;Zeiger auf Tabelle mit Eckpunkten eintragen
   lea     (a1,d0.w*2),a1     ;Zeiger auf Eckpunkte-Tabelle erhöhen
   add.l   a2,a0              ;Object-Info-Struktur der nächsten Fläche
-  dbf     d7,bv_init_object_info_table_loop
+  dbf     d7,bv_init_object_info_loop
   rts
 
 ; ** Objekt ins Playfield kopieren **
@@ -1326,11 +1326,12 @@ beam_routines
   bsr     swap_first_copperlist
   bsr     swap_second_copperlist
   bsr     spr_swap_structures
+  bsr     spr_set_sprite_ptrs
   bsr     swap_images
   bsr     blind_fader_in
   bsr     blind_fader_out
   bsr     if_rgb8_copy_color_table
-  tst.w   fx_active(a3)      ;Effekte beendet ?
+  tst.w   stop_fx_active(a3)      ;Effekte beendet ?
   bne.s   beam_routines      ;Nein -> verzweige
   rts
 
@@ -1339,7 +1340,9 @@ beam_routines
 
   SWAP_COPPERLIST cl2,2,NOSET
 
-  SWAP_SPRITES_STRUCTURES spr,spr_swap_number,6
+  SWAP_SPRITES spr,spr_swap_number,6
+
+  SET_SPRITES spr,spr_swap_number,6
 
   CNOP 0,4
 swap_images
@@ -1578,7 +1581,7 @@ bv_draw_lines
   movem.l a3-a5,-(a7)
   move.l  a7,save_a7(a3)     ;Alten Stackpointer retten
   bsr     bv_draw_lines_init
-  lea     bv_object_info_table(pc),a0 ;Zeiger auf Info-Daten zum Objekt
+  lea     bv_object_info(pc),a0 ;Zeiger auf Info-Daten zum Objekt
   lea     bv_rotation_xyz_coords(pc),a1 ;Zeiger auf XYZ-Koordinaten
   move.l  extra_pf2(a3),a2   ;Plane0
   move.l  (a2),a2
@@ -1658,7 +1661,7 @@ bv_draw_lines_check_plane1
   move.w  d2,BLTSIZE-DMACONR(a6) ;Blitter starten
 bv_draw_lines_check_plane2
   btst    #1,d7              ;Bitplane 2 ?
-  beq.s   bv_draw_lines_no_line ;Nein -> verzweige
+  beq.s   bv_draw_lines_noop ;Nein -> verzweige
   moveq   #extra_pf1_plane_width,d5
   add.l   d5,d1              ;nächste Plane
   WAITBLIT
@@ -1668,7 +1671,7 @@ bv_draw_lines_check_plane2
   move.l  d1,BLTDPT-DMACONR(a6) ;Bild schreiben
   move.l  d4,BLTBMOD-DMACONR(a6) ;Bits 31-16: 4*dy, Bits 15-0: 4*(dy-dx)
   move.w  d2,BLTSIZE-DMACONR(a6) ;Blitter starten
-bv_draw_lines_no_line
+bv_draw_lines_noop
   dbf     d6,bv_draw_lines_loop2
 bv_draw_lines_no_face
   swap    d7                 ;Flächenzähler 
@@ -1972,9 +1975,9 @@ image_fader_in
   tst.w   ifi_rgb8_active(a3)     ;Image-Fader-In an ?
   bne.s   no_image_fader_in  ;Nein -> verzweige
   movem.l a4-a6,-(a7)
-  move.w  ifi_rgb8_fader_angle(a3),d2 ;Fader-Winkel 
+  move.w  ifi_rgb8_fader_angle(a3),d2 ;Winkel 
   move.w  d2,d0
-  ADDF.W  ifi_rgb8_fader_angle_speed,d0 ;nächster Fader-Winkel
+  ADDF.W  ifi_rgb8_fader_angle_speed,d0 ;nächster Winkel
   cmp.w   #sine_table_length/2,d0 ;Y-Winkel <= 180 Grad ?
   ble.s   ifi_rgb8_save_fader_angle ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d0 ;180 Grad
@@ -2009,9 +2012,9 @@ image_fader_out
   tst.w   ifo_rgb8_active(a3)     ;Image-Fader-Out an ?
   bne.s   no_image_fader_out ;Nein -> verzweige
   movem.l a4-a6,-(a7)
-  move.w  ifo_rgb8_fader_angle(a3),d2 ;Fader-Winkel 
+  move.w  ifo_rgb8_fader_angle(a3),d2 ;Winkel 
   move.w  d2,d0
-  ADDF.W  ifo_rgb8_fader_angle_speed,d0 ;nächster Fader-Winkel
+  ADDF.W  ifo_rgb8_fader_angle_speed,d0 ;nächster Winkel
   cmp.w   #sine_table_length/2,d0 ;Y-Winkel <= 180 Grad ?
   ble.s   ifo_rgb8_save_fader_angle ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d0 ;180 Grad
@@ -2516,7 +2519,7 @@ VERTB_int_server
     bra.s   pt_PlayMusic
 
 ; ** Musik ausblenden **
-    PT_FADE_OUT_VOLUME fx_active
+    PT_FADE_OUT_VOLUME stop_fx_active
     CNOP 0,4
   ENDC
 
@@ -2792,7 +2795,7 @@ bv_object_coords
   
 ; ** Information über Objekt **
   CNOP 0,4
-bv_object_info_table
+bv_object_info
 ; ** 1. Fläche **
   DC.L 0                     ;Zeiger auf Koords
   DC.W bv_object_face1_color ;Farbe der Fläche
@@ -2825,7 +2828,7 @@ bv_object_info_table
   
 ; ** Eckpunkte der Flächen **
   CNOP 0,2
-bv_object_edge_table
+bv_object_edges
   DC.W 0*3,1*3,2*3,3*3,0*3   ;Fläche vorne
   DC.W 5*3,4*3,7*3,6*3,5*3   ;Fläche hinten
   DC.W 4*3,0*3,3*3,7*3,4*3   ;Fläche links
