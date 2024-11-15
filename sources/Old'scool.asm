@@ -59,8 +59,8 @@
 ; V.1.8 beta
 ; - Code optimiert
 ; - Bugfix: Nach dem Einblenden wurde fälschlicherweise der Title-Part
-;	     deaktiviert und bei einem vozeitigen User-Abbruch das Titelbild
-;	     nicht mehr ausgeblendet
+;   deaktiviert und bei einem vozeitigen User-Abbruch das Titelbild
+;   nicht mehr ausgeblendet
 ; V.1.0
 ; - Endversion
 ; - Code optimiert
@@ -147,19 +147,19 @@ pt_track_volumes_enabled	EQU FALSE
 pt_track_periods_enabled	EQU FALSE
 pt_music_fader_enabled		EQU TRUE
 pt_split_module_enabled		EQU TRUE
-pt_usedfx		 	EQU %1111010101011001
-pt_usedefx		 	EQU %0000100000000000
+pt_usedfx			EQU %1111010101011001
+pt_usedefx			EQU %0000100000000000
 
 open_border_enabled		EQU TRUE
 rz_table_length_256		EQU FALSE
 bv_EpRGB_check_max_enabled	EQU TRUE
 
-dma_bits		 	EQU DMAF_BLITTER|DMAF_SPRITE|DMAF_COPPER|DMAF_RASTER|DMAF_MASTER+DMAF_SETCLR
+dma_bits			EQU DMAF_BLITTER|DMAF_SPRITE|DMAF_COPPER|DMAF_RASTER|DMAF_MASTER+DMAF_SETCLR
 
 	IFEQ pt_ciatiming_enabled
-intena_bits		 	EQU INTF_EXTER|INTF_INTEN|INTF_SETCLR
-	ELSE		 			
-intena_bits		 	EQU INTF_VERTB|INTF_EXTER|INTF_INTEN|INTF_SETCLR
+intena_bits			EQU INTF_EXTER|INTF_INTEN|INTF_SETCLR
+	ELSE					
+intena_bits			EQU INTF_VERTB|INTF_EXTER|INTF_INTEN|INTF_SETCLR
 	ENDC
 
 ciaa_icr_bits EQU CIAICRF_SETCLR
@@ -169,31 +169,31 @@ ciab_icr_bits			EQU CIAICRF_TA|CIAICRF_TB|CIAICRF_SETCLR
 ciab_icr_bits			EQU CIAICRF_TB|CIAICRF_SETCLR
 	ENDC
 
-copcon_bits		 	EQU 0
+copcon_bits			EQU 0
 
-pf1_x_size1		 	EQU 0
-pf1_y_size1		 	EQU 0
-pf1_depth1		 	EQU 0
-pf1_x_size2		 	EQU 0
-pf1_y_size2		 	EQU 0
-pf1_depth2		 	EQU 0
-pf1_x_size3		 	EQU 320
-pf1_y_size3		 	EQU 256
-pf1_depth3		 	EQU 7
+pf1_x_size1			EQU 0
+pf1_y_size1			EQU 0
+pf1_depth1			EQU 0
+pf1_x_size2			EQU 0
+pf1_y_size2			EQU 0
+pf1_depth2			EQU 0
+pf1_x_size3			EQU 320
+pf1_y_size3			EQU 256
+pf1_depth3			EQU 7
 pf1_colors_number		EQU 128
 
-pf2_x_size1		 	EQU 0
-pf2_y_size1		 	EQU 0
-pf2_depth1		 	EQU 0
-pf2_x_size2		 	EQU 0
-pf2_y_size2		 	EQU 0
-pf2_depth2		 	EQU 0
-pf2_x_size3		 	EQU 0
-pf2_y_size3		 	EQU 0
-pf2_depth3		 	EQU 0
+pf2_x_size1			EQU 0
+pf2_y_size1			EQU 0
+pf2_depth1			EQU 0
+pf2_x_size2			EQU 0
+pf2_y_size2			EQU 0
+pf2_depth2			EQU 0
+pf2_x_size3			EQU 0
+pf2_y_size3			EQU 0
+pf2_depth3			EQU 0
 pf2_colors_number		EQU 0
 pf_colors_number		EQU pf1_colors_number+pf2_colors_number
-pf_depth		 	EQU pf1_depth3+pf2_depth3
+pf_depth			EQU pf1_depth3+pf2_depth3
 
 pf_extra_number			EQU 3
 extra_pf1_x_size		EQU 128
@@ -206,10 +206,10 @@ extra_pf3_x_size		EQU 128
 extra_pf3_y_size		EQU 128
 extra_pf3_depth			EQU 2
 
-spr_number		 	EQU 8
-spr_x_size1		 	EQU 64
-spr_x_size2		 	EQU 64
-spr_depth		 	EQU 2
+spr_number			EQU 8
+spr_x_size1			EQU 64
+spr_x_size2			EQU 64
+spr_depth			EQU 2
 spr_colors_number		EQU 16
 spr_odd_color_table_select	EQU 8
 spr_even_color_table_select	EQU 8
@@ -231,16 +231,16 @@ ciaa_crb_bits			EQU CIACRBF_LOAD|CIACRBF_RUNMODE ; oneshot
 ciab_cra_bits			EQU CIACRBF_LOAD
 	ENDC
 ciab_crb_bits			EQU CIACRBF_LOAD|CIACRBF_RUNMODE ; Oneshot mode
-ciaa_ta_time		 	EQU 0
-ciaa_tb_time		 	EQU 142 ;0.709379 MHz * 200 µs
+ciaa_ta_time			EQU 0
+ciaa_tb_time			EQU 142 ;0.709379 MHz * 200 µs
 	IFEQ pt_ciatiming_enabled
-ciab_ta_time		 	EQU 14187 ;= 0.709379 MHz * [20000 µs = 50 Hz duration for one frame on a PAL machine]
-;ciab_ta_time		 	EQU 14318 ;= 0.715909 MHz * [20000 µs = 50 Hz duration for one frame on a NTSC machine]
+ciab_ta_time			EQU 14187 ;= 0.709379 MHz * [20000 µs = 50 Hz duration for one frame on a PAL machine]
+;ciab_ta_time			EQU 14318 ;= 0.715909 MHz * [20000 µs = 50 Hz duration for one frame on a NTSC machine]
 	ELSE
-ciab_ta_time		 	EQU 0
+ciab_ta_time			EQU 0
 	ENDC
-ciab_tb_time		 	EQU 362 ;= 0.709379 MHz * [511.43 µs = Lowest note period C1 with Tuning=-8 * 2 / PAL clock constant = 907*2/3546895 ticks per second]
-		 		 	;= 0.715909 MHz * [506.76 µs = Lowest note period C1 with Tuning=-8 * 2 / NTSC clock constant = 907*2/3579545 ticks per second]
+ciab_tb_time			EQU 362 ;= 0.709379 MHz * [511.43 µs = Lowest note period C1 with Tuning=-8 * 2 / PAL clock constant = 907*2/3546895 ticks per second]
+					;= 0.715909 MHz * [506.76 µs = Lowest note period C1 with Tuning=-8 * 2 / NTSC clock constant = 907*2/3579545 ticks per second]
 ciaa_ta_continuous_enabled	EQU FALSE
 ciaa_tb_continuous_enabled	EQU FALSE
 	IFEQ pt_ciatiming_enabled
@@ -255,7 +255,7 @@ beam_position			EQU VSTOP_256_LINES
 pixel_per_line			EQU 320
 visible_pixels_number		EQU 320
 visible_lines_number		EQU 256
-MINROW		 		EQU VSTART_256_LINES
+MINROW				EQU VSTART_256_LINES
 
 pf_pixel_per_datafetch		EQU 64	; 4x
 spr_pixel_per_datafetch		EQU 64	; 4x
@@ -272,20 +272,20 @@ extra_pf1_plane_width		EQU extra_pf1_x_size/8
 extra_pf2_plane_width		EQU extra_pf2_x_size/8
 extra_pf3_plane_width		EQU extra_pf3_x_size/8
 
-diwstrt_bits		 	EQU ((display_window_vstart&$ff)*DIWSTRTF_V0)|(display_window_hstart&$ff)
-diwstop_bits		 	EQU ((display_window_vstop&$ff)*DIWSTOPF_V0)|(display_window_hstop&$ff)
-ddfstrt_bits		 	EQU DDFSTART_320_PIXEL
-ddfstop_bits		 	EQU DDFSTOP_320_PIXEL_4X
-bplcon0_bits		 	EQU BPLCON0F_ECSENA|BPLCON0F_COLOR
+diwstrt_bits			EQU ((display_window_vstart&$ff)*DIWSTRTF_V0)|(display_window_hstart&$ff)
+diwstop_bits			EQU ((display_window_vstop&$ff)*DIWSTOPF_V0)|(display_window_hstop&$ff)
+ddfstrt_bits			EQU DDFSTART_320_PIXEL
+ddfstop_bits			EQU DDFSTOP_320_PIXEL_4X
+bplcon0_bits			EQU BPLCON0F_ECSENA|BPLCON0F_COLOR
 bplcon0_bits2			EQU BPLCON0F_ECSENA|((pf_depth>>3)*BPLCON0F_BPU3)|(BPLCON0F_COLOR)|((pf_depth&$07)*BPLCON0F_BPU0)
-bplcon1_bits		 	EQU 0
-bplcon2_bits		 	EQU 0
+bplcon1_bits			EQU 0
+bplcon2_bits			EQU 0
 bplcon3_bits1			EQU BPLCON3F_SPRES0
 bplcon3_bits2			EQU bplcon3_bits1|BPLCON3F_LOCT
-bplcon4_bits		 	EQU (BPLCON4F_OSPRM4*spr_odd_color_table_select)|(BPLCON4F_ESPRM4*spr_even_color_table_select)
+bplcon4_bits			EQU (BPLCON4F_OSPRM4*spr_odd_color_table_select)|(BPLCON4F_ESPRM4*spr_even_color_table_select)
 diwhigh_bits			EQU DIWHIGHF_HSTOP1|(((display_window_hstop&$100)>>8)*DIWHIGHF_HSTOP8)|(((display_window_vstop&$700)>>8)*DIWHIGHF_VSTOP8)+DIWHIGHF_hstart1+(((display_window_hstart&$100)>>8)*DIWHIGHF_HSTART8)+((display_window_vstart&$700)>>8)
-fmode_bits		 	EQU FMODEF_BPL32|FMODEF_BPAGEM|FMODEF_SPR32|FMODEF_SPAGEM
-color00_bits		 	EQU $090909
+fmode_bits			EQU FMODEF_BPL32|FMODEF_BPAGEM|FMODEF_SPR32|FMODEF_SPAGEM
+color00_bits			EQU $090909
 
 rz_display_y_scale_factor	EQU 4
 
@@ -2414,8 +2414,8 @@ mh_exit_demo
 	clr.w	pt_music_fader_active(a3)
 	tst.w	part_title_active(a3)
 	bne.s	mh_exit_demo_skip2
-	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	clr.w	ifo_rgb8_active(a3)
+	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	clr.w	if_rgb8_copy_colors_active(a3)
 	tst.w	ifi_rgb8_active(a3)
 	bne.s	mh_exit_demo_skip1
@@ -2451,7 +2451,6 @@ VERTB_int_server
 		bsr.s	pt_music_fader
 		bra.s	pt_PlayMusic
 
-; ** Musik ausblenden **
 		PT_FADE_OUT_VOLUME stop_fx_active
 		CNOP 0,4
 	ENDC
@@ -2459,6 +2458,7 @@ VERTB_int_server
 	IFD PROTRACKER_VERSION_2.3A 
 		PT2_REPLAY pt_effects_handler
 	ENDC
+
 	IFD PROTRACKER_VERSION_3.0B
 		PT3_REPLAY pt_effects_handler
 	ENDC
@@ -2496,8 +2496,8 @@ pt_start_horiz_scrolltext
 	CNOP 0,4
 pt_start_fade_in_image
 	move.l	a0,-(a7)
-	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	clr.w	ifi_rgb8_active(a3)
+	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	clr.w	if_rgb8_copy_colors_active(a3)
 	clr.w	part_title_active(a3)
 	move.l	cl1_construction2(a3),a0 
@@ -2508,8 +2508,8 @@ pt_start_fade_in_image
 	rts
 	CNOP 0,4
 pt_start_fade_out_image
-	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	clr.w	ifo_rgb8_active(a3)
+	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	clr.w	if_rgb8_copy_colors_active(a3)
 	rts
 	CNOP 0,4
@@ -2528,8 +2528,8 @@ pt_start_fade_in_rotation_zoomer
 	rts
 	CNOP 0,4
 pt_start_cube_zoomer_in
-	clr.w	bv_active(a3)
 	clr.w	czi_active(a3)
+	clr.w	bv_active(a3)
 	rts
 	CNOP 0,4
 pt_start_zoomer
@@ -2557,7 +2557,7 @@ rz_init_colors_loop
 	move.l	d0,d1		
 	RGB8_TO_RGB4_HIGH d0,d2,d3
 	move.w	d0,(a1)			; High-Bits COLORxx
-	addq.w	#4,a1
+	addq.w	#LONGWORD_SIZE,a1
 	move.w	d0,(a2)			; High-Bits COLORxx
 	RGB8_TO_RGB4_LOW d1,d2,d3
 	move.w	d1,cl1_COLOR00_low1-cl1_COLOR00_high1-4(a1) ; Low-Bits COLORxx
@@ -2675,6 +2675,7 @@ sine_table
 	IFD PROTRACKER_VERSION_2.3A 
 		INCLUDE "music-tracker/pt2-period-table.i"
 	ENDC
+
 	IFD PROTRACKER_VERSION_3.0B
 		INCLUDE "music-tracker/pt3-period-table.i"
 	ENDC
@@ -2704,9 +2705,10 @@ wst_characters_x_positions
 bv_color_table
 	INCLUDE "Daten:Asm-Sources.AGA/projects/Old'scool/colortables/64-Colorgradient-Brown.ct"
 
+; ** Würfel **
 	CNOP 0,2
 bv_object_coords
-	DC.W -(35*8),-(35*8),-(35*8)	; P0 Würfel
+	DC.W -(35*8),-(35*8),-(35*8)	; P0
 	DC.W 35*8,-(35*8),-(35*8)	; P1
 	DC.W 35*8,35*8,-(35*8)		; P2
 	DC.W -(35*8),35*8,-(35*8)	; P3
@@ -2721,27 +2723,22 @@ bv_object_info
 	DC.L 0				; Zeiger auf Koords
 	DC.W bv_object_face1_color 	; Farbe der Fläche
 	DC.W bv_object_face1_lines_number-1 ; Anzahl der Linien
-
 ; ** 2. Fläche **
 	DC.L 0				; Zeiger auf Koords
 	DC.W bv_object_face2_color 	; Farbe der Fläche
 	DC.W bv_object_face2_lines_number-1 ; Anzahl der Linien
-
 ; ** 3. Fläche **
 	DC.L 0				; Zeiger auf Koords
 	DC.W bv_object_face3_color 	; Farbe der Fläche
 	DC.W bv_object_face3_lines_number-1 ; Anzahl der Linien
-
 ; ** 4. Fläche **
 	DC.L 0				; Zeiger auf Koords
 	DC.W bv_object_face4_color 	; Farbe der Fläche
 	DC.W bv_object_face4_lines_number-1 ; Anzahl der Linien
-
 ; ** 5. Fläche **
 	DC.L 0				; Zeiger auf Koords
 	DC.W bv_object_face5_color 	; Farbe der Fläche
 	DC.W bv_object_face5_lines_number-1 ; Anzahl der Linien
-
 ; ** 6. Fläche **
 	DC.L 0				; Zeiger auf Koords
 	DC.W bv_object_face6_color 	; Farbe der Fläche
