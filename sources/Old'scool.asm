@@ -1900,7 +1900,7 @@ rotation_zoomer_skip
 	muls.w	d0,d2			; Ax*cos(w)
 	moveq	#rz_Ay,d3		; Y links oben
 	muls.w	d1,d3			; Ay*sin(w)
-	move.l	extra_memory(a3),a0 	; Zeiger auf Switchwert-Tabelle
+	move.l	extra_memory(a3),a0 	; Zeiger auf BPLAM-Tabelle
 	add.l	d3,d2			; Ax'=Ax*cos(w)+Ay*sin(w)
 	moveq	#rz_Bx,d3		; X rechts oben
 	muls.w	d1,d3			; Bx*sin(w)
@@ -1913,7 +1913,7 @@ rotation_zoomer_skip
 	add.w	#rz_z_rotation_y_center<<8,d3 ; y' + Y-Mittelpunkt
 	move.l	cl2_construction2(a3),a1
 	move.w	d3,a5			; Y-Mittelpunkt retten
-; ** Switchwerte in Copperliste kopieren **
+; ** BPLAM-werte in Copperliste kopieren **
 	move.l	a7,save_a7(a3)	
 	move.w	#cl2_extension1_size,a2
 	move.w	d0,a3			; cos(w) retten
@@ -1925,21 +1925,21 @@ rotation_zoomer_skip
 	moveq	#0,d2
 	moveq	#cl2_display_width-1,d7 ; Anzahl der Spalten
 rotation_zoomer_loop1
-	move.w	a4,d4			; X Linke obere Ecke in Switchwert-Tabelle
-	move.w	a5,d5			; Y Linke obere Ecke in Switchwert-Tabelle
+	move.w	a4,d4			; X Linke obere Ecke in BPLAM-Tabelle
+	move.w	a5,d5			; Y Linke obere Ecke in BPLAM-Tabelle
 	moveq	#cl2_display_y_size-1,d6
 rotation_zoomer_loop2
-	move.w	d4,d3			; X-Pos in Switchwert-Tabelle
-	move.w	d5,d2			; Y-Pos in Switchwert-Tabelle
+	move.w	d4,d3			; X-Pos in BPLAM-Tabelle
+	move.w	d5,d2			; Y-Pos in BPLAM-Tabelle
 	lsr.w	#8,d3			; Bits in richtige Postion bringen
 	move.b	d3,d2			; Bits 0-7: X-Offset, Bits 8-15: Y-Offset
-	move.b	(a0,d2.l),(a1)		; Switchwert
-	add.w	d1,d4			; nächste Pixel-Spalte in Switchwert-Tabelle
-	add.w	d0,d5			; nächste Pixel-Zeile in Switchwert-Tabelle
+	move.b	(a0,d2.l),(a1)		; BPLCON4 high
+	add.w	d1,d4			; nächste Pixel-Spalte in BPLAM-Tabelle
+	add.w	d0,d5			; nächste Pixel-Zeile in BPLAM-Tabelle
 	add.l	a2,a1			; nächste Zeile in CL
 	dbf	d6,rotation_zoomer_loop2
-	add.w	a3,a4			; nächste X-Pos in Switchwert-Tabelle
-	sub.w	a7,a5			; nächste Y-Pos in Switchwert-Tabelle
+	add.w	a3,a4			; nächste X-Pos in BPLAM--Tabelle
+	sub.w	a7,a5			; nächste Y-Pos in BPLAM-Tabelle
 	sub.l	a6,a1			; nächste Spalte in CL
 	dbf	d7,rotation_zoomer_loop1
 	move.l	variables+save_a7(pc),a7
