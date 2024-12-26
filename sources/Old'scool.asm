@@ -140,7 +140,6 @@ screen_fader_enabled		EQU TRUE
 text_output_enabled		EQU FALSE
 
 pt_ciatiming_enabled		EQU TRUE
-pt_finetune_enabled		EQU FALSE
 pt_metronome_enabled		EQU FALSE
 pt_mute_enabled			EQU FALSE
 pt_track_notes_played_enabled	EQU FALSE
@@ -1048,9 +1047,7 @@ init_main
 	bsr.s	pt_InitRegisters
 	bsr	pt_InitAudTempStrucs
 	bsr	pt_ExamineSongStruc
-	IFEQ pt_finetune_enabled
-		bsr	pt_InitFtuPeriodTableStarts
-	ENDC
+	bsr	pt_InitFtuPeriodTableStarts
 	bsr	rz_convert_image_data
 	bsr	wst_init_characters_offsets
 	bsr	wst_init_characters_x_positions
@@ -1071,9 +1068,7 @@ init_main
 
 	PT_EXAMINE_SONG_STRUCTURE
 
-	IFEQ pt_finetune_enabled
-		PT_INIT_FINETUNE_TABLE_STARTS
-	ENDC
+	PT_INIT_FINETUNE_TABLE_STARTS
 
 ; **** Rotation-Zoomer ****
 	CONVERT_IMAGE_TO_BPLCON4_CHUNKY.B rz,extra_memory,a3
