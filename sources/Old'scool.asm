@@ -1,9 +1,3 @@
-; Programm:	Old'scool
-; Autor:	Christian Gerbig
-; Datum:	31.08.2023
-; Version:	1.0
-
-
 ; Requirements
 ; CPU:		68020+
 ; Fat-Memory:	-
@@ -85,8 +79,6 @@
 ; Ausführungszeit 68020: 220 Rasterzeilen
 
 
-	SECTION code_and_variables,CODE
-
 	MC68040
 
 
@@ -139,20 +131,31 @@ workbench_start_enabled		EQU FALSE
 screen_fader_enabled		EQU TRUE
 text_output_enabled		EQU FALSE
 
+; PT-Replay
 pt_ciatiming_enabled		EQU TRUE
-pt_metronome_enabled		EQU FALSE
+pt_usedfx			EQU %1111010101011001
+pt_usedefx			EQU %0000100000000000
 pt_mute_enabled			EQU FALSE
+pt_music_fader_enabled		EQU TRUE
+pt_fade_out_delay		EQU 2 ; ticks
+pt_split_module_enabled		EQU TRUE
 pt_track_notes_played_enabled	EQU FALSE
 pt_track_volumes_enabled	EQU FALSE
 pt_track_periods_enabled	EQU FALSE
 pt_track_data_enabled		EQU FALSE
-pt_music_fader_enabled		EQU TRUE
-pt_split_module_enabled		EQU TRUE
-pt_usedfx			EQU %1111010101011001
-pt_usedefx			EQU %0000100000000000
+	IFD PROTRACKER_VERSION_3
+pt_metronome_enabled		EQU FALSE
+pt_metrochanbits		EQU pt_metrochan1
+pt_metrospeedbits		EQU pt_metrospeed4th
+	ENDC
 
 open_border_enabled		EQU TRUE
+
+; Rotation-Zoomer
 rz_table_length_256		EQU FALSE
+rz_display_y_scale_factor	EQU 4
+
+; Blenk-Vectors
 bv_EpRGB_check_max_enabled	EQU TRUE
 
 dma_bits			EQU DMAF_BLITTER|DMAF_SPRITE|DMAF_COPPER|DMAF_RASTER|DMAF_MASTER+DMAF_SETCLR
@@ -221,17 +224,17 @@ spr_swap_number			EQU 2
 audio_memory_size		EQU 0
 	ENDC
 	IFD PROTRACKER_VERSION_3
-audio_memory_size		EQU 2
+audio_memory_size		EQU 1*WORD_SIZE
 	ENDC
 
 disk_memory_size		EQU 0
 
 chip_memory_size		EQU 0
-ciaa_crb_bits			EQU CIACRBF_LOAD|CIACRBF_RUNMODE ; oneshot
+ciaa_crb_bits			EQU CIACRBF_LOAD|CIACRBF_RUNMODE ; oneshot mode
 	IFEQ pt_ciatiming_enabled
 ciab_cra_bits			EQU CIACRBF_LOAD
 	ENDC
-ciab_crb_bits			EQU CIACRBF_LOAD|CIACRBF_RUNMODE ; Oneshot mode
+ciab_crb_bits			EQU CIACRBF_LOAD|CIACRBF_RUNMODE ; oneshot mode
 ciaa_ta_time			EQU 0
 ciaa_tb_time			EQU 142 ;0.709379 MHz * 200 µs
 	IFEQ pt_ciatiming_enabled
@@ -288,8 +291,6 @@ diwhigh_bits			EQU DIWHIGHF_HSTOP1|(((display_window_hstop&$100)>>8)*DIWHIGHF_HS
 fmode_bits			EQU FMODEF_BPL32|FMODEF_BPAGEM|FMODEF_SPR32|FMODEF_SPAGEM
 color00_bits			EQU $090909
 
-rz_display_y_scale_factor	EQU 4
-
 cl2_display_x_size		EQU visible_pixels_number+8
 cl2_display_width		EQU cl2_display_x_size/8
 cl2_display_y_size		EQU visible_lines_number/rz_display_y_scale_factor
@@ -304,17 +305,14 @@ cl1_vstart2			EQU beam_position&$ff
 
 sine_table_length		EQU 512
 
-; **** Background-Image ****
+; Background-Image
 bg_image_x_size			EQU 320
 bg_image_plane_width		EQU bg_image_x_size/8
 bg_image_y_size			EQU 256
 bg_image_depth			EQU 7
 bg_image_colors_number		EQU 128
 
-; **** PT-Replay ****
-pt_fade_out_delay		EQU 2 ;Ticks
-
-; **** Rotation-Zoomer ****
+; Rotation-Zoomer
 rz_image_x_size			EQU 256
 rz_image_plane_width		EQU rz_image_x_size/8
 rz_image_y_size			EQU 256
@@ -334,7 +332,7 @@ rz_zoom_radius			EQU 1024
 rz_zoom_center			EQU 1024+rz_d
 rz_zoom_angle_speed		EQU 1
 
-; **** Wave-Scrolltext ****
+; Wave-Scrolltext
 wst_used_sprites_number		EQU 6
 
 wst_image_x_size		EQU 640
@@ -366,7 +364,7 @@ wst_y_center			EQU ((visible_lines_number-wst_text_character_y_size)/2)+display_
 wst_y_angle_speed1		EQU 5
 wst_y_angle_step1		EQU sine_table_length/wst_text_characters_number
 
-; **** Blenk-Vectors ****
+; Blenk-Vectors
 bv_rotation_d			EQU 256
 bv_rotation_xy_center		EQU extra_pf2_x_size/2
 bv_rotation_x_angle_speed1	EQU 4
@@ -466,24 +464,24 @@ bv_fill_blit_x_size		EQU extra_pf1_x_size
 bv_fill_blit_y_size		EQU extra_pf1_y_size
 bv_fill_blit_depth		EQU extra_pf1_depth
 
-; **** Image-Fader ****
+; Image-Fader
 if_rgb8_start_color		EQU 0
 if_rgb8_color_table_offset	EQU 0
 if_rgb8_colors_number		EQU pf1_colors_number
 
-; **** Image-Fader-In ****
+; Image-Fader-In
 ifi_rgb8_fader_speed_max	EQU 4
 ifi_rgb8_fader_radius		EQU ifi_rgb8_fader_speed_max
 ifi_rgb8_fader_center		EQU ifi_rgb8_fader_speed_max+1
 ifi_rgb8_fader_angle_speed	EQU 1
 
-; **** Image-Fader-Out ****
+; Image-Fader-Out
 ifo_rgb8_fader_speed_max	EQU 8
 ifo_rgb8_fader_radius		EQU ifo_rgb8_fader_speed_max
 ifo_rgb8_fader_center		EQU ifo_rgb8_fader_speed_max+1
 ifo_rgb8_fader_angle_speed	EQU 1
 
-; **** Blind-Fader ****
+; Blind-Fader
 bf_lamellas_number		EQU 8
 bf_lamella_height		EQU 8
 bf_step1			EQU 1
@@ -491,7 +489,7 @@ bf_step2			EQU 1
 bf_speed			EQU 1
 bf_table_length			EQU bf_lamella_height*4
 
-; **** Cube-Zoomer-In ****
+; Cube-Zoomer-In
 czi_zoom_radius			EQU 32768
 czi_zoom_center			EQU 32768
 czi_zoom_angle_speed		EQU 1
@@ -509,6 +507,24 @@ extra_memory_size		EQU rz_image_x_size*rz_image_y_size*BYTE_SIZE
 
 
 	INCLUDE "sprite-attributes.i"
+
+
+; PT-Replay
+	INCLUDE "music-tracker/pt-song.i"
+
+	INCLUDE "music-tracker/pt-temp-channel.i"
+
+
+; Blenk-Vectors
+	RSRESET
+
+object_info			RS.B 0
+
+object_info_edges_table		RS.L 1
+object_info_face_color		RS.W 1
+object_info_lines_number	RS.W 1
+
+object_info_size		RS.B 0
 
 
 	RSRESET
@@ -623,7 +639,6 @@ cl2_extension2_entry		RS.B cl2_extension2_size
 copperlist2_size		RS.B 0
 
 
-; ** Konstanten für die größe der Copperlisten **
 cl1_size1			EQU 0
 cl1_size2			EQU copperlist1_size
 cl1_size3			EQU copperlist1_size
@@ -632,7 +647,7 @@ cl2_size2			EQU copperlist2_size
 cl2_size3			EQU copperlist2_size
 
 
-; ** Sprite0-Zusatzstruktur **
+; Sprite0-Zusatzstruktur
 	RSRESET
 
 spr0_extension1			RS.B 0
@@ -642,7 +657,7 @@ spr0_ext1_planedata		RS.L (spr_pixel_per_datafetch/16)*wst_text_character_y_size
 
 spr0_extension1_size		RS.B 0
 
-; ** Sprite0-Hauptstruktur **
+; Sprite0-Hauptstruktur
 	RSRESET
 
 spr0_begin			RS.B 0
@@ -653,7 +668,7 @@ spr0_end			RS.L 1*(spr_pixel_per_datafetch/16)
 
 sprite0_size			RS.B 0
 
-; ** Sprite1-Zusatzstruktur **
+; Sprite1-Zusatzstruktur
 	RSRESET
 
 spr1_extension1	RS.B 0
@@ -663,7 +678,7 @@ spr1_ext1_planedata		RS.L (spr_pixel_per_datafetch/16)*wst_text_character_y_size
 
 spr1_extension1_size		RS.B 0
 
-; ** Sprite1-Hauptstruktur **
+; Sprite1-Hauptstruktur
 	RSRESET
 
 spr1_begin			RS.B 0
@@ -674,7 +689,7 @@ spr1_end			RS.L 1*(spr_pixel_per_datafetch/16)
 
 sprite1_size			RS.B 0
 
-; ** Sprite2-Zusatzstruktur **
+; Sprite2-Zusatzstruktur
 	RSRESET
 
 spr2_extension1			RS.B 0
@@ -684,7 +699,7 @@ spr2_ext1_planedata		RS.L (spr_pixel_per_datafetch/16)*wst_text_character_y_size
 
 spr2_extension1_size		RS.B 0
 
-; ** Sprite2-Hauptstruktur **
+; Sprite2-Hauptstruktur
 	RSRESET
 
 spr2_begin			RS.B 0
@@ -695,7 +710,7 @@ spr2_end			RS.L 1*(spr_pixel_per_datafetch/16)
 
 sprite2_size			RS.B 0
 
-; ** Sprite3-Zusatzstruktur **
+; Sprite3-Zusatzstruktur
 	RSRESET
 
 spr3_extension1			RS.B 0
@@ -705,7 +720,7 @@ spr3_ext1_planedata		RS.L (spr_pixel_per_datafetch/16)*wst_text_character_y_size
 
 spr3_extension1_size		RS.B 0
 
-; ** Sprite3-Hauptstruktur **
+; Sprite3-Hauptstruktur
 	RSRESET
 
 spr3_begin			RS.B 0
@@ -716,7 +731,7 @@ spr3_end			RS.L 1*(spr_pixel_per_datafetch/16)
 
 sprite3_size			RS.B 0
 
-; ** Sprite4-Zusatzstruktur **
+; Sprite4-Zusatzstruktur
 	RSRESET
 
 spr4_extension1			RS.B 0
@@ -726,7 +741,7 @@ spr4_ext1_planedata		RS.L (spr_pixel_per_datafetch/16)*wst_text_character_y_size
 
 spr4_extension1_size 		RS.B 0
 
-; ** Sprite4-Hauptstruktur **
+; Sprite4-Hauptstruktur
 	RSRESET
 
 spr4_begin			RS.B 0
@@ -737,7 +752,7 @@ spr4_end			RS.L 1*(spr_pixel_per_datafetch/16)
 
 sprite4_size			RS.B 0
 
-; ** Sprite5-Zusatzstruktur **
+; Sprite5-Zusatzstruktur
 	RSRESET
 
 spr5_extension1	RS.B 0
@@ -747,7 +762,7 @@ spr5_ext1_planedata		RS.L (spr_pixel_per_datafetch/16)*wst_text_character_y_size
 
 spr5_extension1_size		RS.B 0
 
-; ** Sprite5-Hauptstruktur **
+; Sprite5-Hauptstruktur
 	RSRESET
 
 spr5_begin			RS.B 0
@@ -758,7 +773,7 @@ spr5_end			RS.L 1*(spr_pixel_per_datafetch/16)
 
 sprite5_size			RS.B 0
 
-; ** Sprite6-Zusatzstruktur **
+; Sprite6-Zusatzstruktur
 	RSRESET
 
 spr6_extension1	RS.B 0
@@ -768,7 +783,7 @@ spr6_ext1_planedata		RS.L bv_image_y_size*(spr_pixel_per_datafetch/16)
 
 spr6_extension1_size		RS.B 0
 
-; ** Sprite6-Hauptstruktur **
+; Sprite6-Hauptstruktur
 	RSRESET
 
 spr6_begin			RS.B 0
@@ -779,7 +794,7 @@ spr6_end			RS.L 1*(spr_pixel_per_datafetch/16)
 
 sprite6_size			RS.B 0
 
-; ** Sprite7-Zusatzstruktur **
+; Sprite7-Zusatzstruktur
 	RSRESET
 
 spr7_extension1	RS.B 0
@@ -789,7 +804,7 @@ spr7_ext1_planedata		RS.L bv_image_y_size*(spr_pixel_per_datafetch/16)
 
 spr7_extension1_size		RS.B 0
 
-; ** Sprite7-Hauptstruktur **
+; Sprite7-Hauptstruktur
 	RSRESET
 
 spr7_begin			RS.B 0
@@ -801,7 +816,6 @@ spr7_end			RS.L 1*(spr_pixel_per_datafetch/16)
 sprite7_size			RS.B 0
 
 
-; ** Konstanten für die Größe der Spritestrukturen **
 spr0_x_size1			EQU spr_x_size1
 spr0_y_size1			EQU sprite0_size/(spr_pixel_per_datafetch/4)
 spr1_x_size1			EQU spr_x_size1
@@ -843,7 +857,7 @@ spr7_y_size2			EQU sprite7_size/(spr_pixel_per_datafetch/4)
 
 save_a7				RS.L 1
 
-; **** PT-Replay ****
+; PT-Replay
 	IFD PROTRACKER_VERSION_2 
 		INCLUDE "music-tracker/pt2-variables-offsets.i"
 	ENDC
@@ -853,13 +867,13 @@ save_a7				RS.L 1
 
 pt_effects_handler_active	RS.W 1
 
-; **** Rotation-Zoomer ****
+; Rotation-Zoomer
 rz_active			RS.W 1
 rz_zoomer_active		RS.W 1
 rz_z_rotation_angle		RS.W 1
 rz_zoom_angle			RS.W 1
 
-; **** Wave-Scrolltext ****
+; Wave-Scrolltext
 	RS_ALIGN_LONGWORD
 wst_image			RS.L 1
 wst_enabled			RS.W 1
@@ -869,7 +883,7 @@ wst_y_angle_speed		RS.W 1
 wst_y_angle_step		RS.W 1
 wst_horiz_scroll_speed		RS.W 1
 
-; **** Blenk-Vectors ****
+; Blenk-Vectors
 bv_active			RS.W 1
 bv_rotation_x_angle		RS.W 1
 bv_rotation_y_angle		RS.W 1
@@ -891,36 +905,36 @@ bv_wobble_x_angle		RS.W 1
 	RS_ALIGN_LONGWORD
 bv_zoom_distance		RS.L 1
 
-; **** Image-Fader ****
+; Image-Fader
 if_rgb8_colors_counter		RS.W 1
 if_rgb8_copy_colors_active	RS.W 1
 
-; **** Image-Fader-In ****
+; Image-Fader-In
 ifi_rgb8_active			RS.W 1
 ifi_rgb8_fader_angle		RS.W 1
 
-; **** Image-Fader-Out ****
+; Image-Fader-Out
 ifo_rgb8_active			RS.W 1
 ifo_rgb8_fader_angle		RS.W 1
 
-; **** Blind-Fader ****
+; Blind-Fader
 bf_address_offsets_table_start	RS.W 1
 
-; **** Blind-Fader-In ****
+; Blind-Fader-In
 bfi_active			RS.W 1
 
-; **** Blind-Fader-Out ****
+; Blind-Fader-Out
 bfo_active			RS.W 1
 
-; **** Cube-Zoomer-In ****
+; Cube-Zoomer-In
 czi_active			RS.W 1
 czi_zoom_angle			RS.W 1
 
-; **** Keyboard-Handler ****
+; Keyboard-Handler
 kh_key_code			RS.B 1
 kh_key_flag			RS.B 1
 
-; **** Main ****
+; Main
 stop_fx_active			RS.W 1
 part_title_active		RS.W 1
 part_main_active		RS.W 1
@@ -928,21 +942,7 @@ part_main_active		RS.W 1
 variables_size			RS.B 0
 
 
-; **** PT-Replay ****
-	INCLUDE "music-tracker/pt-song.i"
-
-	INCLUDE "music-tracker/pt-temp-channel.i"
-
-; **** Blenk-Vectors ****
-	RSRESET
-
-object_info			RS.B 0
-
-object_info_edges_table		RS.L 1
-object_info_face_color		RS.W 1
-object_info_lines_number	RS.W 1
-
-object_info_size		RS.B 0
+	SECTION code,CODE
 
 
 	INCLUDE "sys-wrapper.i"
@@ -953,9 +953,11 @@ init_main_variables
 	bsr.s	init_pt_variables
 	bra.s	init_main_variables2
 
-; **** PT-Replay ****
+
 	CNOP 0,4
 init_pt_variables
+
+; PT-Replay
 	IFD PROTRACKER_VERSION_2
 		PT2_INIT_VARIABLES
 	ENDC
@@ -968,7 +970,7 @@ init_pt_variables
 
 	CNOP 0,4
 init_main_variables2
-; **** Rotation-Zoomer ****
+; Rotation-Zoomer
 	moveq	#FALSE,d1
 	move.w	d1,rz_active(a3)
 	move.w	d1,rz_zoomer_active(a3)
@@ -976,7 +978,7 @@ init_main_variables2
 	move.w	d0,rz_z_rotation_angle(a3) ; 0 Grad
 	move.w	#(sine_table_length/4)*3,rz_zoom_angle(a3) ; 270 Grad
 
-; **** Wave-Scrolltext ****
+; Wave-Scrolltext
 	move.w	d1,wst_enabled(a3)
 	lea	wst_image_data,a0
 	move.l	a0,wst_image(a3)
@@ -986,7 +988,7 @@ init_main_variables2
 	move.w	#wst_y_angle_step1,wst_y_angle_step(a3)
 	move.w	#wst_horiz_scroll_speed1,wst_horiz_scroll_speed(a3)
 
-; **** Blenk-Vectors ****
+; Blenk-Vectors
 	move.w	d1,bv_active(a3)
 	move.w	d0,bv_rotation_x_angle(a3) ; 0 Grad
 	move.w	d0,bv_rotation_y_angle(a3) ; 0 Grad
@@ -1007,7 +1009,7 @@ init_main_variables2
 
 	move.l	#czi_zoom_radius,bv_zoom_distance(a3)
 
-; **** Image-Fader ****
+; Image-Fader
 	move.w	d0,if_rgb8_colors_counter(a3)
 	move.w	d1,if_rgb8_copy_colors_active(a3)
 
@@ -1017,24 +1019,24 @@ init_main_variables2
 	move.w	d1,ifo_rgb8_active(a3)
 	move.w	#sine_table_length/4,ifo_rgb8_fader_angle(a3) ; 90 Grad
 
-; **** Blind-Fader ****
+; Blind-Fader
 	move.w	d0,bf_address_offsets_table_start(a3)
 
-; **** Blind-Fader-In ****
+; Blind-Fader-In
 	move.w	d1,bfi_active(a3)
 
-; **** Blind-Fader-Out ****
+; Blind-Fader-Out
 	move.w	d1,bfo_active(a3)
 
-; **** Cube-Zoomer-In ****
+; Cube-Zoomer-In
 	move.w	d1,czi_active(a3)
 	move.w	d0,czi_zoom_angle(a3)	; 90 Grad
 
-; **** Keyboard-Handler ****
+; Keyboard-Handler
 	move.b	d0,kh_key_code(a3)
 	move.b	d0,kh_key_flag(a3)
 
-; **** Main ****
+; Main
 	move.w	d1,stop_fx_active(a3)
 	move.w	d1,part_title_active(a3)
 	move.w	d1,part_main_active(a3)
@@ -1059,7 +1061,8 @@ init_main
 	bsr	init_first_copperlist
 	bra	init_second_copperlist
 
-; **** PT-Replay ****
+
+; PT-Replay
 	PT_DETECT_SYS_FREQUENCY
 
 	PT_INIT_REGISTERS
@@ -1070,15 +1073,18 @@ init_main
 
 	PT_INIT_FINETUNE_TABLE_STARTS
 
-; **** Rotation-Zoomer ****
+
+; Rotation-Zoomer
 	CONVERT_IMAGE_TO_BPLCON4_CHUNKY.B rz,extra_memory,a3
 
-; **** Wave-Scrolltext ****
+
+; Wave-Scrolltext
 	INIT_CHARACTERS_OFFSETS.W wst
 
 	INIT_CHARACTERS_X_POSITIONS wst,SHIRES
 
-; **** Blenk-Vectors ****
+
+; Blenk-Vectors
 	RGB8_TO_RGB8_HIGH_LOW bv,segments_number1*color_values_number1
 
 	CNOP 0,4
@@ -1096,7 +1102,8 @@ bv_init_object_info_loop
 	dbf	d7,bv_init_object_info_loop
 	rts
 
-; **** Background-Image ****
+
+; Background-Image
 	COPY_IMAGE_TO_BITPLANE bg
 
 
@@ -1119,6 +1126,7 @@ init_CIA_timers
 	moveq	#ciaa_crb_bits,d0
 	move.b	d0,CIACRB(a4)
 
+; PT-Replay
 	PT_INIT_TIMERS
 	rts
 
@@ -1218,12 +1226,12 @@ cl1_set_branches_ptrs
 	CNOP 0,4
 cl1_set_jump_entry_ptrs
 ; Input
-; d0.l	... Einsprungadresse Copperliste2
-; d2.l	... cl1_subextension1_size
-; d4.l	... cl1_extension1_size
-; a0	... Copperliste1
+; d0.l	Einsprungadresse Copperliste2
+; d2.l	cl1_subextension1_size
+; d4.l	cl1_extension1_size
+; a0.l	Copperliste1
 ; Result
-; d0.l	... Kein Rückgabewert
+; d0.l	Kein Rückgabewert
 	MOVEF.L cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subextension1_size,d1 ; Offset Rücksprungadresse CL1
 	add.l	a0,d1			; + Rücksprungadresse CL1
 	lea	cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subext1_COP1LCH+WORD_SIZE(a0),a1
@@ -1406,9 +1414,9 @@ wave_scrolltext_quit
 	CNOP 0,4
 wst_check_control_codes
 ; Input
-; d0.b	... ASCII-Code
+; d0.b	ASCII-Code
 ; Result
-; d0.l	... Rückgabewert: Return-Code
+; d0.l	Rückgabewert: Return-Code
 	cmp.b	#"°",d0
 	beq.s	wst_set_standard_scroll
 	cmp.b	#"¹",d0
@@ -1543,7 +1551,7 @@ bv_rotation_loop
 	ROTATE_X_AXIS
 	ROTATE_Y_AXIS
 	ROTATE_Z_AXIS
-; ** Zentralprojektion und Translation **
+; Zentralprojektion und Translation
 	move.w	d2,d3			; z -> d3
 	ext.l	d0			; Auf 32 Bit erweitern
 	add.w	a4,d3			; z+d
@@ -1580,7 +1588,7 @@ bv_draw_lines
 	lea	bv_color_table(pc),a7	; Zeiger auf Tabelle mit Farbverlaufwerten
 	moveq	#bv_object_faces_number-1,d7
 bv_draw_lines_loop1
-; ** Z-Koordinate des Vektors N durch das Kreuzprodukt u x v berechnen **
+; Z-Koordinate des Vektors N durch das Kreuzprodukt u x v berechnen
 	move.l	(a0)+,a5		; Zeiger auf Startwerte der Punkte
 	swap	d7			; Flächenzähler retten
 	move.w	(a5),d4			; P1-Startwert
@@ -1596,7 +1604,7 @@ bv_draw_lines_loop1
 	muls.w	d2,d1			; yu*xv
 	sub.l	d0,d1			; zn = (yu*xv)-(xu*yv)
 	bpl	bv_draw_lines_skip5
-; ** Mittlere Z-Koordinate der Fläche berechnen **
+; Mittlere Z-Koordinate der Fläche berechnen
 	move.w	6(a5),d7		; P4-Startwert
 	move.w	4(a1,d4.w*2),d0		; zm = zp1+zp2+zp3+zp4
 	add.w	4(a1,d5.w*2),d0
@@ -1609,10 +1617,10 @@ bv_draw_lines_loop1
 		ext.l	d0
 		divs.w	#bv_object_edge_points_per_face,d0 ; zm / Anzahl der Eckpunkte
 	ENDC
-; ** Entfernung zur Lichtquelle berechnen **
+; Entfernung zur Lichtquelle berechnen
 	move.w	(a0),d7			; Farbnummer
 	sub.w	variables+bv_light_z_coordinate(pc),d0 ; D = zm-zl
-; ** Farbintensität der Fläche ermitteln **
+; Farbintensität der Fläche ermitteln
 	sub.w	#bv_D0,d0		; D-D0
 	bgt.s	bv_draw_lines_skip1
 	moveq	#1,d0			; D = 1
@@ -1624,7 +1632,7 @@ bv_draw_lines_skip1
 		MOVEF.W bv_EpRGB_max,d1	; Maximalwert setzen
 bv_draw_lines_skip2
 	ENDC
-; ** Farbwert in Copperliste eintragen **
+; Farbwert in Copperliste eintragen
 	move.l	(a7,d1.w*4),d0
 	move.w	d0,(cl1_COLOR12_low5-cl1_COLOR12_high5,a4,d7.w*4) ; Low-Bits COLORxx
 	swap	d0			; High
@@ -1869,7 +1877,7 @@ rotation_zoomer_skip
 		and.w	d6,d5		; Überlauf entfernen
 	ENDC
 rotation_zoomer_skip
-; ** Zoomfaktor berechnen **
+; Zoomfaktor berechnen
 	IFEQ rz_zoom_radius-4096
 		asr.w	#3,d2		; zoom'=(zoomr*sin(w))/2^15
 	ELSE
@@ -1891,7 +1899,7 @@ rotation_zoomer_skip
 	muls.w	d2,d1			; y'=(zoom'*sin(w))/2^15
 	swap	d0
 	swap	d1
-; ** Rotation um die Z-Achse **
+; Rotation um die Z-Achse
 	moveq	#rz_Ax,d2		; X links oben
 	muls.w	d0,d2			; Ax*cos(w)
 	moveq	#rz_Ay,d3		; Y links oben
@@ -1904,12 +1912,12 @@ rotation_zoomer_skip
 	muls.w	d0,d4			; By*cos(w)
 	add.w	#rz_z_rotation_x_center<<8,d2 ; x' + X-Mittelpunkt
 	add.l	d4,d3			; By'=Bx*sin(w)+By*cos(w)
-; ** Translation **
+; Translation
 	move.w	d2,a4			; X-Mittelpunkt retten
 	add.w	#rz_z_rotation_y_center<<8,d3 ; y' + Y-Mittelpunkt
 	move.l	cl2_construction2(a3),a1
 	move.w	d3,a5			; Y-Mittelpunkt retten
-; ** BPLAM-werte in Copperliste kopieren **
+; BPLAM-werte in Copperliste kopieren
 	move.l	a7,save_a7(a3)	
 	move.w	#cl2_extension1_size,a2
 	move.w	d0,a3			; cos(w) retten
@@ -2165,7 +2173,7 @@ blind_fader_out_quit
 
 	CNOP 0,4
 init_colors2
-; ***** Bild *****
+; Bild
 	lea	ifo_rgb8_color_table(pc),a0
 	move.l	cl1_construction2(a3),a1 
 	ADDF.W	cl1_COLOR00_high1+WORD_SIZE,a1
@@ -2195,7 +2203,7 @@ init_colors2_loop
 init_colors2_skip
 	ENDC
 	dbf	d7,init_colors2_loop
-; **** Sprites ****
+; Sprites
 	lea	spr_rgb8_color_table(pc),a0
 	move.l	cl1_construction2(a3),a1 
 	ADDF.W	cl1_COLOR00_high5+WORD_SIZE,a1
@@ -2443,7 +2451,7 @@ ciab_ta_int_server
 VERTB_int_server
 	ENDC
 
-; **** PT-Replay *****
+; PT-Replay
 	IFEQ pt_music_fader_enabled
 		bsr.s	pt_music_fader
 		bra.s	pt_PlayMusic
@@ -2586,12 +2594,11 @@ rz_set_branches_ptrs
 	CNOP 0,4
 rz_set_jump_entry_ptrs
 ; Input
-; a0	... Copperliste1
-; d0.l	... Einsprungadresse Copperliste2
-; d2.l	... cl1_subextension1_size
-; d3.l	... cl2_extension1_size
+; a0.l	Copperliste1
+; d0.l	Einsprungadresse Copperliste2
+; d2.l	cl1_subextension1_size
+; d3.l	cl2_extension1_size
 ; Result
-; d0.l	... Kein Rückgabewert
 	MOVEF.L cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subextension1_size,d1 ; Offset Rücksprungadresse CL1
 	add.l	a0,d1			; + Rücksprungadresse CL1
 	lea	cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subext1_COP1LCH+WORD_SIZE(a0),a1
@@ -2664,7 +2671,7 @@ spr_ptrs_display
 sine_table
 	INCLUDE "sine-table-512x32.i"
 
-; **** PT-Replay ****
+; PT-Replay
 	INCLUDE "music-tracker/pt-invert-table.i"
 
 	INCLUDE "music-tracker/pt-vibrato-tremolo-table.i"
@@ -2683,7 +2690,7 @@ sine_table
 
 	INCLUDE "music-tracker/pt-finetune-starts-table.i"
 
-; **** Wave-Scrolltext ****
+; Wave-Scrolltext
 wst_ascii
 	DC.B "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.!?-'():/\*#@ "
 wst_ascii_end
@@ -2697,12 +2704,12 @@ wst_characters_offsets
 wst_characters_x_positions
 	DS.W wst_text_characters_number
 
-; **** Blenk-Vectors ****
+; Blenk-Vectors
 	CNOP 0,4
 bv_color_table
 	INCLUDE "Daten:Asm-Sources.AGA/projects/Old'scool/colortables/64-Colorgradient-Brown.ct"
 
-; ** Würfel **
+; Würfel
 	CNOP 0,2
 bv_object_coords
 	DC.W -(35*8),-(35*8),-(35*8)	; P0
@@ -2754,7 +2761,7 @@ bv_object_edges
 bv_rotation_xyz_coords
 	DS.W bv_object_edge_points_number*3
 
-; **** Image-Fader ****
+; Image-Fader
 	CNOP 0,4
 ifi_rgb8_color_table
 	INCLUDE "Daten:Asm-Sources.AGA/projects/Old'scool/colortables/320x256x128-Title.ct"
@@ -2765,7 +2772,7 @@ ifo_rgb8_color_table
 		DC.L color00_bits
 	ENDR
 
-; **** Blind-Fader ****
+; Blind-Fader
 	CNOP 0,2
 bf_address_offsets_table
 	REPT bf_table_length/2
@@ -2784,7 +2791,7 @@ bf_address_offsets_table
 
 	INCLUDE "error-texts.i"
 
-; **** Wave-Scrolltext ****
+; Wave-Scrolltext
 wst_text
 	DC.B ASCII_CTRL_F,"°¹"
 	DC.B "RESISTANCE"
@@ -2832,13 +2839,16 @@ wst_stop_text
 	EVEN
 
 
-	DC.B "$VER: RSE-Old'scool 1.0 (31.8.23)",0
+	DC.B "$VER: "
+	DC.B "RSE-Old'scool "
+	DC.B "1.0 "
+	DC.B "(31.8.23)",0
 	EVEN
 
 
-; ## Audiodaten nachladen ##
+; Audiodaten nachladen
 
-; **** PT-Replay ****
+; PT-Replay
 	IFNE pt_split_module_enabled
 pt_auddata SECTION pt_audio_module,DATA_C
 		INCBIN "Daten:Asm-Sources.AGA/projects/Old'scool/modules/mod.ClassicTune14remix"
@@ -2851,17 +2861,17 @@ pt_audsmps SECTION pt_audio_samples,DATA_C
 	ENDC
 
 
-; ## Grafikdaten nachladen ##
+; Grafikdaten nachladen
 
-; **** Background-Image ****
+; Background-Image
 bg_image_data SECTION bg_gfx,DATA
 	INCBIN "Daten:Asm-Sources.AGA/projects/Old'scool/graphics/320x256x128-Title.rawblit"
 
-; **** Rotation-Zoomer ****
+; Rotation-Zoomer
 rz_image_data SECTION rz_gfx,DATA
 	INCBIN "Daten:Asm-Sources.AGA/projects/Old'scool/graphics/256x256x128-Texture.rawblit"
 
-; **** Wave-Scrolltext ****
+; Wave-Scrolltext
 wst_image_data SECTION wst_gfx,DATA
 	INCBIN "Daten:Asm-Sources.AGA/projects/Old'scool/fonts/64x56x4-Font.rawblit"
 
