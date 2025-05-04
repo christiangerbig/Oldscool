@@ -1,8 +1,7 @@
 ; Requirements
-; CPU:		68020+
-; Fat-Memory:	-
-; Chipset:	AGA PAL
-; OS:		3.0+
+; 68020+
+; AGA PAL
+; 3.0+
 
 
 ; History/Changes
@@ -76,13 +75,14 @@
 ; 860	Enable zoomer
 ; 861	Disable zoomer
 
+
 ; Ausführungszeit 68020: 220 Rasterzeilen
 
 
 	MC68040
 
 
-	INCDIR "Daten:include3.5/"
+	INCDIR "include3.5:"
 
 	INCLUDE "exec/exec.i"
 	INCLUDE "exec/exec_lib.i"
@@ -110,10 +110,10 @@
 	INCLUDE "hardware/intbits.i"
 
 
-	INCDIR "Daten:Asm-Sources.AGA/custom-includes/"
-
-
 PROTRACKER_VERSION_3		SET 1
+
+
+	INCDIR "custom-includes-aga:"
 
 
 	INCLUDE "macros.i"
@@ -143,11 +143,9 @@ pt_track_notes_played_enabled	EQU FALSE
 pt_track_volumes_enabled	EQU FALSE
 pt_track_periods_enabled	EQU FALSE
 pt_track_data_enabled		EQU FALSE
-	IFD PROTRACKER_VERSION_3
 pt_metronome_enabled		EQU FALSE
 pt_metrochanbits		EQU pt_metrochan1
 pt_metrospeedbits		EQU pt_metrospeed4th
-	ENDC
 
 open_border_enabled		EQU TRUE
 
@@ -339,28 +337,28 @@ wst_image_x_size		EQU 640
 wst_image_plane_width		EQU wst_image_x_size/8
 wst_image_depth			EQU 2
 
-wst_origin_character_x_size	EQU 64
-wst_origin_character_y_size	EQU 56
-wst_origin_character_depth	EQU wst_image_depth
+wst_origin_char_x_size		EQU 64
+wst_origin_char_y_size		EQU 56
+wst_origin_char_depth		EQU wst_image_depth
 
-wst_text_character_x_size	EQU wst_origin_character_x_size
-wst_text_character_width	EQU wst_text_character_x_size/8
-wst_text_character_y_size	EQU wst_origin_character_y_size
-wst_text_character_depth	EQU wst_image_depth
+wst_text_char_x_size		EQU wst_origin_char_x_size
+wst_text_char_width		EQU wst_text_char_x_size/8
+wst_text_char_y_size		EQU wst_origin_char_y_size
+wst_text_char_depth		EQU wst_image_depth
 
-wst_horiz_scroll_window_x_size	EQU visible_pixels_number+wst_text_character_x_size
+wst_horiz_scroll_window_x_size	EQU visible_pixels_number+wst_text_char_x_size
 wst_horiz_scroll_window_width	EQU wst_horiz_scroll_window_x_size/8
-wst_horiz_scroll_window_y_size	EQU wst_text_character_y_size
-wst_horiz_scroll_window_depth	EQU wst_text_character_depth
+wst_horiz_scroll_window_y_size	EQU wst_text_char_y_size
+wst_horiz_scroll_window_depth	EQU wst_text_char_depth
 wst_horiz_scroll_speed1		EQU 10
 wst_horiz_scroll_speed2		EQU 12
 wst_horiz_scroll_speed3		EQU 17
 
-wst_text_character_x_restart	EQU wst_horiz_scroll_window_x_size*4 ;*4 da superhires Pixel
-wst_text_characters_number	EQU wst_horiz_scroll_window_x_size/wst_text_character_x_size
+wst_text_char_x_restart		EQU wst_horiz_scroll_window_x_size*4 ;*4 da superhires Pixel
+wst_text_characters_number	EQU wst_horiz_scroll_window_x_size/wst_text_char_x_size
 
-wst_y_radius			EQU (visible_lines_number-wst_text_character_y_size)/2
-wst_y_center			EQU ((visible_lines_number-wst_text_character_y_size)/2)+display_window_vstart
+wst_y_radius			EQU (visible_lines_number-wst_text_char_y_size)/2
+wst_y_center			EQU ((visible_lines_number-wst_text_char_y_size)/2)+display_window_vstart
 wst_y_angle_speed1		EQU 5
 wst_y_angle_step1		EQU sine_table_length/wst_text_characters_number
 
@@ -500,7 +498,7 @@ segments_number1		EQU 1
 extra_memory_size		EQU rz_image_x_size*rz_image_y_size*BYTE_SIZE
 
 
-	INCLUDE "except-vectors-offsets.i"
+	INCLUDE "except-vectors.i"
 
 
 	INCLUDE "extra-pf-attributes.i"
@@ -536,7 +534,7 @@ cl1_subext1_SPR7POS		RS.L 1
 cl1_subext1_COP1LCH		RS.L 1
 cl1_subext1_COP1LCL		RS.L 1
 cl1_subext1_COPJMP2		RS.L 1
-cl1_subextension1_size 		RS.B 0
+cl1_subextension1_size		RS.B 0
 
 
 	RSRESET
@@ -552,7 +550,7 @@ cl1_extension1_size		RS.B 0
 
 cl1_begin			RS.B 0
 
-	INCLUDE "copperlist1-offsets.i"
+	INCLUDE "copperlist1.i"
 
 cl1_extension1_entry		RS.B cl1_extension1_size*cl2_display_y_size
 cl1_WAIT1			RS.L 1
@@ -652,8 +650,8 @@ cl2_size3			EQU copperlist2_size
 
 spr0_extension1			RS.B 0
 
-spr0_ext1_header		RS.L 1*(spr_pixel_per_datafetch/16)
-spr0_ext1_planedata		RS.L (spr_pixel_per_datafetch/16)*wst_text_character_y_size
+spr0_ext1_header		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
+spr0_ext1_planedata		RS.L (spr_pixel_per_datafetch/WORD_BITS)*wst_text_char_y_size
 
 spr0_extension1_size		RS.B 0
 
@@ -664,7 +662,7 @@ spr0_begin			RS.B 0
 
 spr0_extension1_entry RS.B spr0_extension1_size
 
-spr0_end			RS.L 1*(spr_pixel_per_datafetch/16)
+spr0_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite0_size			RS.B 0
 
@@ -673,8 +671,8 @@ sprite0_size			RS.B 0
 
 spr1_extension1	RS.B 0
 
-spr1_ext1_header		RS.L 1*(spr_pixel_per_datafetch/16)
-spr1_ext1_planedata		RS.L (spr_pixel_per_datafetch/16)*wst_text_character_y_size
+spr1_ext1_header		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
+spr1_ext1_planedata		RS.L (spr_pixel_per_datafetch/WORD_BITS)*wst_text_char_y_size
 
 spr1_extension1_size		RS.B 0
 
@@ -685,7 +683,7 @@ spr1_begin			RS.B 0
 
 spr1_extension1_entry		RS.B spr1_extension1_size
 
-spr1_end			RS.L 1*(spr_pixel_per_datafetch/16)
+spr1_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite1_size			RS.B 0
 
@@ -694,8 +692,8 @@ sprite1_size			RS.B 0
 
 spr2_extension1			RS.B 0
 
-spr2_ext1_header		RS.L 1*(spr_pixel_per_datafetch/16)
-spr2_ext1_planedata		RS.L (spr_pixel_per_datafetch/16)*wst_text_character_y_size
+spr2_ext1_header		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
+spr2_ext1_planedata		RS.L (spr_pixel_per_datafetch/WORD_BITS)*wst_text_char_y_size
 
 spr2_extension1_size		RS.B 0
 
@@ -706,7 +704,7 @@ spr2_begin			RS.B 0
 
 spr2_extension1_entry		RS.B spr2_extension1_size
 
-spr2_end			RS.L 1*(spr_pixel_per_datafetch/16)
+spr2_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite2_size			RS.B 0
 
@@ -715,8 +713,8 @@ sprite2_size			RS.B 0
 
 spr3_extension1			RS.B 0
 
-spr3_ext1_header		RS.L 1*(spr_pixel_per_datafetch/16)
-spr3_ext1_planedata		RS.L (spr_pixel_per_datafetch/16)*wst_text_character_y_size
+spr3_ext1_header		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
+spr3_ext1_planedata		RS.L (spr_pixel_per_datafetch/WORD_BITS)*wst_text_char_y_size
 
 spr3_extension1_size		RS.B 0
 
@@ -727,7 +725,7 @@ spr3_begin			RS.B 0
 
 spr3_extension1_entry		RS.B spr3_extension1_size
 
-spr3_end			RS.L 1*(spr_pixel_per_datafetch/16)
+spr3_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite3_size			RS.B 0
 
@@ -736,10 +734,10 @@ sprite3_size			RS.B 0
 
 spr4_extension1			RS.B 0
 
-spr4_ext1_header		RS.L 1*(spr_pixel_per_datafetch/16)
-spr4_ext1_planedata		RS.L (spr_pixel_per_datafetch/16)*wst_text_character_y_size
+spr4_ext1_header		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
+spr4_ext1_planedata		RS.L (spr_pixel_per_datafetch/WORD_BITS)*wst_text_char_y_size
 
-spr4_extension1_size 		RS.B 0
+spr4_extension1_size		RS.B 0
 
 ; Sprite4-Hauptstruktur
 	RSRESET
@@ -748,7 +746,7 @@ spr4_begin			RS.B 0
 
 spr4_extension1_entry		RS.B spr4_extension1_size
 
-spr4_end			RS.L 1*(spr_pixel_per_datafetch/16)
+spr4_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite4_size			RS.B 0
 
@@ -757,8 +755,8 @@ sprite4_size			RS.B 0
 
 spr5_extension1	RS.B 0
 
-spr5_ext1_header		RS.L 1*(spr_pixel_per_datafetch/16)
-spr5_ext1_planedata		RS.L (spr_pixel_per_datafetch/16)*wst_text_character_y_size
+spr5_ext1_header		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
+spr5_ext1_planedata		RS.L (spr_pixel_per_datafetch/WORD_BITS)*wst_text_char_y_size
 
 spr5_extension1_size		RS.B 0
 
@@ -769,7 +767,7 @@ spr5_begin			RS.B 0
 
 spr5_extension1_entry		RS.B spr5_extension1_size
 
-spr5_end			RS.L 1*(spr_pixel_per_datafetch/16)
+spr5_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite5_size			RS.B 0
 
@@ -778,8 +776,8 @@ sprite5_size			RS.B 0
 
 spr6_extension1	RS.B 0
 
-spr6_ext1_header		RS.L 1*(spr_pixel_per_datafetch/16)
-spr6_ext1_planedata		RS.L bv_image_y_size*(spr_pixel_per_datafetch/16)
+spr6_ext1_header		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
+spr6_ext1_planedata		RS.L bv_image_y_size*(spr_pixel_per_datafetch/WORD_BITS)
 
 spr6_extension1_size		RS.B 0
 
@@ -790,7 +788,7 @@ spr6_begin			RS.B 0
 
 spr6_extension1_entry		RS.B spr6_extension1_size
 
-spr6_end			RS.L 1*(spr_pixel_per_datafetch/16)
+spr6_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite6_size			RS.B 0
 
@@ -799,8 +797,8 @@ sprite6_size			RS.B 0
 
 spr7_extension1	RS.B 0
 
-spr7_ext1_header		RS.L 1*(spr_pixel_per_datafetch/16)
-spr7_ext1_planedata		RS.L bv_image_y_size*(spr_pixel_per_datafetch/16)
+spr7_ext1_header		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
+spr7_ext1_planedata		RS.L bv_image_y_size*(spr_pixel_per_datafetch/WORD_BITS)
 
 spr7_extension1_size		RS.B 0
 
@@ -811,7 +809,7 @@ spr7_begin			RS.B 0
 
 spr7_extension1_entry		RS.B spr7_extension1_size
 
-spr7_end			RS.L 1*(spr_pixel_per_datafetch/16)
+spr7_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite7_size			RS.B 0
 
@@ -853,16 +851,16 @@ spr7_y_size2			EQU sprite7_size/(spr_pixel_per_datafetch/4)
 
 	RSRESET
 
-	INCLUDE "variables-offsets.i"
+	INCLUDE "main-variables.i"
 
 save_a7				RS.L 1
 
 ; PT-Replay
 	IFD PROTRACKER_VERSION_2 
-		INCLUDE "music-tracker/pt2-variables-offsets.i"
+		INCLUDE "music-tracker/pt2-variables.i"
 	ENDC
 	IFD PROTRACKER_VERSION_3
-		INCLUDE "music-tracker/pt3-variables-offsets.i"
+		INCLUDE "music-tracker/pt3-variables.i"
 	ENDC
 
 pt_effects_handler_active	RS.W 1
@@ -968,6 +966,7 @@ init_pt_variables
 	clr.w	pt_effects_handler_active(a3)
 	rts
 
+
 	CNOP 0,4
 init_main_variables2
 ; Rotation-Zoomer
@@ -975,24 +974,24 @@ init_main_variables2
 	move.w	d1,rz_active(a3)
 	move.w	d1,rz_zoomer_active(a3)
 	moveq	#TRUE,d0
-	move.w	d0,rz_z_rotation_angle(a3) ; 0 Grad
-	move.w	#(sine_table_length/4)*3,rz_zoom_angle(a3) ; 270 Grad
+	move.w	d0,rz_z_rotation_angle(a3) ; 0°
+	move.w	#(sine_table_length/4)*3,rz_zoom_angle(a3) ; 270°
 
 ; Wave-Scrolltext
 	move.w	d1,wst_enabled(a3)
 	lea	wst_image_data,a0
 	move.l	a0,wst_image(a3)
 	move.w	d0,wst_text_table_start(a3)
-	move.w	d0,wst_y_angle(a3)	; 0 Grad
+	move.w	d0,wst_y_angle(a3)	; 0°
 	move.w	#wst_y_angle_speed1,wst_y_angle_speed(a3)
 	move.w	#wst_y_angle_step1,wst_y_angle_step(a3)
 	move.w	#wst_horiz_scroll_speed1,wst_horiz_scroll_speed(a3)
 
 ; Blenk-Vectors
 	move.w	d1,bv_active(a3)
-	move.w	d0,bv_rotation_x_angle(a3) ; 0 Grad
-	move.w	d0,bv_rotation_y_angle(a3) ; 0 Grad
-	move.w	d0,bv_rotation_z_angle(a3) ; 0 Grad
+	move.w	d0,bv_rotation_x_angle(a3) ; 0°
+	move.w	d0,bv_rotation_y_angle(a3) ; 0°
+	move.w	d0,bv_rotation_z_angle(a3) ; 0°
 	move.w	#bv_rotation_x_angle_speed1,bv_rotation_x_angle_speed(a3)
 	move.w	#bv_rotation_y_angle_speed1,bv_rotation_y_angle_speed(a3)
 	move.w	#bv_rotation_z_angle_speed1,bv_rotation_z_angle_speed(a3)
@@ -1004,8 +1003,8 @@ init_main_variables2
 	move.w	#bv_sprite_x_direction_speed,bv_sprite_x_direction(a3)
 	move.w	#bv_sprite_y_direction_speed,bv_sprite_y_direction(a3)
 
-	move.w	#sine_table_length/4,bv_wobble_x_radius_angle(a3) ; 90 Grad
-	move.w	d0,bv_wobble_x_angle(a3) ; 0 Grad
+	move.w	#sine_table_length/4,bv_wobble_x_radius_angle(a3) ; 90°
+	move.w	d0,bv_wobble_x_angle(a3) ; 0°
 
 	move.l	#czi_zoom_radius,bv_zoom_distance(a3)
 
@@ -1014,10 +1013,10 @@ init_main_variables2
 	move.w	d1,if_rgb8_copy_colors_active(a3)
 
 	move.w	d1,ifi_rgb8_active(a3)
-	move.w	#sine_table_length/4,ifi_rgb8_fader_angle(a3) ; 90 Grad
+	move.w	#sine_table_length/4,ifi_rgb8_fader_angle(a3) ; 90°
 
 	move.w	d1,ifo_rgb8_active(a3)
-	move.w	#sine_table_length/4,ifo_rgb8_fader_angle(a3) ; 90 Grad
+	move.w	#sine_table_length/4,ifo_rgb8_fader_angle(a3) ; 90°
 
 ; Blind-Fader
 	move.w	d0,bf_address_offsets_table_start(a3)
@@ -1030,7 +1029,7 @@ init_main_variables2
 
 ; Cube-Zoomer-In
 	move.w	d1,czi_active(a3)
-	move.w	d0,czi_zoom_angle(a3)	; 90 Grad
+	move.w	d0,czi_zoom_angle(a3)	; 90°
 
 ; Keyboard-Handler
 	move.b	d0,kh_key_code(a3)
@@ -1146,9 +1145,12 @@ init_first_copperlist
 	bsr	copy_first_copperlist
 	bra	cl1_set_branches_ptrs
 
+
 	COP_INIT_PLAYFIELD_REGISTERS cl1
 
+
 	COP_INIT_SPRITE_POINTERS cl1
+
 
 	CNOP 0,4
 cl1_init_colors
@@ -1174,11 +1176,13 @@ cl1_init_colors
 	COP_INIT_COLOR_LOW COLOR00,16,spr_rgb8_color_table
 	rts
 
+
 	COP_INIT_BITPLANE_POINTERS cl1
+
 
 	CNOP 0,4
 cl1_init_branches_ptrs
-	move.l	#(((cl1_vstart1<<24)|(((cl1_hstart1/4)*2)<<16))|$10000)|$fffe,d0 ; WAIT-Befehl
+	move.l	#(((cl1_vstart1<<24)|(((cl1_hstart1/4)*2)<<16))|$10000)|$fffe,d0 ; CWAIT
 	moveq	#2,d1			; X-Verschiebung $00020000
 	swap	d1
 	moveq	#1,d2
@@ -1189,7 +1193,7 @@ cl1_init_branches_ptrs_loop1
 	COP_MOVEQ 0,COP2LCL
 	moveq	#rz_display_y_scale_factor-1,d6 ; Anzahl der Abschnitte für Y-Skalierung
 cl1_init_branches_ptrs_loop2
-	move.l	d0,(a0)+		; WAIT x,y
+	move.l	d0,(a0)+		; CWAIT x,y
 	COP_MOVEQ 0,SPR6POS
 	COP_MOVEQ 0,SPR7POS
 	COP_MOVEQ 0,COP1LCH
@@ -1201,13 +1205,18 @@ cl1_init_branches_ptrs_loop2
 	dbf	d7,cl1_init_branches_ptrs_loop1
 	rts
 
+
 	COP_INIT_COPINT cl1,cl1_hstart2,cl1_vstart2
+
 
 	COP_SET_SPRITE_POINTERS cl1,construction2,spr_number
 
+
 	COP_SET_BITPLANE_POINTERS cl1,construction2,pf1_depth3
 
+
 	COPY_COPPERLIST cl1,2
+
 
 	CNOP 0,4
 cl1_set_branches_ptrs
@@ -1223,8 +1232,7 @@ cl1_set_branches_ptrs
 	bsr.s	cl1_set_jump_entry_ptrs
 	rts
 
-	CNOP 0,4
-cl1_set_jump_entry_ptrs
+
 ; Input
 ; d0.l	Einsprungadresse Copperliste2
 ; d2.l	cl1_subextension1_size
@@ -1232,6 +1240,8 @@ cl1_set_jump_entry_ptrs
 ; a0.l	Copperliste1
 ; Result
 ; d0.l	Kein Rückgabewert
+	CNOP 0,4
+cl1_set_jump_entry_ptrs
 	MOVEF.L cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subextension1_size,d1 ; Offset Rücksprungadresse CL1
 	add.l	a0,d1			; + Rücksprungadresse CL1
 	lea	cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subext1_COP1LCH+WORD_SIZE(a0),a1
@@ -1257,12 +1267,14 @@ cl1_set_branches_loop2
 	dbf	d7,cl1_set_branches_loop1
 	rts
 
+
 	CNOP 0,4
 init_second_copperlist
 	move.l	cl2_construction2(a3),a0 
 	bsr	cl2_init_bplcon4
 	bsr	cl2_init_noop
 	bra	copy_second_copperlist
+
 
 	CNOP 0,4
 cl2_init_bplcon4
@@ -1282,6 +1294,7 @@ cl2_init_bplcon4_loop2
 	COP_MOVEQ 0,COPJMP1
 	dbf	d7,cl2_init_bplcon4_loop1
 	rts
+
 
 	CNOP 0,4
 cl2_init_noop
@@ -1339,11 +1352,15 @@ beam_routines
 
 	SWAP_COPPERLIST cl1,2
 
+
 	SWAP_COPPERLIST cl2,2,NOSET
+
 
 	SWAP_SPRITES spr,spr_swap_number,6
 
+
 	SET_SPRITES spr,spr_swap_number,6
+
 
 	CNOP 0,4
 swap_images
@@ -1376,12 +1393,12 @@ wave_scrolltext_loop1
 	move.w	(a2),d5			; X-Position
 	move.w	d5,d0		
 	move.l	(a5,d4.w*4),d1		; sin(w)
-	MULUF.L wst_y_radius*2,d1,d2 	; y'=(yr*sin(w))/2^15
-	add.w	#(display_window_hstart-wst_text_character_x_size)*SHIRES_PIXEL_FACTOR,d0 ; X-Zentrierung
+	MULUF.L wst_y_radius*2,d1,d2	; y'=(yr*sin(w))/2^15
+	add.w	#(display_window_hstart-wst_text_char_x_size)*SHIRES_PIXEL_FACTOR,d0 ; X-Zentrierung
 	swap	d1
 	sub.w	wst_y_angle_step(a3),d4 ; nächster Buchstabe
 	add.w	#wst_y_center,d1	; Y-Zentrierung
-	moveq	#wst_text_character_y_size,d2
+	moveq	#wst_text_char_y_size,d2
 	add.w	d1,d2			; VSTOP
 	SET_SPRITE_POSITION d0,d1,d2
 	move.w	d1,(a1)			; SPRxPOS
@@ -1389,11 +1406,11 @@ wave_scrolltext_loop1
 	move.w	d2,spr_pixel_per_datafetch/8(a1) ; SPRxCTL
 	sub.w	a6,d5			; X-Position verringern
 	bpl.s   wave_scrolltext_skip
-	add.w	#wst_text_character_x_restart,d5 ; X-Pos zurücksetzen
-	bsr.s	wst_get_new_character_image
+	add.w	#wst_text_char_x_restart,d5 ; X-Pos zurücksetzen
+	bsr.s	wst_get_new_char_image
 	move.l	d0,a0			; Bild für Character
 	add.l	#(spr_pixel_per_datafetch/8)*2,a1 ; Sprite-Header überpsringen
-	moveq	#wst_text_character_y_size-1,d6
+	moveq	#wst_text_char_y_size-1,d6
 wave_scrolltext_loop2
 	move.l	(a0)+,(a1)+		; 64 Pixel BP0
 	move.l	(a0),(a1)+
@@ -1409,7 +1426,9 @@ wave_scrolltext_quit
 	movem.l (a7)+,a4-a6
 	rts
 
-	GET_NEW_CHARACTER_IMAGE.W wst,wst_check_control_codes,NORESTART
+
+	GET_NEW_char_IMAGE.W wst,wst_check_control_codes,NORESTART
+
 
 	CNOP 0,4
 wst_check_control_codes
@@ -1476,6 +1495,7 @@ wst_stop_scrolltext
 	moveq	#RETURN_OK,d0
 	rts
 
+
 	CNOP 0,4
 bv_clear_image
 	move.l	extra_pf1(a3),a0
@@ -1484,8 +1504,9 @@ bv_clear_image
 	move.l	(a0),BLTDPT-DMACONR(a6)
 	moveq	#0,d0
 	move.w	d0,BLTDMOD-DMACONR(a6) ; D-Mod
-	move.w	#(bv_clear_blit_y_size*bv_clear_blit_depth*64)+(bv_clear_blit_x_size/16),BLTSIZE-DMACONR(a6) ; Blitter starten
+	move.w	#(bv_clear_blit_y_size*bv_clear_blit_depth*64)+(bv_clear_blit_x_size/WORD_BITS),BLTSIZE-DMACONR(a6) ; Blitter starten
 	rts
+
 
 	CNOP 0,4
 bv_move_lightsource
@@ -1501,6 +1522,7 @@ bv_move_lightsource
 	move.w	d1,bv_light_z_coordinate(a3)
 	rts
 
+
 	CNOP 0,4
 bv_rotation
 	movem.l a4-a5,-(a7)
@@ -1510,36 +1532,36 @@ bv_rotation
 	move.w	2(a2,d0.w*4),d4		; sin(a)
 	move.w	#sine_table_length/4,a4
 	MOVEF.W sine_table_length-1,d3
-	add.w	a4,d0			; + 90 Grad
-	swap	d4			; Bits 16-31: sin(a)
+	add.w	a4,d0			; + 90°
+	swap	d4			; Bits 16..31: sin(a)
 	and.w	d3,d0			; Übertrag entfernen
-	move.w	2(a2,d0.w*4),d4		; Bits	0-15: cos(a)
+	move.w	2(a2,d0.w*4),d4		; Bits	0..15: cos(a)
 	add.w	bv_rotation_x_angle_speed(a3),d1 ; nächster X-Winkel
 	and.w	d3,d1			; Übertrag entfernen
 	move.w	d1,bv_rotation_x_angle(a3) 
 	move.w	bv_rotation_y_angle(a3),d1
 	move.w	d1,d0		
 	move.w	2(a2,d0.w*4),d5		; sin(b)
-	add.w	a4,d0			; + 90 Grad
-	swap	d5			; Bits 16-31: sin(b)
+	add.w	a4,d0			; + 90°
+	swap	d5			; Bits 16..31: sin(b)
 	and.w	d3,d0			; Übertrag entfernen
-	move.w	2(a2,d0.w*4),d5		; Bits	0-15: cos(b)
+	move.w	2(a2,d0.w*4),d5		; Bits	0..15: cos(b)
 	add.w	bv_rotation_y_angle_speed(a3),d1 ; nächster Y-Winkel
 	and.w	d3,d1			; Übertrag entfernen
 	move.w	d1,bv_rotation_y_angle(a3) 
 	move.w	bv_rotation_z_angle(a3),d1
 	move.w	d1,d0		
 	move.w	2(a2,d0.w*4),d6	;sin(c)
-	add.w	a4,d0			; + 90 Grad
-	swap	d6			; Bits 16-31: sin(c)
+	add.w	a4,d0			; + 90°
+	swap	d6			; Bits 16..31: sin(c)
 	and.w	d3,d0			; Übertrag entfernen
-	move.w	2(a2,d0.w*4),d6		; Bits 0-15: cos(c)
+	move.w	2(a2,d0.w*4),d6		; Bits 0..15: cos(c)
 	add.w	bv_rotation_z_angle_speed(a3),d1 ; nächster Z-Winkel
 	and.w	d3,d1			; Übertrag entfernen
 	move.w	d1,bv_rotation_z_angle(a3) 
 	lea	bv_object_coords(pc),a0
 	lea	bv_rotation_xyz_coords(pc),a1
-	move.w	#bv_rotation_d*8,a4 	; d
+	move.w	#bv_rotation_d*8,a4	; d
 	add.l	bv_zoom_distance(a3),a4
 	move.w	#bv_rotation_xy_center,a5
 	moveq	#bv_object_edge_points_number-1,d7
@@ -1553,12 +1575,12 @@ bv_rotation_loop
 	ROTATE_Z_AXIS
 ; Zentralprojektion und Translation
 	move.w	d2,d3			; z -> d3
-	ext.l	d0			; Auf 32 Bit erweitern
+	ext.l	d0
 	add.w	a4,d3			; z+d
-	MULUF.L bv_rotation_d,d0,d7 	; x*d X-Projektion
-	ext.l	d1			; Auf 32 Bit erweitern
+	MULUF.L bv_rotation_d,d0,d7	; x*d X-Projektion
+	ext.l	d1
 	divs.w	d3,d0			; x' = (x*d)/(z+d)
-	MULUF.L bv_rotation_d,d1,d7 	; y*d Y-Projektion
+	MULUF.L bv_rotation_d,d1,d7	; y*d Y-Projektion
 	add.w	a5,d0			; x' + X-Mittelpunkt
 	move.w	d0,(a1)+		; X-Pos.
 	divs.w	d3,d1			; y' = (y*d)/(z+d)
@@ -1570,6 +1592,7 @@ bv_rotation_loop
 	dbf	d7,bv_rotation_loop
 	movem.l (a7)+,a4-a5
 	rts
+
 
 	CNOP 0,4
 bv_draw_lines
@@ -1627,14 +1650,14 @@ bv_draw_lines_loop1
 bv_draw_lines_skip1
 	divu.w	d0,d1			; RtdRGB = (kdRGB*EpRGB)/(D-D0)
 	IFEQ bv_EpRGB_check_max_enabled
-		cmp.w	#bv_EpRGB_max,d1 ; Maximalwert ?
+		cmp.w	#bv_EpRGB_max,d1
 		ble.s	bv_draw_lines_skip2
-		MOVEF.W bv_EpRGB_max,d1	; Maximalwert setzen
+		MOVEF.W bv_EpRGB_max,d1
 bv_draw_lines_skip2
 	ENDC
 ; Farbwert in Copperliste eintragen
 	move.l	(a7,d1.w*4),d0
-	move.w	d0,(cl1_COLOR12_low5-cl1_COLOR12_high5,a4,d7.w*4) ; Low-Bits COLORxx
+	move.w	d0,(cl1_COLOR12_low5-cl1_COLOR12_high5,a4,d7.w*4) ; Color low
 	swap	d0			; High
 	move.w	d0,(a4,d7.w*4)		; High-Bits COLORxx
 	move.w	object_info_lines_number-object_info_face_color(a0),d6 ; Anzahl der Linien
@@ -1649,12 +1672,12 @@ bv_draw_lines_loop2
 	btst	#0,d7			; Bitplane1 ?
 	beq.s	bv_draw_lines_skip3
 	WAITBLIT
-	move.l	d0,BLTCON0-DMACONR(a6)	; Bits 0-15: BLTCON1, Bits 16-31: BLTCON0
+	move.l	d0,BLTCON0-DMACONR(a6)	; Bits 0..15: BLTCON1, Bits 16..31: BLTCON0
 	move.w	d3,BLTAPTL-DMACONR(a6)	; (dy)-(2*dx)
 	move.l	d1,BLTCPT-DMACONR(a6)	; Bitplanes lesen
 	move.l	d1,BLTDPT-DMACONR(a6)	; Bitplanes schreiben
-	move.l	d4,BLTBMOD-DMACONR(a6)	; Bits 0-15: 4*(dy-dx), Bits 16-31: 4*dy
-	move.w	d2,BLTSIZE-DMACONR(a6)	; Blitter starten
+	move.l	d4,BLTBMOD-DMACONR(a6)	; Bits 0..15: 4*(dy-dx), Bits 16..31: 4*dy
+	move.w	d2,BLTSIZE-DMACONR(a6)
 bv_draw_lines_skip3
 	btst	#1,d7			; Bitplane2 ?
 	beq.s	bv_draw_lines_skip4
@@ -1666,7 +1689,7 @@ bv_draw_lines_skip3
 	move.l	d1,BLTCPT-DMACONR(a6)	; Bitplanes lesen
 	move.l	d1,BLTDPT-DMACONR(a6)	; Bitplanes schreiben
 	move.l	d4,BLTBMOD-DMACONR(a6)	; Bits 0-15: 4*(dy-dx), Bits 16-31: 4*dy
-	move.w	d2,BLTSIZE-DMACONR(a6)	; Blitter starten
+	move.w	d2,BLTSIZE-DMACONR(a6)
 bv_draw_lines_skip4
 	dbf	d6,bv_draw_lines_loop2
 bv_draw_lines_skip5
@@ -1682,27 +1705,29 @@ bv_draw_lines_quit
 bv_draw_lines_init
 	move.w	#DMAF_BLITHOG+DMAF_SETCLR,DMACON-DMACONR(a6)
 	WAITBLIT
-	move.l	#$ffff8000,BLTBDAT-DMACONR(a6) ; Bits 0-15: Linientextur mit MSB beginnen, Bits 16-31: Linientextur
-	moveq	#FALSE,d0
-	move.l	d0,BLTAFWM-DMACONR(a6)	; Keine Ausmaskierung
+	move.l	#$ffff8000,BLTBDAT-DMACONR(a6) ; Bits 0..15: Linientextur mit MSB beginnen, Bits 16..31: Linientextur
+	moveq	#-1,d0
+	move.l	d0,BLTAFWM-DMACONR(a6)
 	moveq	#extra_pf1_plane_width*extra_pf1_depth,d0 ; Moduli für Interleaved-Bitmaps
 	move.w	d0,BLTCMOD-DMACONR(a6)
 	move.w	d0,BLTDMOD-DMACONR(a6)
 	rts
 
+
 	CNOP 0,4
 bv_fill_image
 	move.l	extra_pf2(a3),a0
 	move.l	(a0),a0
-	add.l	#(extra_pf1_plane_width*extra_pf1_y_size*extra_pf1_depth)-2,a0 ;Ende des Bildes
+	add.l	#(extra_pf1_plane_width*extra_pf1_y_size*extra_pf1_depth)-2,a0 ; Ende des Bildes
 	WAITBLIT
 	move.l	#((BC0F_SRCA+BC0F_DEST+ANBNC+ANBC+ABNC+ABC)<<16)+(BLTCON1F_DESC+BLTCON1F_EFE),BLTCON0-DMACONR(a6) ; Minterm D=A, Füll-Modus, Rückwärts
 	move.l	a0,BLTAPT-DMACONR(a6)	; Quelle
 	move.l	a0,BLTDPT-DMACONR(a6)	; Ziel
 	moveq	#0,d0
 	move.l	d0,BLTAMOD-DMACONR(a6)	; A+D-Mod
-	move.w	#(bv_fill_blit_y_size*bv_fill_blit_depth*64)+(bv_fill_blit_x_size/16),BLTSIZE-DMACONR(a6) ; Blitter starten
+	move.w	#(bv_fill_blit_y_size*bv_fill_blit_depth*64)+(bv_fill_blit_x_size/WORD_BITS),BLTSIZE-DMACONR(a6) ; Blitter starten
 	rts
+
 
 	CNOP 0,4
 bv_copy_image
@@ -1729,6 +1754,7 @@ bv_copy_image_loop
 	move.l	(a7)+,a4
 	rts
 
+
 	CNOP 0,4
 bv_move_sprites
 	movem.l a3-a6,-(a7)
@@ -1748,7 +1774,7 @@ bv_move_sprites
 	moveq	#bv_sprite_x_min,d3	; X zurücksetzen
 	neg.w	d5			; X-Richtung umkehren
 bv_move_sprites_skip1
-	cmp.w	a2,d3			; X < X-Max ?
+	cmp.w	a2,d3			; X-Max ?
 	blt.s	bv_move_sprites_skip2
 	move.w	a2,d3			; X zurücksetzen
 	neg.w	d5			; X-Richtung umkehren
@@ -1760,13 +1786,13 @@ bv_move_sprites_skip2
 	move.w	bv_sprite_y_direction(a3),d5
 	add.w	d5,d4			; Y-Pos. erhöhen/verringern
 	IFNE bv_sprite_y_min
-		cmp.w	#bv_sprite_y_min,d4 ; Y >= Y-Min ?
+		cmp.w	#bv_sprite_y_min,d4
 	ENDC
 	bge.s	bv_move_sprites_skip3
-	moveq	#bv_sprite_y_min,d4 	; Y zurücksetzen
+	moveq	#bv_sprite_y_min,d4	; Y zurücksetzen
 	neg.w	d5			; Y-Richtung ändern
 bv_move_sprites_skip3
-	cmp.w	a4,d4			; Y < Y-Max ?
+	cmp.w	a4,d4			; Y-Max ?
 	blt.s	bv_move_sprites_skip4
 	move.w	a4,d4			; Y zurücksetzen
 	neg.w	d5			; Y-Richtung ändern
@@ -1810,10 +1836,10 @@ bv_wobble_sprites
 	move.l	(a0)+,a2		; Sprite6-Struktur
 	move.w	(a2),a5			; SPR6POS
 	move.l	(a0),a2			; Sprite7-Struktur
-	move.w	#cl1_subextension1_size,a4
 	move.w	(a2),a6			; SPR7POS
 	lea	sine_table(pc),a0
 	move.w	#bv_wobble_x_center,a2
+	move.w	#cl1_subextension1_size,a4
 	MOVEF.W cl2_display_y_size-1,d7
 bv_wobble_sprites_loop1
 	moveq	#rz_display_y_scale_factor-1,d6 ; Anzahl der Abschnitte für Y-Skalierung
@@ -1840,6 +1866,7 @@ bv_wobble_sprites_loop2
 	movem.l (a7)+,a4-a6
 	rts
 
+
 	CNOP 0,4
 rotation_zoomer
 	movem.l a3-a6,-(a7)
@@ -1854,9 +1881,9 @@ rotation_zoomer
 	ENDC
 	move.w	2(a0,d4.w*4),d1		; sin(w)
 	IFEQ rz_table_length_256
-		add.b	#sine_table_length/4,d4 ; + 90 Grad
+		add.b	#sine_table_length/4,d4 ; + 90°
 	ELSE
-		add.w	#sine_table_length/4,d4 ; + 90 Grad
+		add.w	#sine_table_length/4,d4 ; + 90°
 	ENDC
 	move.w	2(a0,d5.w*4),d2		; sin(w) für Zoom
 	IFEQ rz_table_length_256
@@ -1904,7 +1931,7 @@ rotation_zoomer_skip
 	muls.w	d0,d2			; Ax*cos(w)
 	moveq	#rz_Ay,d3		; Y links oben
 	muls.w	d1,d3			; Ay*sin(w)
-	move.l	extra_memory(a3),a0 	; Zeiger auf BPLAM-Tabelle
+	move.l	extra_memory(a3),a0	; Zeiger auf BPLAM-Tabelle
 	add.l	d3,d2			; Ax'=Ax*cos(w)+Ay*sin(w)
 	moveq	#rz_Bx,d3		; X rechts oben
 	muls.w	d1,d3			; Bx*sin(w)
@@ -1960,9 +1987,9 @@ image_fader_in
 	move.w	ifi_rgb8_fader_angle(a3),d2
 	move.w	d2,d0
 	ADDF.W	ifi_rgb8_fader_angle_speed,d0 ; nächster Winkel
-	cmp.w	#sine_table_length/2,d0	; Y-Winkel <= 180 Grad ?
+	cmp.w	#sine_table_length/2,d0	; 180° ?
 	ble.s	image_fader_in_skip
-	MOVEF.W sine_table_length/2,d0	; 180 Grad
+	MOVEF.W sine_table_length/2,d0
 image_fader_in_skip
 	move.w	d0,ifi_rgb8_fader_angle(a3) 
 	MOVEF.W if_rgb8_colors_number*3,d6 ; RGB-Zähler
@@ -1988,6 +2015,7 @@ image_fader_in_quit
 	movem.l (a7)+,a4-a6
 	rts
 
+
 	CNOP 0,4
 image_fader_out
 	movem.l a4-a6,-(a7)
@@ -1996,9 +2024,9 @@ image_fader_out
 	move.w	ifo_rgb8_fader_angle(a3),d2
 	move.w	d2,d0
 	ADDF.W	ifo_rgb8_fader_angle_speed,d0 ; nächster Winkel
-	cmp.w	#sine_table_length/2,d0	; Y-Winkel <= 180 Grad ?
+	cmp.w	#sine_table_length/2,d0	; 180° ?
 	ble.s	image_fader_out_skip
-	MOVEF.W sine_table_length/2,d0	; 180 Grad
+	MOVEF.W sine_table_length/2,d0
 image_fader_out_skip
 	move.w	d0,ifo_rgb8_fader_angle(a3) 
 	MOVEF.W if_rgb8_colors_number*3,d6 ; RGB-Zähler
@@ -2026,9 +2054,12 @@ image_fader_out_quit
 	movem.l (a7)+,a4-a6
 	rts
 
+
 	RGB8_COLOR_FADER if
 
+
 	COPY_RGB8_COLORS_TO_COPPERLIST if,pf1,cl1,cl1_COLOR00_high1,cl1_COLOR00_low1
+
 
 	CNOP 0,4
 blind_fader_in
@@ -2095,6 +2126,7 @@ blind_fader_in_quit
 	move.l	(a7)+,a4
 	rts
 
+
 	CNOP 0,4
 blind_fader_out
 	move.l	a4,-(a7)
@@ -2124,7 +2156,7 @@ blind_fader_out
 blind_fader_out_skip
 	move.w	d0,bf_address_offsets_table_start(a3) 
 	moveq	#bf_step2,d5
-	lea	bf_address_offsets_table(pc),a0 ;Tabelle mit Registeroffsets
+	lea	bf_address_offsets_table(pc),a0
 	IFNE cl2_size1
 		move.l	cl2_construction1(a3),a1
 		IFNE cl2_extension1_entry+cl2_ext1_BPL1DAT
@@ -2171,6 +2203,7 @@ blind_fader_out_quit
 	move.l	(a7)+,a4
 	rts
 
+
 	CNOP 0,4
 init_colors2
 ; Bild
@@ -2185,16 +2218,16 @@ init_colors2
 	ENDC
 	moveq	#pf1_colors_number-1,d7
 init_colors2_loop
-	move.l	(a0)+,d0		; RGB8-Farbwert
+	move.l	(a0)+,d0		; RGB8
 	move.l	d0,d1		
 	RGB8_TO_RGB4_HIGH d0,d2,d3
-	move.w	d0,(a1)			; High-Bits COLORxx
+	move.w	d0,(a1)			; Color high
 	addq.w	#4,a1
-	move.w	d0,(a2)			; High-Bits COLORxx
+	move.w	d0,(a2)			; Color high
 	RGB8_TO_RGB4_LOW d1,d2,d3
-	move.w	d2,cl1_COLOR00_low1-cl1_COLOR00_high1-4(a1) ;Low-Bits COLORxx
+	move.w	d2,cl1_COLOR00_low1-cl1_COLOR00_high1-4(a1) ; Color low
 	addq.w	#4,a2
-	move.w	d2,cl1_COLOR00_low1-cl1_COLOR00_high1-4(a2) ;Low-Bits COLORxx
+	move.w	d2,cl1_COLOR00_low1-cl1_COLOR00_high1-4(a2) ; Color low
 	IFGT pf1_colors_number-32
 	addq.b	#1<<3,d4		; Farbregister-Zähler erhöhen
 	bne.s	init_colors2_skip
@@ -2215,16 +2248,16 @@ init_colors2_skip
 	ENDC
 	moveq	#spr_colors_number-1,d7
 init_colors2_loop2
-	move.l	(a0)+,d0		; RGB8-Farbwert
+	move.l	(a0)+,d0		; RGB8
 	move.l	d0,d1		
 	RGB8_TO_RGB4_HIGH d0,d2,d3
-	move.w	d0,(a1)			; High-Bits COLORxx
+	move.w	d0,(a1)			; Color high
 	addq.w	#4,a1
-	move.w	d0,(a2)			; High-Bits COLORxx
+	move.w	d0,(a2)			; Color high
 	RGB8_TO_RGB4_LOW d1,d2,d3
-	move.w	d2,cl1_COLOR00_low5-cl1_COLOR00_high5-4(a1) ; Low-Bits COLORxx
+	move.w	d2,cl1_COLOR00_low5-cl1_COLOR00_high5-4(a1) ; Color low
 	addq.w	#4,a2
-	move.w	d2,cl1_COLOR00_low5-cl1_COLOR00_high5-4(a2) ; Low-Bits COLORxx
+	move.w	d2,cl1_COLOR00_low5-cl1_COLOR00_high5-4(a2) ; Color low
 	IFGT spr_colors_number-32
 		addq.b	1<<3,d4		; Farbregister-Zähler erhöhen
 		bne.s	init_colors2_skip
@@ -2234,6 +2267,7 @@ init_colors2_skip
 	ENDC
 	dbf	d7,init_colors2_loop2
 	rts
+
 
 	CNOP 0,4
 set_noop_screen
@@ -2274,13 +2308,14 @@ set_noop_screen_loop1
 	dbf	d7,set_noop_screen_loop1
 	rts
 
+
 	CNOP 0,4
 cube_zoomer_in
 	tst.w	czi_active(a3)
 	bne.s	cube_zoomer_in_quit
 	lea	sine_table(pc),a0
 	move.w	czi_zoom_angle(a3),d1
-	cmp.w	#sine_table_length/4,d1	; 90 Grad erreicht ?
+	cmp.w	#sine_table_length/4,d1	; 90° ?
 	blt.s   cube_zoomer_in_skip
 	move.w	#FALSE,czi_active(a3)
 	bra.s	cube_zoomer_in_quit
@@ -2290,7 +2325,7 @@ cube_zoomer_in_skip
 	move.w	2(a0,d1.w*4),d0		; sin(w)
 	add.w	#czi_zoom_center,d0
 	move.l	d0,bv_zoom_distance(a3) 
-	addq.w	#czi_zoom_angle_speed,d1 ; nächster Zoom-In-Winkel
+	addq.w	#czi_zoom_angle_speed,d1
 	move.w	d1,czi_zoom_angle(a3)
 cube_zoomer_in_quit
 	rts
@@ -2409,7 +2444,7 @@ kh_set_xyz_rotation_angle_speed10
 
 	CNOP 0,4
 mouse_handler
-	btst	#CIAB_GAMEPORT0,CIAPRA(a4) ; Linke Maustaste gedrückt ?
+	btst	#CIAB_GAMEPORT0,CIAPRA(a4) ; LMB gedrückt ?
 	beq.s	mh_exit_demo
 	rts
 	CNOP 0,4
@@ -2450,6 +2485,7 @@ ciab_ta_int_server
 		CNOP 0,4
 VERTB_int_server
 	ENDC
+
 
 ; PT-Replay
 	IFEQ pt_music_fader_enabled
@@ -2591,14 +2627,15 @@ rz_set_branches_ptrs
 	bsr.s	rz_set_jump_entry_ptrs
 	rts
 
-	CNOP 0,4
-rz_set_jump_entry_ptrs
+
 ; Input
 ; a0.l	Copperliste1
 ; d0.l	Einsprungadresse Copperliste2
 ; d2.l	cl1_subextension1_size
 ; d3.l	cl2_extension1_size
 ; Result
+	CNOP 0,4
+rz_set_jump_entry_ptrs
 	MOVEF.L cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subextension1_size,d1 ; Offset Rücksprungadresse CL1
 	add.l	a0,d1			; + Rücksprungadresse CL1
 	lea	cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subext1_COP1LCH+WORD_SIZE(a0),a1
@@ -2643,33 +2680,39 @@ nmi_int_server
 
 	INCLUDE "sys-structures.i"
 
+
 	CNOP 0,4
 pf1_rgb8_color_table
 	REPT pf1_colors_number
 		DC.L color00_bits
 	ENDR
-	INCLUDE "Daten:Asm-Sources.AGA/projects/Old'scool/colortables/256x256x128-Texture.ct"
+	INCLUDE "Old'scool:colortables/256x256x128-Texture.ct"
+
 
 	CNOP 0,4
 spr_rgb8_color_table
-	INCLUDE "Daten:Asm-Sources.AGA/projects/Old'scool/colortables/64x56x4-Font.ct"
-	INCLUDE "Daten:Asm-Sources.AGA/projects/Old'scool/colortables/64x56x4-Font.ct"
-	INCLUDE "Daten:Asm-Sources.AGA/projects/Old'scool/colortables/64x56x4-Font.ct"
+	INCLUDE "Old'scool:colortables/64x56x4-Font.ct"
+	INCLUDE "Old'scool:colortables/64x56x4-Font.ct"
+	INCLUDE "Old'scool:colortables/64x56x4-Font.ct"
 	REPT 4
 		DC.L color00_bits
 	ENDR
+
 
 	CNOP 0,4
 spr_ptrs_construction
 	DS.L spr_number
 
+
 	CNOP 0,4
 spr_ptrs_display
 	DS.L spr_number
 
+
 	CNOP 0,4
 sine_table
 	INCLUDE "sine-table-512x32.i"
+
 
 ; PT-Replay
 	INCLUDE "music-tracker/pt-invert-table.i"
@@ -2679,7 +2722,6 @@ sine_table
 	IFD PROTRACKER_VERSION_2 
 		INCLUDE "music-tracker/pt2-period-table.i"
 	ENDC
-
 	IFD PROTRACKER_VERSION_3
 		INCLUDE "music-tracker/pt3-period-table.i"
 	ENDC
@@ -2689,6 +2731,7 @@ sine_table
 	INCLUDE "music-tracker/pt-sample-starts-table.i"
 
 	INCLUDE "music-tracker/pt-finetune-starts-table.i"
+
 
 ; Wave-Scrolltext
 wst_ascii
@@ -2704,10 +2747,12 @@ wst_characters_offsets
 wst_characters_x_positions
 	DS.W wst_text_characters_number
 
+
 ; Blenk-Vectors
 	CNOP 0,4
 bv_color_table
-	INCLUDE "Daten:Asm-Sources.AGA/projects/Old'scool/colortables/64-Colorgradient-Brown.ct"
+	INCLUDE "Old'scool:colortables/64-Colorgradient-Brown.ct"
+
 
 ; Würfel
 	CNOP 0,2
@@ -2720,34 +2765,34 @@ bv_object_coords
 	DC.W 35*8,-(35*8),35*8		; P5
 	DC.W 35*8,35*8,35*8		; P6
 	DC.W -(35*8),35*8,35*8		; P7
-	
+
 	CNOP 0,4
 bv_object_info
 ; ** 1. Fläche **
 	DC.L 0				; Zeiger auf Koords
-	DC.W bv_object_face1_color 	; Farbe der Fläche
+	DC.W bv_object_face1_color	; Farbe der Fläche
 	DC.W bv_object_face1_lines_number-1 ; Anzahl der Linien
 ; ** 2. Fläche **
 	DC.L 0				; Zeiger auf Koords
-	DC.W bv_object_face2_color 	; Farbe der Fläche
+	DC.W bv_object_face2_color	; Farbe der Fläche
 	DC.W bv_object_face2_lines_number-1 ; Anzahl der Linien
 ; ** 3. Fläche **
 	DC.L 0				; Zeiger auf Koords
-	DC.W bv_object_face3_color 	; Farbe der Fläche
+	DC.W bv_object_face3_color	; Farbe der Fläche
 	DC.W bv_object_face3_lines_number-1 ; Anzahl der Linien
 ; ** 4. Fläche **
 	DC.L 0				; Zeiger auf Koords
-	DC.W bv_object_face4_color 	; Farbe der Fläche
+	DC.W bv_object_face4_color	; Farbe der Fläche
 	DC.W bv_object_face4_lines_number-1 ; Anzahl der Linien
 ; ** 5. Fläche **
 	DC.L 0				; Zeiger auf Koords
-	DC.W bv_object_face5_color 	; Farbe der Fläche
+	DC.W bv_object_face5_color	; Farbe der Fläche
 	DC.W bv_object_face5_lines_number-1 ; Anzahl der Linien
 ; ** 6. Fläche **
 	DC.L 0				; Zeiger auf Koords
-	DC.W bv_object_face6_color 	; Farbe der Fläche
+	DC.W bv_object_face6_color	; Farbe der Fläche
 	DC.W bv_object_face6_lines_number-1 ; Anzahl der Linien
-	
+
 	CNOP 0,2
 bv_object_edges
 	DC.W 0*3,1*3,2*3,3*3,0*3	; Fläche vorne
@@ -2761,16 +2806,18 @@ bv_object_edges
 bv_rotation_xyz_coords
 	DS.W bv_object_edge_points_number*3
 
+
 ; Image-Fader
 	CNOP 0,4
 ifi_rgb8_color_table
-	INCLUDE "Daten:Asm-Sources.AGA/projects/Old'scool/colortables/320x256x128-Title.ct"
+	INCLUDE "Old'scool:colortables/320x256x128-Title.ct"
 
 	CNOP 0,4
 ifo_rgb8_color_table
 	REPT pf1_colors_number
 		DC.L color00_bits
 	ENDR
+
 
 ; Blind-Fader
 	CNOP 0,2
@@ -2791,25 +2838,26 @@ bf_address_offsets_table
 
 	INCLUDE "error-texts.i"
 
+
 ; Wave-Scrolltext
 wst_text
 	DC.B ASCII_CTRL_F,"°¹"
 	DC.B "RESISTANCE"
-	REPT wst_text_characters_number/(wst_origin_character_x_size/wst_text_character_x_size)
+	REPT wst_text_characters_number/(wst_origin_char_x_size/wst_text_char_x_size)
 		DC.B " "
 	ENDR
 	DC.B "PRESENTS  "
-	REPT wst_text_characters_number/(wst_origin_character_x_size/wst_text_character_x_size)
+	REPT wst_text_characters_number/(wst_origin_char_x_size/wst_text_char_x_size)
 		DC.B " "
 	ENDR
 	DC.B ASCII_CTRL_W,ASCII_CTRL_M,"¹³"
 	DC.B " YES WE ARE BACK ON THE AMIGA ### "
-	REPT wst_text_characters_number/(wst_origin_character_x_size/wst_text_character_x_size)
+	REPT wst_text_characters_number/(wst_origin_char_x_size/wst_text_char_x_size)
 		DC.B " "
 	ENDR
 	DC.B ASCII_CTRL_W,ASCII_CTRL_S
 	DC.B "PRESS F1-F10 FOR DIFFERENT CUBE MOVEMENTS...  "
-	REPT wst_text_characters_number/(wst_origin_character_x_size/wst_text_character_x_size)
+	REPT wst_text_characters_number/(wst_origin_char_x_size/wst_text_char_x_size)
 		DC.B " "
 	ENDR
 	DC.B ASCII_CTRL_W,ASCII_CTRL_F,"²³"
@@ -2823,7 +2871,7 @@ wst_text
 	DC.B "WANTED TEAM  "
 	DC.B "SOFTWARE FAILURE  "
 	DC.B "EPHIDRENA  "
-	REPT wst_text_characters_number/(wst_origin_character_x_size/wst_text_character_x_size)
+	REPT wst_text_characters_number/(wst_origin_char_x_size/wst_text_char_x_size)
 		DC.B " "
 	ENDR
 	DC.B ASCII_CTRL_W,ASCII_CTRL_M,"¹³"
@@ -2832,7 +2880,7 @@ wst_text
 	DC.B "GRAPHICS *GRASS*      "
 	DC.B "RELEASED @ NORDLICHT 2023"
 wst_stop_text
-	REPT wst_text_characters_number/(wst_origin_character_x_size/wst_text_character_x_size)
+	REPT wst_text_characters_number/(wst_origin_char_x_size/wst_text_char_x_size)
 		DC.B " "
 	ENDR
 	DC.B ASCII_CTRL_W," "
@@ -2850,30 +2898,30 @@ wst_stop_text
 
 ; PT-Replay
 	IFNE pt_split_module_enabled
-pt_auddata SECTION pt_audio_module,DATA_C
-		INCBIN "Daten:Asm-Sources.AGA/projects/Old'scool/modules/mod.ClassicTune14remix"
+pt_auddata			SECTION pt_audio_module,DATA_C
+		INCBIN "Old'scool:modules/mod.ClassicTune14remix"
 	ELSE
-pt_auddata SECTION pt_audio_song,DATA
-		INCBIN "Daten:Asm-Sources.AGA/projects/Old'scool/modules/MOD.ClassicTune14Remix.song"
+pt_auddata			SECTION pt_audio_song,DATA
+		INCBIN "Old'scool:modules/MOD.ClassicTune14Remix.song"
 
-pt_audsmps SECTION pt_audio_samples,DATA_C
-		INCBIN "Daten:Asm-Sources.AGA/projects/Old'scool/modules/MOD.ClassicTune14Remix.smps"
+pt_audsmps			SECTION pt_audio_samples,DATA_C
+		INCBIN "Old'scool:modules/MOD.ClassicTune14Remix.smps"
 	ENDC
 
 
 ; Grafikdaten nachladen
 
 ; Background-Image
-bg_image_data SECTION bg_gfx,DATA
-	INCBIN "Daten:Asm-Sources.AGA/projects/Old'scool/graphics/320x256x128-Title.rawblit"
+bg_image_data			SECTION bg_gfx,DATA
+	INCBIN "Old'scool:graphics/320x256x128-Title.rawblit"
 
 ; Rotation-Zoomer
-rz_image_data SECTION rz_gfx,DATA
-	INCBIN "Daten:Asm-Sources.AGA/projects/Old'scool/graphics/256x256x128-Texture.rawblit"
+rz_image_data			SECTION rz_gfx,DATA
+	INCBIN "Old'scool:graphics/256x256x128-Texture.rawblit"
 
 ; Wave-Scrolltext
-wst_image_data SECTION wst_gfx,DATA
-	INCBIN "Daten:Asm-Sources.AGA/projects/Old'scool/fonts/64x56x4-Font.rawblit"
+wst_image_data			SECTION wst_gfx,DATA
+	INCBIN "Old'scool:fonts/64x56x4-Font.rawblit"
 
 	END
 
@@ -2895,7 +2943,7 @@ cube_zoomer_out
 	bne.s	cube_zoomer_out_quit
 	lea	sine_table(pc),a0
 	move.w	czo_zoom_angle(a3),d1
-	cmp.w	#sine_table_length/2,d1	; 180 Grad erreicht ?
+	cmp.w	#sine_table_length/2,d1	; 180° ?
 	blt.s	cube_zoomer_out_skip
 	move.w	#FALSE,czo_active(a3)	; Cube-Zoomer-Out aus
 	bra.s	cube_zoomer_out_quit
@@ -2906,6 +2954,6 @@ cube_zoomer_out_skip
 	move.w	2(a0,d1.w*4),d0		; sin(w)
 	add.w	#czo_zoom_center,d0
 	move.l	d0,bv_zoom_distance(a3) 
-	addq.w	#czo_zoom_angle_speed,d1 ; nächster Zoom-Out-Winkel
+	addq.w	#czo_zoom_angle_speed,d1
 cube_zoomer_out_quit
 	rts
