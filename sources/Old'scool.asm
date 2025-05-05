@@ -1533,7 +1533,7 @@ bv_rotation
 	move.w	#sine_table_length/4,a4
 	MOVEF.W sine_table_length-1,d3
 	add.w	a4,d0			; + 90°
-	swap	d4			; Bits 16..31: sin(a)
+	swap	d4			; high word: sin(a)
 	and.w	d3,d0			; Übertrag entfernen
 	move.w	2(a2,d0.w*4),d4		; Bits	0..15: cos(a)
 	add.w	bv_rotation_x_angle_speed(a3),d1 ; nächster X-Winkel
@@ -1543,7 +1543,7 @@ bv_rotation
 	move.w	d1,d0		
 	move.w	2(a2,d0.w*4),d5		; sin(b)
 	add.w	a4,d0			; + 90°
-	swap	d5			; Bits 16..31: sin(b)
+	swap	d5			; high word: sin(b)
 	and.w	d3,d0			; Übertrag entfernen
 	move.w	2(a2,d0.w*4),d5		; Bits	0..15: cos(b)
 	add.w	bv_rotation_y_angle_speed(a3),d1 ; nächster Y-Winkel
@@ -1553,9 +1553,9 @@ bv_rotation
 	move.w	d1,d0		
 	move.w	2(a2,d0.w*4),d6	;sin(c)
 	add.w	a4,d0			; + 90°
-	swap	d6			; Bits 16..31: sin(c)
+	swap	d6			; high word: sin(c)
 	and.w	d3,d0			; Übertrag entfernen
-	move.w	2(a2,d0.w*4),d6		; Bits 0..15: cos(c)
+	move.w	2(a2,d0.w*4),d6		; low word: cos(c)
 	add.w	bv_rotation_z_angle_speed(a3),d1 ; nächster Z-Winkel
 	and.w	d3,d1			; Übertrag entfernen
 	move.w	d1,bv_rotation_z_angle(a3) 
@@ -1672,11 +1672,11 @@ bv_draw_lines_loop2
 	btst	#0,d7			; Bitplane1 ?
 	beq.s	bv_draw_lines_skip3
 	WAITBLIT
-	move.l	d0,BLTCON0-DMACONR(a6)	; Bits 0..15: BLTCON1, Bits 16..31: BLTCON0
+	move.l	d0,BLTCON0-DMACONR(a6)	; low word: BLTCON1, high word: BLTCON0
 	move.w	d3,BLTAPTL-DMACONR(a6)	; (dy)-(2*dx)
 	move.l	d1,BLTCPT-DMACONR(a6)	; Bitplanes lesen
 	move.l	d1,BLTDPT-DMACONR(a6)	; Bitplanes schreiben
-	move.l	d4,BLTBMOD-DMACONR(a6)	; Bits 0..15: 4*(dy-dx), Bits 16..31: 4*dy
+	move.l	d4,BLTBMOD-DMACONR(a6)	; low word: 4*(dy-dx), high word: 4*dy
 	move.w	d2,BLTSIZE-DMACONR(a6)
 bv_draw_lines_skip3
 	btst	#1,d7			; Bitplane2 ?
@@ -1705,7 +1705,7 @@ bv_draw_lines_quit
 bv_draw_lines_init
 	move.w	#DMAF_BLITHOG+DMAF_SETCLR,DMACON-DMACONR(a6)
 	WAITBLIT
-	move.l	#$ffff8000,BLTBDAT-DMACONR(a6) ; Bits 0..15: Linientextur mit MSB beginnen, Bits 16..31: Linientextur
+	move.l	#$ffff8000,BLTBDAT-DMACONR(a6) ; low word: Linientextur mit MSB beginnen, high word: Linientextur
 	moveq	#-1,d0
 	move.l	d0,BLTAFWM-DMACONR(a6)
 	moveq	#extra_pf1_plane_width*extra_pf1_depth,d0 ; Moduli für Interleaved-Bitmaps
