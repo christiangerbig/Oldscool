@@ -1684,11 +1684,11 @@ bv_draw_lines_skip3
 	moveq	#extra_pf1_plane_width,d5
 	add.l	d5,d1			; nächste Bitplane
 	WAITBLIT
-	move.l	d0,BLTCON0-DMACONR(a6)	; Bits 0-15: BLTCON1, Bits 16-31: BLTCON0
+	move.l	d0,BLTCON0-DMACONR(a6)	; low word: BLTCON1, high word: BLTCON0
 	move.w	d3,BLTAPTL-DMACONR(a6)	; (dy)-(2*dx)
 	move.l	d1,BLTCPT-DMACONR(a6)	; Bitplanes lesen
 	move.l	d1,BLTDPT-DMACONR(a6)	; Bitplanes schreiben
-	move.l	d4,BLTBMOD-DMACONR(a6)	; Bits 0-15: 4*(dy-dx), Bits 16-31: 4*dy
+	move.l	d4,BLTBMOD-DMACONR(a6)	; low word: 4*(dy-dx), high word: 4*dy
 	move.w	d2,BLTSIZE-DMACONR(a6)
 bv_draw_lines_skip4
 	dbf	d6,bv_draw_lines_loop2
