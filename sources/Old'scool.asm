@@ -14,8 +14,8 @@
 
 ; V.1.2 beta
 ; - Optimierung der Copperlist2. Wenn kein Rotator/Zoomer dargestellt wird, dann
-;   wird kein BPLCON4-Chunky-Screen dargestellt und die CPU entlastet, da der
-;   Copper weniger Memory-Slots bei nur 2 CMOVEs benötigt
+; wird kein BPLCON4-Chunky-Screen dargestellt und die CPU entlastet, da der
+; Copper weniger Memory-Slots bei nur 2 CMOVEs benötigt
 ; - Die Credits werden jetzt durch das Modul getriggert
 ; - Umstellung auf VERTB main loop
 ; - Mit Grass' Titelbild in 64 Farben
@@ -23,7 +23,7 @@
 ; V.1.3 beta
 ; - Mit Grass' Zoomer/Rotator-Textur
 ; - Würfelfarbe and Textur angepasst und Maximalwertprüfung bei Helligkeit des
-;   Würfels
+; Würfels
 ; - geänderte Schrift
 ; - Mit überarbeitetem Titelbild in 128 Farben
 ; - Bugfix: Low-Farbwerte des Zoomers wurden falsch initislidiert
@@ -41,25 +41,25 @@
 ; V.1.6 beta
 ; - Alle States, die mit not.w gesetzt werden durch move.w ersetzt
 ; - Bugfix: Delay für Tastatur läuft jetzt über CIA-A Timer-B, da Timer-A
-;   von der Tastatur benutzt wird. Jetzt ist auch vom Freezer eine Rückkehr
-;   ohne Fehler möglich
+; von der Tastatur benutzt wird. Jetzt ist auch vom Freezer eine Rückkehr
+; ohne Fehler möglich
 
 ; V.1.7 beta
 ; - Keyboard-Handler: Handshake-Delay auf 200 µs hochgesetzt und es wird keine
-;   Tastaturleitung mehr manuell gesetzt. Die passiert automatisch beim Wechsel
-;   von SP input -> SP output -> SP input laut Toni Wilen
+; Tastaturleitung mehr manuell gesetzt. Die passiert automatisch beim Wechsel
+; von SP input -> SP output -> SP input laut Toni Wilen
 
 ; V.1.8 beta
 ; - Code optimiert
 ; - Bugfix: Nach dem Einblenden wurde fälschlicherweise der Title-Part
-;   deaktiviert und bei einem vozeitigen User-Abbruch das Titelbild
-;   nicht mehr ausgeblendet
+; deaktiviert und bei einem vozeitigen User-Abbruch das Titelbild
+; nicht mehr ausgeblendet
 ; V.1.0
 ; - Endversion
 ; - Code optimiert
 ; - Mit überarbeitetem Tracker-Modul
 ; - Bugfix: Bitplane-DMA wird nur für das Intro und den Title-Screen aktiviert,
-;   um die Anzeige von Datenmüll im Hauptteil zu Brginn zu vermeiden
+; um die Anzeige von Datenmüll im Hauptteil zu Brginn zu vermeiden
 ; - Image-Fader: Abfrage der RGB-Werte beim Vergleich verfeinert. ble -> bls
 ; - Rotationen 1-10 geändert damit die Unterschiede offensichtlicher sind
 ; - Modul leicht geändert
