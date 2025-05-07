@@ -645,7 +645,7 @@ cl2_size2			EQU copperlist2_size
 cl2_size3			EQU copperlist2_size
 
 
-; Sprite0-Zusatzstruktur
+; Sprite0 additional structure
 	RSRESET
 
 spr0_extension1			RS.B 0
@@ -655,7 +655,7 @@ spr0_ext1_planedata		RS.L (spr_pixel_per_datafetch/WORD_BITS)*wst_text_char_y_si
 
 spr0_extension1_size		RS.B 0
 
-; Sprite0-Hauptstruktur
+; Sprite0 main structure
 	RSRESET
 
 spr0_begin			RS.B 0
@@ -666,7 +666,7 @@ spr0_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite0_size			RS.B 0
 
-; Sprite1-Zusatzstruktur
+; Sprite1 additional structure
 	RSRESET
 
 spr1_extension1	RS.B 0
@@ -676,7 +676,7 @@ spr1_ext1_planedata		RS.L (spr_pixel_per_datafetch/WORD_BITS)*wst_text_char_y_si
 
 spr1_extension1_size		RS.B 0
 
-; Sprite1-Hauptstruktur
+; Sprite1 main structure
 	RSRESET
 
 spr1_begin			RS.B 0
@@ -687,7 +687,7 @@ spr1_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite1_size			RS.B 0
 
-; Sprite2-Zusatzstruktur
+; Sprite2 additional structure
 	RSRESET
 
 spr2_extension1			RS.B 0
@@ -697,7 +697,7 @@ spr2_ext1_planedata		RS.L (spr_pixel_per_datafetch/WORD_BITS)*wst_text_char_y_si
 
 spr2_extension1_size		RS.B 0
 
-; Sprite2-Hauptstruktur
+; Sprite2 main structure
 	RSRESET
 
 spr2_begin			RS.B 0
@@ -708,7 +708,7 @@ spr2_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite2_size			RS.B 0
 
-; Sprite3-Zusatzstruktur
+; Sprite3 additional structure
 	RSRESET
 
 spr3_extension1			RS.B 0
@@ -718,7 +718,7 @@ spr3_ext1_planedata		RS.L (spr_pixel_per_datafetch/WORD_BITS)*wst_text_char_y_si
 
 spr3_extension1_size		RS.B 0
 
-; Sprite3-Hauptstruktur
+; Sprite3 main structure
 	RSRESET
 
 spr3_begin			RS.B 0
@@ -729,7 +729,7 @@ spr3_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite3_size			RS.B 0
 
-; Sprite4-Zusatzstruktur
+; Sprite4 additional structure
 	RSRESET
 
 spr4_extension1			RS.B 0
@@ -739,7 +739,7 @@ spr4_ext1_planedata		RS.L (spr_pixel_per_datafetch/WORD_BITS)*wst_text_char_y_si
 
 spr4_extension1_size		RS.B 0
 
-; Sprite4-Hauptstruktur
+; Sprite4 main structure
 	RSRESET
 
 spr4_begin			RS.B 0
@@ -750,7 +750,7 @@ spr4_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite4_size			RS.B 0
 
-; Sprite5-Zusatzstruktur
+; Sprite5 additional structure
 	RSRESET
 
 spr5_extension1	RS.B 0
@@ -760,7 +760,7 @@ spr5_ext1_planedata		RS.L (spr_pixel_per_datafetch/WORD_BITS)*wst_text_char_y_si
 
 spr5_extension1_size		RS.B 0
 
-; Sprite5-Hauptstruktur
+; Sprite5 main structure
 	RSRESET
 
 spr5_begin			RS.B 0
@@ -771,7 +771,7 @@ spr5_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite5_size			RS.B 0
 
-; Sprite6-Zusatzstruktur
+; Sprite6 additional structure
 	RSRESET
 
 spr6_extension1	RS.B 0
@@ -781,7 +781,7 @@ spr6_ext1_planedata		RS.L bv_image_y_size*(spr_pixel_per_datafetch/WORD_BITS)
 
 spr6_extension1_size		RS.B 0
 
-; Sprite6-Hauptstruktur
+; Sprite6 main structure
 	RSRESET
 
 spr6_begin			RS.B 0
@@ -792,7 +792,7 @@ spr6_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite6_size			RS.B 0
 
-; Sprite7-Zusatzstruktur
+; Sprite7 additional structure
 	RSRESET
 
 spr7_extension1	RS.B 0
@@ -802,7 +802,7 @@ spr7_ext1_planedata		RS.L bv_image_y_size*(spr_pixel_per_datafetch/WORD_BITS)
 
 spr7_extension1_size		RS.B 0
 
-; Sprite7-Hauptstruktur
+; Sprite7 main structure
 	RSRESET
 
 spr7_begin			RS.B 0
@@ -1287,7 +1287,7 @@ cl2_init_bplcon4_loop1
 	IFEQ open_border_enabled 
 		move.l	d1,(a0)+	; BPL1DAT
 	ENDC
-	moveq	#cl2_display_width-1,d6	; Anzahl der Spalten
+	moveq	#cl2_display_width-1,d6	; number of columns
 cl2_init_bplcon4_loop2
 	move.l	d0,(a0)+		; BPLCON4
 	dbf	d6,cl2_init_bplcon4_loop2
@@ -1380,7 +1380,7 @@ wave_scrolltext
 	move.w	wst_y_angle(a3),d4
 	move.w	d4,d0		
 	add.w	wst_y_angle_speed(a3),d0 ; nächster Y-Winkel
-	and.w	#sine_table_length-1,d0	; Überlauf entfernen
+	and.w	#sine_table_length-1,d0	; remove overflow
 	move.w	d0,wst_y_angle(a3) 
 	moveq	#wst_image_plane_width-4,d3
 	lea	wst_characters_x_positions(pc),a2
@@ -1402,7 +1402,7 @@ wave_scrolltext_loop1
 	add.w	d1,d2			; VSTOP
 	SET_SPRITE_POSITION d0,d1,d2
 	move.w	d1,(a1)			; SPRxPOS
-	and.w	#sine_table_length-1,d4 ; Überlauf entfernen
+	and.w	#sine_table_length-1,d4 ; remove overflow
 	move.w	d2,spr_pixel_per_datafetch/8(a1) ; SPRxCTL
 	sub.w	a6,d5			; X-Position verringern
 	bpl.s   wave_scrolltext_skip
@@ -1824,11 +1824,11 @@ bv_wobble_sprites
 	MOVEF.W sine_table_length-1,d5
 	addq.w	#bv_wobble_x_radius_angle_speed,d0 ; nächster X-Radius-Winkel
 	move.w	bv_wobble_x_angle(a3),d2
-	and.w	d5,d0			; Überlauf entfernen
+	and.w	d5,d0			; remove overflow
 	move.w	d0,bv_wobble_x_radius_angle(a3)
 	move.w	d2,d0		
 	addq.w	#bv_wobble_x_angle_speed,d0 ; nächster X-Winkel
-	move.w	d5,d0			; Überlauf entfernen
+	move.w	d5,d0			; remove overflow
 	move.w	d0,bv_wobble_x_angle(a3)
 	lea	spr_ptrs_construction+(bv_used_first_sprite*LONGWORD_SIZE)(pc),a0
 	move.l	cl1_construction2(a3),a1
@@ -1851,15 +1851,15 @@ bv_wobble_sprites_loop2
 	swap	d0
 	add.w	a2,d0			; x' + X-Mittelpunkt
 	move.w	d0,d3		
-	add.w	a5,d0			; x' + vertikaler/horizontaler Startwert des Sprites6
+	add.w	a5,d0			; x' + vertikaler/horizontaler table start des Sprites6
 	move.w	d0,(a1)			; SPR6POS
 	addq.w	#bv_wobble_x_radius_angle_step,d1 ; nächster X-Radius-Winkel
 	addq.w	#bv_wobble_x_angle_step,d2 ; nächster X-Winkel
-	and.w	d5,d1			; Überlauf entfernen
-	and.w	d5,d2			; Überlauf entfernen
-	add.w	a6,d3			; x' + vertikaler/horizontaler Startwert des Sprites7
+	and.w	d5,d1			; remove overflow
+	and.w	d5,d2			; remove overflow
+	add.w	a6,d3			; x' + vertikaler/horizontaler table start des Sprites7
 	move.w	d3,4(a1)		; SPR7POS
-	add.l	a4,a1			; nächste Zeile in CL
+	add.l	a4,a1			; next line in cl
 	dbf	d6,bv_wobble_sprites_loop2
 	addq.w	#QUADWORD_SIZE,a1	; COP2LCH + COP2LCL überspringen
 	dbf	d7,bv_wobble_sprites_loop1
@@ -1889,9 +1889,9 @@ rotation_zoomer
 	IFEQ rz_table_length_256
 		addq.b	#rz_z_rotation_angle_speed,d3 ; nächster Rotations-Winkel
 	ELSE
-	and.w	d6,d4			; Überlauf entfernen
+	and.w	d6,d4			; remove overflow
 		addq.w	#rz_z_rotation_angle_speed,d3 ; nächster Rotations-Winkel
-		and.w	d6,d3		; Überlauf entfernen
+		and.w	d6,d3		; remove overflow
 	ENDC
 	move.w	2(a0,d4.w*4),d0	;cos(w)
 	tst.w	rz_zoomer_active(a3)
@@ -1901,7 +1901,7 @@ rotation_zoomer
 rotation_zoomer_skip
 	ELSE
 		addq.w	#rz_zoom_angle_speed,d5 ; nächster Zoom-Winkel
-		and.w	d6,d5		; Überlauf entfernen
+		and.w	d6,d5		; remove overflow
 	ENDC
 rotation_zoomer_skip
 ; Zoomfaktor berechnen
@@ -1954,7 +1954,7 @@ rotation_zoomer_skip
 	move.w	#(cl2_extension1_size*cl2_display_y_size)-4,a6
 	add.w	a7,a7			; notwendig, um die 2:1 Pixelverzerrung auszugleichen
 	moveq	#0,d2
-	moveq	#cl2_display_width-1,d7 ; Anzahl der Spalten
+	moveq	#cl2_display_width-1,d7 ; number of columns
 rotation_zoomer_loop1
 	move.w	a4,d4			; X Linke obere Ecke in BPLAM-Tabelle
 	move.w	a5,d5			; Y Linke obere Ecke in BPLAM-Tabelle
@@ -1967,11 +1967,11 @@ rotation_zoomer_loop2
 	move.b	(a0,d2.l),(a1)		; BPLCON4 high
 	add.w	d1,d4			; nächste Pixel-Spalte in BPLAM-Tabelle
 	add.w	d0,d5			; nächste Pixel-Zeile in BPLAM-Tabelle
-	add.l	a2,a1			; nächste Zeile in CL
+	add.l	a2,a1			; next line in cl
 	dbf	d6,rotation_zoomer_loop2
 	add.w	a3,a4			; nächste X-Pos in BPLAM--Tabelle
 	sub.w	a7,a5			; nächste Y-Pos in BPLAM-Tabelle
-	sub.l	a6,a1			; nächste Spalte in CL
+	sub.l	a6,a1			; next column in CL
 	dbf	d7,rotation_zoomer_loop1
 	move.l	variables+save_a7(pc),a7
 rotation_zoomer_quit
@@ -2000,12 +2000,12 @@ image_fader_in_skip
 	ADDF.W	ifi_rgb8_fader_center,d0
 	lea	pf1_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a0 ; Puffer für Farbwerte
 	lea	ifi_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a1 ; Sollwerte
-	move.w	d0,a5			; Additions-/Subtraktionswert für Blau
+	move.w	d0,a5			; increase/decrease blue
 	swap	d0
 	clr.w	d0
-	move.l	d0,a2			; Additions-/Subtraktionswert für Rot
+	move.l	d0,a2			; increase/decrease red
 	lsr.l	#8,d0
-	move.l	d0,a4			; Additions-/Subtraktionswert für Grün
+	move.l	d0,a4			; increase/decrease green
 	MOVEF.W if_rgb8_colors_number-1,d7
 	bsr	if_rgb8_fader_loop
 	move.w	d6,if_rgb8_colors_counter(a3) ; Fading-In beendet ?
@@ -2037,12 +2037,12 @@ image_fader_out_skip
 	ADDF.W	ifo_rgb8_fader_center,d0
 	lea	pf1_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a0 ; Puffer für Farbwerte
 	lea	ifo_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a1 ; Sollwerte
-	move.w	d0,a5			; Additions-/Subtraktionswert für Blau
+	move.w	d0,a5			; increase/decrease blue
 	swap	d0
 	clr.w	d0
-	move.l	d0,a2			; Additions-/Subtraktionswert für Rot
+	move.l	d0,a2			; increase/decrease red
 	lsr.l	#8,d0
-	move.l	d0,a4			; Additions-/Subtraktionswert für Grün
+	move.l	d0,a4			; increase/decrease green
 	MOVEF.W if_rgb8_colors_number-1,d7
 	bsr.s	if_rgb8_fader_loop
 	move.w	d6,if_rgb8_colors_counter(a3) ; Fading-Out beendet ?
@@ -2070,9 +2070,9 @@ blind_fader_in
 	MOVEF.W bf_table_length-1,d3
 	move.w	d2,d0		
 	MOVEF.L cl2_extension1_size,d4
-	addq.w	#bf_speed,d0		; Startwert erhöhen
+	addq.w	#bf_speed,d0		; increase table start
 	moveq	#bf_step2,d5
-	cmp.w	#(bf_table_length/2)+1,d0 ; Ende der Tabelle erreicht ?
+	cmp.w	#(bf_table_length/2)+1,d0 ; end of table ?
 	ble.s	blind_fader_in_skip
 	move.w	#FALSE,bfi_active(a3)
 	bra.s	blind_fader_in_quit
@@ -2104,23 +2104,23 @@ blind_fader_in_loop1
 	moveq	#bf_lamella_height-1,d6
 blind_fader_in_loop2
 	move.w	(a0,d1.w*2),d0		; Registeroffset aus Tabelle
-	addq.w	#bf_step1,d1		; nächster Wert aus Tabelle
+	addq.w	#bf_step1,d1		; next entry
 	IFNE cl2_size1
 		move.w	d0,(a1)		; Registeroffset in CL schreiben
-		add.l	d4,a1		; nächste Zeile in CL
+		add.l	d4,a1		; next line in cl
 	ENDC
 	IFNE cl2_size2
 		move.w	d0,(a2)		; Registeroffset in CL schreiben
-		add.l	d4,a2		; nächste Zeile in CL
+		add.l	d4,a2		; next line in cl
 	ENDC
 	IFNE cl2_size3
 		move.w	d0,(a4)		; Registeroffset in CL schreiben
-		add.l	d4,a4		; nächste Zeile in CL
+		add.l	d4,a4		; next line in cl
 	ENDC
-	and.w	d3,d1			; Überlauf entfernen
+	and.w	d3,d1			; remove overflow
 	dbf	d6,blind_fader_in_loop2
-	add.w	d5,d2			; Startwert erhöhen
-	and.w	d3,d2			; Überlauf entfernen
+	add.w	d5,d2			; increase table start
+	and.w	d3,d2			; remove overflow
 	dbf	d7,blind_fader_in_loop1
 blind_fader_in_quit
 	move.l	(a7)+,a4
@@ -2136,7 +2136,7 @@ blind_fader_out
 	MOVEF.W bf_table_length-1,d3
 	move.w	d2,d0		
 	MOVEF.L cl2_extension1_size,d4
-	subq.w	#bf_speed,d0		; Startwert verringern
+	subq.w	#bf_speed,d0		; decrease table start
 	bpl.s	blind_fader_out_skip
 	moveq	#FALSE,d0
 	move.w	d0,bfo_active(a3)
@@ -2181,23 +2181,23 @@ blind_fader_out_loop1
 	moveq	#bf_lamella_height-1,d6
 blind_fader_out_loop2
 	move.w	(a0,d1.w*2),d0		; Registeradresse aus Tabelle
-	addq.w	#bf_step1,d1		; nächster Wert aus Tabelle
+	addq.w	#bf_step1,d1		; next entry
 	IFNE cl2_size1
 		move.w	d0,(a1)		; Registeroffset in CL schreiben
-		add.l	d4,a1		; nächste Zeile in CL
+		add.l	d4,a1		; next line in cl
 	ENDC
 	IFNE cl2_size2
 		move.w	d0,(a2)		; Registeroffset in CL schreiben
-		add.l	d4,a2		; nächste Zeile in CL
+		add.l	d4,a2		; next line in cl
 	ENDC
 	IFNE cl2_size3
 		move.w	d0,(a4)		; Registeroffset in CL schreiben
-		add.l	d4,a4		; nächste Zeile in CL
+		add.l	d4,a4		; next line in cl
 	ENDC
-	and.w	d3,d1			; Überlauf entfernen
+	and.w	d3,d1			; remove overflow
 	dbf	d6,blind_fader_out_loop2
-	add.w	d5,d2			; Startwert erhöhen
-	and.w	d3,d2			; Überlauf entfernen
+	add.w	d5,d2			; increase table start
+	and.w	d3,d2			; remove overflow
 	dbf	d7,blind_fader_out_loop1
 blind_fader_out_quit
 	move.l	(a7)+,a4
