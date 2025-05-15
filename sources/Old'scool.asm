@@ -156,7 +156,7 @@ rz_display_y_scale_factor	EQU 4
 ; Blenk-Vectors
 bv_EpRGB_check_max_enabled	EQU TRUE
 
-dma_bits			EQU DMAF_BLITTER|DMAF_SPRITE|DMAF_COPPER|DMAF_RASTER|DMAF_MASTER+DMAF_SETCLR
+dma_bits			EQU DMAF_BLITTER|DMAF_SPRITE|DMAF_COPPER|DMAF_RASTER|DMAF_MASTER|DMAF_SETCLR
 
 	IFEQ pt_ciatiming_enabled
 intena_bits			EQU INTF_EXTER|INTF_INTEN|INTF_SETCLR
@@ -355,12 +355,12 @@ wst_horiz_scroll_speed2		EQU 12
 wst_horiz_scroll_speed3		EQU 17
 
 wst_text_char_x_restart		EQU wst_horiz_scroll_window_x_size*4 ;*4 da superhires Pixel
-wst_text_characters_number	EQU wst_horiz_scroll_window_x_size/wst_text_char_x_size
+wst_text_chars_number	EQU wst_horiz_scroll_window_x_size/wst_text_char_x_size
 
 wst_y_radius			EQU (visible_lines_number-wst_text_char_y_size)/2
 wst_y_center			EQU ((visible_lines_number-wst_text_char_y_size)/2)+display_window_vstart
 wst_y_angle_speed1		EQU 5
-wst_y_angle_step1		EQU sine_table_length/wst_text_characters_number
+wst_y_angle_step1		EQU sine_table_length/wst_text_chars_number
 
 ; Blenk-Vectors
 bv_rotation_d			EQU 256
@@ -1050,8 +1050,8 @@ init_main
 	bsr	pt_ExamineSongStruc
 	bsr	pt_InitFtuPeriodTableStarts
 	bsr	rz_convert_image_data
-	bsr	wst_init_characters_offsets
-	bsr	wst_init_characters_x_positions
+	bsr	wst_init_chars_offsets
+	bsr	wst_init_chars_x_positions
 	bsr	bv_convert_color_table
 	bsr	bv_init_object_info
 	bsr	bg_copy_image_to_plane
@@ -1078,9 +1078,9 @@ init_main
 
 
 ; Wave-Scrolltext
-	INIT_CHARACTERS_OFFSETS.W wst
+	INIT_CHARS_OFFSETS.W wst
 
-	INIT_CHARACTERS_X_POSITIONS wst,SHIRES
+	INIT_CHARS_X_POSITIONS wst,SHIRES
 
 
 ; Blenk-Vectors
@@ -1383,11 +1383,11 @@ wave_scrolltext
 	and.w	#sine_table_length-1,d0	; remove overflow
 	move.w	d0,wst_y_angle(a3) 
 	moveq	#wst_image_plane_width-4,d3
-	lea	wst_characters_x_positions(pc),a2
+	lea	wst_chars_x_positions(pc),a2
 	lea	spr_ptrs_display(pc),a4
 	lea	sine_table(pc),a5
 	move.w	wst_horiz_scroll_speed(a3),a6
-	moveq	#wst_text_characters_number-1,d7
+	moveq	#wst_text_chars_number-1,d7
 wave_scrolltext_loop1
 	move.l	(a4)+,a1		; Zeiger auf Sprite-Struktur
 	move.w	(a2),d5			; X-Position
@@ -1533,9 +1533,9 @@ bv_rotation
 	move.w	#sine_table_length/4,a4
 	MOVEF.W sine_table_length-1,d3
 	add.w	a4,d0			; + 90°
-	swap	d4			; high word: sin(a)
+	swap	d4 			; high word: sin(a)
 	and.w	d3,d0			; Übertrag entfernen
-	move.w	2(a2,d0.w*4),d4		; Bits	0..15: cos(a)
+	move.w	2(a2,d0.w*4),d4		; low word: cos(a)
 	add.w	bv_rotation_x_angle_speed(a3),d1 ; nächster X-Winkel
 	and.w	d3,d1			; Übertrag entfernen
 	move.w	d1,bv_rotation_x_angle(a3) 
@@ -1543,9 +1543,9 @@ bv_rotation
 	move.w	d1,d0		
 	move.w	2(a2,d0.w*4),d5		; sin(b)
 	add.w	a4,d0			; + 90°
-	swap	d5			; high word: sin(b)
+	swap	d5 			; high word: sin(b)
 	and.w	d3,d0			; Übertrag entfernen
-	move.w	2(a2,d0.w*4),d5		; Bits	0..15: cos(b)
+	move.w	2(a2,d0.w*4),d5		; low word: cos(b)
 	add.w	bv_rotation_y_angle_speed(a3),d1 ; nächster Y-Winkel
 	and.w	d3,d1			; Übertrag entfernen
 	move.w	d1,bv_rotation_y_angle(a3) 
@@ -1553,9 +1553,9 @@ bv_rotation
 	move.w	d1,d0		
 	move.w	2(a2,d0.w*4),d6	;sin(c)
 	add.w	a4,d0			; + 90°
-	swap	d6			; high word: sin(c)
+	swap	d6 			; high word: sin(c)
 	and.w	d3,d0			; Übertrag entfernen
-	move.w	2(a2,d0.w*4),d6		; low word: cos(c)
+	move.w	2(a2,d0.w*4),d6	 	; low word: cos(c)
 	add.w	bv_rotation_z_angle_speed(a3),d1 ; nächster Z-Winkel
 	and.w	d3,d1			; Übertrag entfernen
 	move.w	d1,bv_rotation_z_angle(a3) 
@@ -1606,7 +1606,7 @@ bv_draw_lines
 	move.l	extra_pf2(a3),a2
 	move.l	(a2),a2			; Bild
 	move.l	cl1_construction2(a3),a4
-	move.l	#((BC0F_SRCA+BC0F_SRCC+BC0F_DEST+NANBC+NABC+ABNC)<<16)+(BLTCON1F_LINE+BLTCON1F_SING),a3 ; Minterm Linien
+	move.l	#((BC0F_SRCA|BC0F_SRCC|BC0F_DEST+NANBC|NABC|ABNC)<<16)+(BLTCON1F_LINE+BLTCON1F_SING),a3 ; Minterm Linien
 	ADDF.W	cl1_COLOR12_high5+WORD_SIZE,a4
 	lea	bv_color_table(pc),a7	; Zeiger auf Tabelle mit Farbverlaufwerten
 	moveq	#bv_object_faces_number-1,d7
@@ -1672,11 +1672,11 @@ bv_draw_lines_loop2
 	btst	#0,d7			; Bitplane1 ?
 	beq.s	bv_draw_lines_skip3
 	WAITBLIT
-	move.l	d0,BLTCON0-DMACONR(a6)	; low word: BLTCON1, high word: BLTCON0
+	move.l	d0,BLTCON0-DMACONR(a6) 	; low word: BLTCON1, high word: BLTCON0
 	move.w	d3,BLTAPTL-DMACONR(a6)	; (dy)-(2*dx)
 	move.l	d1,BLTCPT-DMACONR(a6)	; Bitplanes lesen
 	move.l	d1,BLTDPT-DMACONR(a6)	; Bitplanes schreiben
-	move.l	d4,BLTBMOD-DMACONR(a6)	; low word: 4*(dy-dx), high word: 4*dy
+	move.l	d4,BLTBMOD-DMACONR(a6) 	; low word: 4*(dy-dx), high word: 4*dy
 	move.w	d2,BLTSIZE-DMACONR(a6)
 bv_draw_lines_skip3
 	btst	#1,d7			; Bitplane2 ?
@@ -1684,11 +1684,11 @@ bv_draw_lines_skip3
 	moveq	#extra_pf1_plane_width,d5
 	add.l	d5,d1			; nächste Bitplane
 	WAITBLIT
-	move.l	d0,BLTCON0-DMACONR(a6)	; low word: BLTCON1, high word: BLTCON0
+	move.l	d0,BLTCON0-DMACONR(a6) 	; low word: BLTCON1, high word: BLTCON0
 	move.w	d3,BLTAPTL-DMACONR(a6)	; (dy)-(2*dx)
 	move.l	d1,BLTCPT-DMACONR(a6)	; Bitplanes lesen
 	move.l	d1,BLTDPT-DMACONR(a6)	; Bitplanes schreiben
-	move.l	d4,BLTBMOD-DMACONR(a6)	; low word: 4*(dy-dx), high word: 4*dy
+	move.l	d4,BLTBMOD-DMACONR(a6) 	; low word: 4*(dy-dx), high word: 4*dy
 	move.w	d2,BLTSIZE-DMACONR(a6)
 bv_draw_lines_skip4
 	dbf	d6,bv_draw_lines_loop2
@@ -1703,7 +1703,7 @@ bv_draw_lines_quit
 	rts
 	CNOP 0,4
 bv_draw_lines_init
-	move.w	#DMAF_BLITHOG+DMAF_SETCLR,DMACON-DMACONR(a6)
+	move.w	#DMAF_BLITHOG|DMAF_SETCLR,DMACON-DMACONR(a6)
 	WAITBLIT
 	move.l	#$ffff8000,BLTBDAT-DMACONR(a6) ; low word: Linientextur mit MSB beginnen, high word: Linientextur
 	moveq	#-1,d0
@@ -1720,7 +1720,7 @@ bv_fill_image
 	move.l	(a0),a0
 	add.l	#(extra_pf1_plane_width*extra_pf1_y_size*extra_pf1_depth)-2,a0 ; Ende des Bildes
 	WAITBLIT
-	move.l	#((BC0F_SRCA+BC0F_DEST+ANBNC+ANBC+ABNC+ABC)<<16)+(BLTCON1F_DESC+BLTCON1F_EFE),BLTCON0-DMACONR(a6) ; Minterm D=A, Füll-Modus, Rückwärts
+	move.l	#((BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC)<<16)+(BLTCON1F_DESC+BLTCON1F_EFE),BLTCON0-DMACONR(a6) ; Minterm D=A, Füll-Modus, Rückwärts
 	move.l	a0,BLTAPT-DMACONR(a6)	; Quelle
 	move.l	a0,BLTDPT-DMACONR(a6)	; Ziel
 	moveq	#0,d0
@@ -2144,11 +2144,11 @@ blind_fader_out
 	tst.w	pt_music_fader_active(a3)
 	beq.s	blind_fader_out_quit
 	bsr	init_main_variables2
-	bsr	wst_init_characters_x_positions
+	bsr	wst_init_chars_x_positions
 	bsr	init_colors2
 	bsr	set_noop_screen
 	bsr	cl1_set_branches_ptrs
-	move.w	#DMAF_RASTER+DMAF_SETCLR,DMACON-DMACONR(a6)
+	move.w	#DMAF_RASTER|DMAF_SETCLR,DMACON-DMACONR(a6)
 	moveq	#0,d0
 	move.w	d0,COPJMP1-DMACONR(a6)	; 1. Copperliste neu starten, damit die geänderte Palette dargestellt wird
 	bra.s	blind_fader_out_quit
@@ -2740,12 +2740,12 @@ wst_ascii_end
 	EVEN
 
 	CNOP 0,2
-wst_characters_offsets
+wst_chars_offsets
 	DS.W wst_ascii_end-wst_ascii
 
 	CNOP 0,2
-wst_characters_x_positions
-	DS.W wst_text_characters_number
+wst_chars_x_positions
+	DS.W wst_text_chars_number
 
 
 ; Blenk-Vectors
@@ -2843,21 +2843,21 @@ bf_address_offsets_table
 wst_text
 	DC.B ASCII_CTRL_F,"°¹"
 	DC.B "RESISTANCE"
-	REPT wst_text_characters_number/(wst_origin_char_x_size/wst_text_char_x_size)
+	REPT wst_text_chars_number/(wst_origin_char_x_size/wst_text_char_x_size)
 		DC.B " "
 	ENDR
 	DC.B "PRESENTS  "
-	REPT wst_text_characters_number/(wst_origin_char_x_size/wst_text_char_x_size)
+	REPT wst_text_chars_number/(wst_origin_char_x_size/wst_text_char_x_size)
 		DC.B " "
 	ENDR
 	DC.B ASCII_CTRL_W,ASCII_CTRL_M,"¹³"
 	DC.B " YES WE ARE BACK ON THE AMIGA ### "
-	REPT wst_text_characters_number/(wst_origin_char_x_size/wst_text_char_x_size)
+	REPT wst_text_chars_number/(wst_origin_char_x_size/wst_text_char_x_size)
 		DC.B " "
 	ENDR
 	DC.B ASCII_CTRL_W,ASCII_CTRL_S
 	DC.B "PRESS F1-F10 FOR DIFFERENT CUBE MOVEMENTS...  "
-	REPT wst_text_characters_number/(wst_origin_char_x_size/wst_text_char_x_size)
+	REPT wst_text_chars_number/(wst_origin_char_x_size/wst_text_char_x_size)
 		DC.B " "
 	ENDR
 	DC.B ASCII_CTRL_W,ASCII_CTRL_F,"²³"
@@ -2871,7 +2871,7 @@ wst_text
 	DC.B "WANTED TEAM  "
 	DC.B "SOFTWARE FAILURE  "
 	DC.B "EPHIDRENA  "
-	REPT wst_text_characters_number/(wst_origin_char_x_size/wst_text_char_x_size)
+	REPT wst_text_chars_number/(wst_origin_char_x_size/wst_text_char_x_size)
 		DC.B " "
 	ENDR
 	DC.B ASCII_CTRL_W,ASCII_CTRL_M,"¹³"
@@ -2880,7 +2880,7 @@ wst_text
 	DC.B "GRAPHICS *GRASS*      "
 	DC.B "RELEASED @ NORDLICHT 2023"
 wst_stop_text
-	REPT wst_text_characters_number/(wst_origin_char_x_size/wst_text_char_x_size)
+	REPT wst_text_chars_number/(wst_origin_char_x_size/wst_text_char_x_size)
 		DC.B " "
 	ENDR
 	DC.B ASCII_CTRL_W," "
