@@ -355,7 +355,7 @@ wst_horiz_scroll_speed2		EQU 12
 wst_horiz_scroll_speed3		EQU 17
 
 wst_text_char_x_restart		EQU wst_horiz_scroll_window_x_size*4 ;*4 da superhires Pixel
-wst_text_chars_number	EQU wst_horiz_scroll_window_x_size/wst_text_char_x_size
+wst_text_chars_number		EQU wst_horiz_scroll_window_x_size/wst_text_char_x_size
 
 wst_y_radius			EQU (visible_lines_number-wst_text_char_y_size)/2
 wst_y_center			EQU ((visible_lines_number-wst_text_char_y_size)/2)+display_window_vstart
