@@ -1379,7 +1379,7 @@ wave_scrolltext
 	bne	wave_scrolltext_quit
 	move.w	wst_y_angle(a3),d4
 	move.w	d4,d0		
-	add.w	wst_y_angle_speed(a3),d0 ; nächster Y-Winkel
+	add.w	wst_y_angle_speed(a3),d0
 	and.w	#sine_table_length-1,d0	; remove overflow
 	move.w	d0,wst_y_angle(a3) 
 	moveq	#wst_image_plane_width-4,d3
@@ -1412,10 +1412,10 @@ wave_scrolltext_loop1
 	add.l	#(spr_pixel_per_datafetch/8)*2,a1 ; Sprite-Header überpsringen
 	moveq	#wst_text_char_y_size-1,d6
 wave_scrolltext_loop2
-	move.l	(a0)+,(a1)+		; 64 Pixel BP0
+	move.l	(a0)+,(a1)+		; quadword bitplane 1
 	move.l	(a0),(a1)+
 	add.l	d3,a0			; nächste Zeile in Quelle
-	move.l	(a0)+,(a1)+		; 64 Pixel BP1
+	move.l	(a0)+,(a1)+		; quadword bitplane 2
 	move.l	(a0),(a1)+
 	add.l	d3,a0			; nächste Zeile in Quelle
 	dbf	d6,wave_scrolltext_loop2
@@ -1504,7 +1504,7 @@ bv_clear_image
 	move.l	(a0),BLTDPT-DMACONR(a6)
 	moveq	#0,d0
 	move.w	d0,BLTDMOD-DMACONR(a6) ; D-Mod
-	move.w	#(bv_clear_blit_y_size*bv_clear_blit_depth*64)+(bv_clear_blit_x_size/WORD_BITS),BLTSIZE-DMACONR(a6) ; Blitter starten
+	move.w	#(bv_clear_blit_y_size*bv_clear_blit_depth<<6)+(bv_clear_blit_x_size/WORD_BITS),BLTSIZE-DMACONR(a6) ; Blitter starten
 	rts
 
 
@@ -1725,7 +1725,7 @@ bv_fill_image
 	move.l	a0,BLTDPT-DMACONR(a6)	; Ziel
 	moveq	#0,d0
 	move.l	d0,BLTAMOD-DMACONR(a6)	; A+D-Mod
-	move.w	#(bv_fill_blit_y_size*bv_fill_blit_depth*64)+(bv_fill_blit_x_size/WORD_BITS),BLTSIZE-DMACONR(a6) ; Blitter starten
+	move.w	#(bv_fill_blit_y_size*bv_fill_blit_depth<<6)+(bv_fill_blit_x_size/WORD_BITS),BLTSIZE-DMACONR(a6) ; Blitter starten
 	rts
 
 
