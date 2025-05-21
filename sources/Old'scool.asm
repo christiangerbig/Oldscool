@@ -143,9 +143,11 @@ pt_track_notes_played_enabled	EQU FALSE
 pt_track_volumes_enabled	EQU FALSE
 pt_track_periods_enabled	EQU FALSE
 pt_track_data_enabled		EQU FALSE
+	IFD PROTRACKER_VERSION_3
 pt_metronome_enabled		EQU FALSE
 pt_metrochanbits		EQU pt_metrochan1
 pt_metrospeedbits		EQU pt_metrospeed4th
+	ENDC
 
 open_border_enabled		EQU TRUE
 
@@ -228,6 +230,7 @@ audio_memory_size		EQU 1*WORD_SIZE
 disk_memory_size		EQU 0
 
 chip_memory_size		EQU 0
+
 ciaa_crb_bits			EQU CIACRBF_LOAD|CIACRBF_RUNMODE ; oneshot mode
 	IFEQ pt_ciatiming_enabled
 ciab_cra_bits			EQU CIACRBF_LOAD
@@ -292,6 +295,7 @@ color00_bits			EQU $090909
 cl2_display_x_size		EQU visible_pixels_number+8
 cl2_display_width		EQU cl2_display_x_size/8
 cl2_display_y_size		EQU visible_lines_number/rz_display_y_scale_factor
+
 	IFNE open_border_enabled
 cl1_hstart1			EQU display_window_hstart-(7*CMOVE_SLOT_PERIOD)
 	ELSE
@@ -872,9 +876,9 @@ rz_z_rotation_angle		RS.W 1
 rz_zoom_angle			RS.W 1
 
 ; Wave-Scrolltext
+wst_active			RS.W 1
 	RS_ALIGN_LONGWORD
 wst_image			RS.L 1
-wst_enabled			RS.W 1
 wst_text_table_start		RS.W 1
 wst_y_angle			RS.W 1
 wst_y_angle_speed		RS.W 1
@@ -904,8 +908,8 @@ bv_wobble_x_angle		RS.W 1
 bv_zoom_distance		RS.L 1
 
 ; Image-Fader
-if_rgb8_colors_counter		RS.W 1
 if_rgb8_copy_colors_active	RS.W 1
+if_rgb8_colors_counter		RS.W 1
 
 ; Image-Fader-In
 ifi_rgb8_active			RS.W 1
@@ -978,7 +982,7 @@ init_main_variables2
 	move.w	#(sine_table_length/4)*3,rz_zoom_angle(a3) ; 270°
 
 ; Wave-Scrolltext
-	move.w	d1,wst_enabled(a3)
+	move.w	d1,wst_active(a3)
 	lea	wst_image_data,a0
 	move.l	a0,wst_image(a3)
 	move.w	d0,wst_text_table_start(a3)
@@ -1009,8 +1013,8 @@ init_main_variables2
 	move.l	#czi_zoom_radius,bv_zoom_distance(a3)
 
 ; Image-Fader
-	move.w	d0,if_rgb8_colors_counter(a3)
 	move.w	d1,if_rgb8_copy_colors_active(a3)
+	move.w	d0,if_rgb8_colors_counter(a3)
 
 	move.w	d1,ifi_rgb8_active(a3)
 	move.w	#sine_table_length/4,ifi_rgb8_fader_angle(a3) ; 90°
@@ -1118,6 +1122,8 @@ init_sprites
 
 	CNOP 0,4
 init_CIA_timers
+
+; Keyboard-Handler
 	MOVEF.W ciaa_tb_time&$ff,d0
 	move.b	d0,CIATBLO(a4)		; Timer-B Low-Bits
 	moveq	#ciaa_tb_time>>8,d0
@@ -1234,12 +1240,11 @@ cl1_set_branches_ptrs
 
 
 ; Input
-; d0.l	Einsprungadresse Copperliste2
+; d0.l	Jump in cl2
 ; d2.l	cl1_subextension1_size
 ; d4.l	cl1_extension1_size
-; a0.l	Copperliste1
+; a0.l	Pointer cl1
 ; Result
-; d0.l	Kein Rückgabewert
 	CNOP 0,4
 cl1_set_jump_entry_ptrs
 	MOVEF.L cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subextension1_size,d1 ; Offset Rücksprungadresse CL1
@@ -1248,15 +1253,15 @@ cl1_set_jump_entry_ptrs
 	ADDF.W	cl1_extension1_entry+cl1_ext1_COP2LCH+WORD_SIZE,a0
 	moveq	#cl2_display_y_size-1,d7
 cl1_set_branches_loop1
-	swap	d0			; High
+	swap	d0
 	move.w	d0,(a0)			; COP2LCH
-	swap	d0			; Low
+	swap	d0
 	move.w	d0,4(a0)		; COP2LCL
 	moveq	#rz_display_y_scale_factor-1,d6 ; Anzahl der Abschnitte für Y-Skalierung
 cl1_set_branches_loop2
-	swap	d1			; High
+	swap	d1
 	move.w	d1,(a1)			; COP1LCH
-	swap	d1			; Low
+	swap	d1
 	move.w	d1,4(a1)		; COP1LCL
 	add.l	d2,d1			; Rücksprungadresse CL1 erhöhen
 	add.l	d2,a1			; nächste Zeile in Unterabschnitt der CL1
@@ -1375,7 +1380,7 @@ swap_images
 	CNOP 0,4
 wave_scrolltext
 	movem.l a4-a6,-(a7)
-	tst.w	wst_enabled(a3)
+	tst.w	wst_active(a3)
 	bne	wave_scrolltext_quit
 	move.w	wst_y_angle(a3),d4
 	move.w	d4,d0		
@@ -1430,12 +1435,12 @@ wave_scrolltext_quit
 	GET_NEW_char_IMAGE.W wst,wst_check_control_codes,NORESTART
 
 
-	CNOP 0,4
-wst_check_control_codes
 ; Input
 ; d0.b	ASCII-Code
 ; Result
-; d0.l	Rückgabewert: Return-Code
+; d0.l	Return-Code
+	CNOP 0,4
+wst_check_control_codes
 	cmp.b	#"°",d0
 	beq.s	wst_set_standard_scroll
 	cmp.b	#"¹",d0
@@ -1491,7 +1496,7 @@ wst_set_horiz_scroll_speed_fast
 	rts
 	CNOP 0,4
 wst_stop_scrolltext
-	move.w	#FALSE,wst_enabled(a3)
+	move.w	#FALSE,wst_active(a3)
 	moveq	#RETURN_OK,d0
 	rts
 
@@ -1574,7 +1579,7 @@ bv_rotation_loop
 	ROTATE_Y_AXIS
 	ROTATE_Z_AXIS
 ; Zentralprojektion und Translation
-	move.w	d2,d3			; z -> d3
+	move.w	d2,d3			; save z
 	ext.l	d0
 	add.w	a4,d3			; z+d
 	MULUF.L bv_rotation_d,d0,d7	; x*d X-Projektion
@@ -1742,13 +1747,13 @@ bv_copy_image
 	moveq	#bv_image_y_size-1,d7
 bv_copy_image_loop
 	movem.l (a0)+,d0-d6/a4		; Bitplane1&2 mit jeweils 128 Pixel lesen
-	move.l	d0,(a1)+		; Sprite0 Bitplane1 64 Pixel
+	move.l	d0,(a1)+		; quadword Sprite0 Bitplane 1
 	move.l	d1,(a1)+
-	move.l	d2,(a2)+		; Sprite1 Bitplane1 64 Pixel
+	move.l	d2,(a2)+		; quadword Sprite1 Bitplane 1
 	move.l	d3,(a2)+
-	move.l	d4,(a1)+		; Sprite0 Bitplane2 64 Pixel
+	move.l	d4,(a1)+		; quadword Sprite0 Bitplane 2
 	move.l	d5,(a1)+
-	move.l	d6,(a2)+		; Sprite1 Bitplane2 64 Pixel
+	move.l	d6,(a2)+		; quadword Sprite1 Bitplane 2
 	move.l	a4,(a2)+
 	dbf	d7,bv_copy_image_loop
 	move.l	(a7)+,a4
@@ -2532,7 +2537,7 @@ pt_restart_intro
 	rts
 	CNOP 0,4
 pt_start_horiz_scrolltext
-	clr.w	wst_enabled(a3)
+	clr.w	wst_active(a3)
 	rts
 	CNOP 0,4
 pt_start_fade_in_image
@@ -2549,15 +2554,17 @@ pt_start_fade_in_image
 	rts
 	CNOP 0,4
 pt_start_fade_out_image
-	clr.w	ifo_rgb8_active(a3)
+	moveq	#TRUE,d0
+	move.w	d0,ifo_rgb8_active(a3)
+	move.w	d0,if_rgb8_copy_colors_active(a3)
 	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
-	clr.w	if_rgb8_copy_colors_active(a3)
 	rts
 	CNOP 0,4
 pt_start_fade_in_rotation_zoomer
 	movem.l d1-d7/a0-a2,-(a7)
-	clr.w	rz_active(a3)
-	clr.w	bfi_active(a3)
+	moveq	#TRUE,d0
+	move.w	d0,rz_active(a3)
+	move.w	d0,bfi_active(a3)
 	clr.w	part_main_active(a3)
 	bsr.s	rz_init_colors
 	bsr	rz_set_branches_ptrs
@@ -2569,8 +2576,9 @@ pt_start_fade_in_rotation_zoomer
 	rts
 	CNOP 0,4
 pt_start_cube_zoomer_in
-	clr.w	czi_active(a3)
-	clr.w	bv_active(a3)
+	moveq	#TRUE,d0
+	move.w	d0,czi_active(a3)
+	move.w	d0,bv_active(a3)
 	rts
 	CNOP 0,4
 pt_start_zoomer
@@ -2642,15 +2650,15 @@ rz_set_jump_entry_ptrs
 	ADDF.W	cl1_extension1_entry+cl1_ext1_COP2LCH+WORD_SIZE,a0
 	moveq	#cl2_display_y_size-1,d7
 rz_set_branches_loop1
-	swap	d0			; High
+	swap	d0
 	move.w	d0,(a0)			; COP2LCH
-	swap	d0			; Low
+	swap	d0
 	move.w	d0,4(a0)		; COP2LCL
 	moveq	#rz_display_y_scale_factor-1,d6 ; Anzahl der Abschnitte für Y-Skalierung
 rz_set_branches_loop2
-	swap	d1			; High-Wert
+	swap	d1
 	move.w	d1,(a1)			; COP1LCH
-	swap	d1			; Low-Wert
+	swap	d1
 	move.w	d1,4(a1)		; COP1LCL
 	add.l	d2,d1			; Rücksprungadresse CL1 erhöhen
 	add.l	d2,a1			; nächste Zeile in Unterabschnitt der CL1
