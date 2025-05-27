@@ -1432,7 +1432,7 @@ wave_scrolltext_quit
 	rts
 
 
-	GET_NEW_char_IMAGE.W wst,wst_check_control_codes,NORESTART
+	GET_NEW_CHAR_IMAGE.W wst,wst_check_control_codes,NORESTART
 
 
 ; Input
@@ -1509,7 +1509,7 @@ bv_clear_image
 	move.l	(a0),BLTDPT-DMACONR(a6)
 	moveq	#0,d0
 	move.w	d0,BLTDMOD-DMACONR(a6) ; D-Mod
-	move.w	#(bv_clear_blit_y_size*bv_clear_blit_depth<<6)+(bv_clear_blit_x_size/WORD_BITS),BLTSIZE-DMACONR(a6) ; Blitter starten
+	move.w	#((bv_clear_blit_y_size*bv_clear_blit_depth)<<6)+(bv_clear_blit_x_size/WORD_BITS),BLTSIZE-DMACONR(a6) ; Blitter starten
 	rts
 
 
@@ -1730,7 +1730,7 @@ bv_fill_image
 	move.l	a0,BLTDPT-DMACONR(a6)	; Ziel
 	moveq	#0,d0
 	move.l	d0,BLTAMOD-DMACONR(a6)	; A+D-Mod
-	move.w	#(bv_fill_blit_y_size*bv_fill_blit_depth<<6)+(bv_fill_blit_x_size/WORD_BITS),BLTSIZE-DMACONR(a6) ; Blitter starten
+	move.w	#((bv_fill_blit_y_size*bv_fill_blit_depth)<<6)+(bv_fill_blit_x_size/WORD_BITS),BLTSIZE-DMACONR(a6) ; Blitter starten
 	rts
 
 
