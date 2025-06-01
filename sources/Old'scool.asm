@@ -302,7 +302,7 @@ cl1_hstart1			EQU display_window_hstart-(7*CMOVE_SLOT_PERIOD)
 cl1_hstart1			EQU display_window_hstart-(8*CMOVE_SLOT_PERIOD)
 	ENDC
 cl1_vstart1			EQU MINROW
-cl1_hstart2			EQU $00
+cl1_hstart2			EQU 0
 cl1_vstart2			EQU beam_position&$ff
 
 sine_table_length		EQU 512
@@ -1112,7 +1112,7 @@ bv_init_object_info_loop
 
 	CNOP 0,4
 init_sprites
-	bsr.s	spr_init_ptrs_table
+	bsr.s	spr_init_pointers_table
 	bra	spr_copy_structures
 
 	INIT_SPRITE_POINTERS_TABLE
@@ -1140,16 +1140,16 @@ init_CIA_timers
 init_first_copperlist
 	move.l	cl1_construction2(a3),a0 
 	bsr.s	cl1_init_playfield_props
-	bsr.s	cl1_init_sprite_ptrs
+	bsr.s	cl1_init_sprite_pointers
 	bsr	cl1_init_colors
-	bsr	cl1_init_plane_ptrs
-	bsr	cl1_init_branches_ptrs
+	bsr	cl1_init_bitplane_pointers
+	bsr	cl1_init_branches_pointers
 	bsr	cl1_init_copper_interrupt
 	COP_LISTEND
-	bsr	cl1_set_sprite_ptrs
-	bsr	cl1_set_plane_ptrs
+	bsr	cl1_set_sprite_pointers
+	bsr	cl1_set_bitplane_pointers
 	bsr	copy_first_copperlist
-	bra	cl1_set_branches_ptrs
+	bra	cl1_set_branches_pointers
 
 
 	COP_INIT_PLAYFIELD_REGISTERS cl1
@@ -1187,18 +1187,18 @@ cl1_init_colors
 
 
 	CNOP 0,4
-cl1_init_branches_ptrs
+cl1_init_branches_pointers
 	move.l	#(((cl1_vstart1<<24)|(((cl1_hstart1/4)*2)<<16))|$10000)|$fffe,d0 ; CWAIT
 	moveq	#2,d1			; X-Verschiebung $00020000
 	swap	d1
 	moveq	#1,d2
 	ror.l	#8,d2			; Y-Additionswert $01000000
 	moveq	#cl2_display_y_size-1,d7
-cl1_init_branches_ptrs_loop1
+cl1_init_branches_pointers_loop1
 	COP_MOVEQ 0,COP2LCH
 	COP_MOVEQ 0,COP2LCL
 	moveq	#rz_display_y_scale_factor-1,d6 ; Anzahl der Abschnitte für Y-Skalierung
-cl1_init_branches_ptrs_loop2
+cl1_init_branches_pointers_loop2
 	move.l	d0,(a0)+		; CWAIT x,y
 	COP_MOVEQ 0,SPR6POS
 	COP_MOVEQ 0,SPR7POS
@@ -1207,8 +1207,8 @@ cl1_init_branches_ptrs_loop2
 	COP_MOVEQ 0,COP1LCL
 	add.l	d2,d0			; nächste Zeile
 	COP_MOVEQ 0,COPJMP2
-	dbf	d6,cl1_init_branches_ptrs_loop2
-	dbf	d7,cl1_init_branches_ptrs_loop1
+	dbf	d6,cl1_init_branches_pointers_loop2
+	dbf	d7,cl1_init_branches_pointers_loop1
 	rts
 
 
@@ -1225,17 +1225,17 @@ cl1_init_branches_ptrs_loop2
 
 
 	CNOP 0,4
-cl1_set_branches_ptrs
+cl1_set_branches_pointers
 	move.l	cl1_construction2(a3),a0 1
 	moveq	#cl1_subextension1_size,d2
 	move.l	cl2_construction2(a3),d0 ; Einsprungadresse
 	add.l	#cl2_extension2_entry,d0
 	moveq	#cl1_extension1_size,d4
-	bsr.s	cl1_set_jump_entry_ptrs
+	bsr.s	cl1_set_jump_entry_pointers
 	move.l	cl1_display(a3),a0 1
 	move.l	cl2_display(a3),d0	; Einsprungadresse
 	add.l	#cl2_extension2_entry,d0
-	bsr.s	cl1_set_jump_entry_ptrs
+	bsr.s	cl1_set_jump_entry_pointers
 	rts
 
 
@@ -1246,7 +1246,7 @@ cl1_set_branches_ptrs
 ; a0.l	Pointer cl1
 ; Result
 	CNOP 0,4
-cl1_set_jump_entry_ptrs
+cl1_set_jump_entry_pointers
 	MOVEF.L cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subextension1_size,d1 ; Offset Rücksprungadresse CL1
 	add.l	a0,d1			; + Rücksprungadresse CL1
 	lea	cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subext1_COP1LCH+WORD_SIZE(a0),a1
@@ -1344,8 +1344,8 @@ beam_routines
 	bsr	wait_copint
 	bsr	swap_first_copperlist
 	bsr	swap_second_copperlist
-	bsr	spr_swap_structures
-	bsr	spr_set_sprite_ptrs
+	bsr	swap_sprite_structures
+	bsr	set_sprite_pointers
 	bsr	swap_images
 	bsr	blind_fader_in
 	bsr	blind_fader_out
@@ -1361,10 +1361,10 @@ beam_routines
 	SWAP_COPPERLIST cl2,2,NOSET
 
 
-	SWAP_SPRITES spr,spr_swap_number,6
+	SWAP_SPRITES spr_swap_number,6
 
 
-	SET_SPRITES spr,spr_swap_number,6
+	SET_SPRITES spr_swap_number,6
 
 
 	CNOP 0,4
@@ -1389,7 +1389,7 @@ wave_scrolltext
 	move.w	d0,wst_y_angle(a3) 
 	moveq	#wst_image_plane_width-4,d3
 	lea	wst_chars_x_positions(pc),a2
-	lea	spr_ptrs_display(pc),a4
+	lea	spr_pointers_display(pc),a4
 	lea	sine_table(pc),a5
 	move.w	wst_horiz_scroll_speed(a3),a6
 	moveq	#wst_text_chars_number-1,d7
@@ -1739,7 +1739,7 @@ bv_copy_image
 	move.l	a4,-(a7)
 	move.l	extra_pf3(a3),a0
 	move.l	(a0),a0			; Image
-	lea	spr_ptrs_construction+(bv_used_first_sprite*LONGWORD_SIZE)(pc),a2
+	lea	spr_pointers_construction+(bv_used_first_sprite*LONGWORD_SIZE)(pc),a2
 	move.l	(a2)+,a1		; Sprite6
 	ADDF.W	(spr_pixel_per_datafetch/4),a1 ; Header überspringen
 	move.l	(a2),a2			; Sprite7
@@ -1767,7 +1767,7 @@ bv_move_sprites
 	move.w	bv_sprite_y_coordinate(a3),d4
 	move.w	bv_sprite_x_direction(a3),d5
 	moveq	#bv_sprite_y_center,d6
-	lea	spr_ptrs_construction+(bv_used_first_sprite*LONGWORD_SIZE)(pc),a1
+	lea	spr_pointers_construction+(bv_used_first_sprite*LONGWORD_SIZE)(pc),a1
 	move.w	#bv_sprite_x_max,a2
 	move.w	#bv_sprite_y_max,a4
 	move.w	#bv_sprite_x_center,a5
@@ -1835,7 +1835,7 @@ bv_wobble_sprites
 	addq.w	#bv_wobble_x_angle_speed,d0 ; nächster X-Winkel
 	move.w	d5,d0			; remove overflow
 	move.w	d0,bv_wobble_x_angle(a3)
-	lea	spr_ptrs_construction+(bv_used_first_sprite*LONGWORD_SIZE)(pc),a0
+	lea	spr_pointers_construction+(bv_used_first_sprite*LONGWORD_SIZE)(pc),a0
 	move.l	cl1_construction2(a3),a1
 	ADDF.W	cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subext1_SPR6POS+WORD_SIZE,a1
 	move.l	(a0)+,a2		; Sprite6-Struktur
@@ -2152,7 +2152,7 @@ blind_fader_out
 	bsr	wst_init_chars_x_positions
 	bsr	init_colors2
 	bsr	set_noop_screen
-	bsr	cl1_set_branches_ptrs
+	bsr	cl1_set_branches_pointers
 	move.w	#DMAF_RASTER|DMAF_SETCLR,DMACON-DMACONR(a6)
 	moveq	#0,d0
 	move.w	d0,COPJMP1-DMACONR(a6)	; 1. Copperliste neu starten, damit die geänderte Palette dargestellt wird
@@ -2567,7 +2567,7 @@ pt_start_fade_in_rotation_zoomer
 	move.w	d0,bfi_active(a3)
 	clr.w	part_main_active(a3)
 	bsr.s	rz_init_colors
-	bsr	rz_set_branches_ptrs
+	bsr	rz_set_branches_pointers
 	move.l	cl1_construction2(a3),a0 
 	move.w	#bplcon0_bits,cl1_BPLCON0+WORD_SIZE(a0) ; Bitplanes aus
 	move.l	cl1_display(a3),a0 
@@ -2623,16 +2623,16 @@ rz_init_colors_skip
 	rts
 
 	CNOP 0,4
-rz_set_branches_ptrs
+rz_set_branches_pointers
 	move.l	cl1_construction2(a3),a0
 	MOVEF.L cl1_subextension1_size,d2
 	move.l	cl2_construction2(a3),d0 ; Einsprungadresse
 	MOVEF.L cl2_extension1_size,d3
 	moveq	#cl1_extension1_size,d4
-	bsr.s	rz_set_jump_entry_ptrs
+	bsr.s	rz_set_jump_entry_pointers
 	move.l	cl1_display(a3),a0
 	move.l	cl2_display(a3),d0	; Einsprungadresse
-	bsr.s	rz_set_jump_entry_ptrs
+	bsr.s	rz_set_jump_entry_pointers
 	rts
 
 
@@ -2643,7 +2643,7 @@ rz_set_branches_ptrs
 ; d3.l	cl2_extension1_size
 ; Result
 	CNOP 0,4
-rz_set_jump_entry_ptrs
+rz_set_jump_entry_pointers
 	MOVEF.L cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subextension1_size,d1 ; Offset Rücksprungadresse CL1
 	add.l	a0,d1			; + Rücksprungadresse CL1
 	lea	cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subext1_COP1LCH+WORD_SIZE(a0),a1
@@ -2708,12 +2708,12 @@ spr_rgb8_color_table
 
 
 	CNOP 0,4
-spr_ptrs_construction
+spr_pointers_construction
 	DS.L spr_number
 
 
 	CNOP 0,4
-spr_ptrs_display
+spr_pointers_display
 	DS.L spr_number
 
 
