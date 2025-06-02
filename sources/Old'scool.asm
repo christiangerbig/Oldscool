@@ -1283,7 +1283,7 @@ init_second_copperlist
 
 	CNOP 0,4
 cl2_init_bplcon4
-	move.l	#(BPLCON4<<16)+bplcon4_bits,d0
+	move.l	#(BPLCON4<<16)|bplcon4_bits,d0
 	IFEQ open_border_enabled 
 		move.l	#BPL1DAT<<16,d1
 	ENDC
