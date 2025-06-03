@@ -288,7 +288,7 @@ bplcon2_bits			EQU 0
 bplcon3_bits1			EQU BPLCON3F_SPRES0
 bplcon3_bits2			EQU bplcon3_bits1|BPLCON3F_LOCT
 bplcon4_bits			EQU (BPLCON4F_OSPRM4*spr_odd_color_table_select)|(BPLCON4F_ESPRM4*spr_even_color_table_select)
-diwhigh_bits			EQU DIWHIGHF_HSTOP1|(((display_window_hstop&$100)>>8)*DIWHIGHF_HSTOP8)|(((display_window_vstop&$700)>>8)*DIWHIGHF_VSTOP8)+DIWHIGHF_hstart1+(((display_window_hstart&$100)>>8)*DIWHIGHF_HSTART8)+((display_window_vstart&$700)>>8)
+diwhigh_bits			EQU DIWHIGHF_HSTOP1|(((display_window_hstop&$100)>>8)*DIWHIGHF_HSTOP8)|(((display_window_vstop&$700)>>8)*DIWHIGHF_VSTOP8)|DIWHIGHF_HSTART1|(((display_window_hstart&$100)>>8)*DIWHIGHF_HSTART8)+((display_window_vstart&$700)>>8)
 fmode_bits			EQU FMODEF_BPL32|FMODEF_BPAGEM|FMODEF_SPR32|FMODEF_SPAGEM
 color00_bits			EQU $090909
 
@@ -303,7 +303,7 @@ cl1_hstart1			EQU display_window_hstart-(8*CMOVE_SLOT_PERIOD)
 	ENDC
 cl1_vstart1			EQU MINROW
 cl1_hstart2			EQU 0
-cl1_vstart2			EQU beam_position&$ff
+cl1_vstart2			EQU beam_position&CL_Y_WRAPPING
 
 sine_table_length		EQU 512
 
@@ -1343,6 +1343,7 @@ beam_routines
 	bsr	mouse_handler
 	bsr	wait_copint
 	bsr	swap_first_copperlist
+	bsr	set_first_copperlist
 	bsr	swap_second_copperlist
 	bsr	swap_sprite_structures
 	bsr	set_sprite_pointers
@@ -1358,7 +1359,10 @@ beam_routines
 	SWAP_COPPERLIST cl1,2
 
 
-	SWAP_COPPERLIST cl2,2,NOSET
+	SET_COPPERLIST cl1
+
+
+	SWAP_COPPERLIST cl2,2
 
 
 	SWAP_SPRITES spr_swap_number,6
