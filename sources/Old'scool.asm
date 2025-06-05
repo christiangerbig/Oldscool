@@ -1276,28 +1276,28 @@ cl1_set_branches_loop2
 	CNOP 0,4
 init_second_copperlist
 	move.l	cl2_construction2(a3),a0 
-	bsr	cl2_init_bplcon4
+	bsr	cl2_init_bplcon4_chunky
 	bsr	cl2_init_noop
 	bra	copy_second_copperlist
 
 
 	CNOP 0,4
-cl2_init_bplcon4
+cl2_init_bplcon4_chunky
 	move.l	#(BPLCON4<<16)|bplcon4_bits,d0
 	IFEQ open_border_enabled 
 		move.l	#BPL1DAT<<16,d1
 	ENDC
 	moveq	#cl2_display_y_size-1,d7
-cl2_init_bplcon4_loop1
+cl2_init_bplcon4_chunky_loop1
 	IFEQ open_border_enabled 
 		move.l	d1,(a0)+	; BPL1DAT
 	ENDC
 	moveq	#cl2_display_width-1,d6	; number of columns
-cl2_init_bplcon4_loop2
+cl2_init_bplcon4_chunky_loop2
 	move.l	d0,(a0)+		; BPLCON4
-	dbf	d6,cl2_init_bplcon4_loop2
+	dbf	d6,cl2_init_bplcon4_chunky_loop2
 	COP_MOVEQ 0,COPJMP1
-	dbf	d7,cl2_init_bplcon4_loop1
+	dbf	d7,cl2_init_bplcon4_chunky_loop1
 	rts
 
 
