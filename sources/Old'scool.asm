@@ -1568,8 +1568,8 @@ bv_rotation
 	add.w	bv_rotation_z_angle_speed(a3),d1 ; nächster Z-Winkel
 	and.w	d3,d1			; Übertrag entfernen
 	move.w	d1,bv_rotation_z_angle(a3) 
-	lea	bv_object_coords(pc),a0
-	lea	bv_rotation_xyz_coords(pc),a1
+	lea	bv_object_coordinates(pc),a0
+	lea	bv_rotation_xyz_coordinates(pc),a1
 	move.w	#bv_rotation_d*8,a4	; d
 	add.l	bv_zoom_distance(a3),a4
 	move.w	#bv_rotation_xy_center,a5
@@ -1611,7 +1611,7 @@ bv_draw_lines
 	bne	bv_draw_lines_quit
 	bsr	bv_draw_lines_init
 	lea	bv_object_info(pc),a0
-	lea	bv_rotation_xyz_coords(pc),a1
+	lea	bv_rotation_xyz_coordinates(pc),a1
 	move.l	extra_pf2(a3),a2
 	move.l	(a2),a2			; Bild
 	move.l	cl1_construction2(a3),a4
@@ -2768,7 +2768,7 @@ bv_color_table
 
 ; Würfel
 	CNOP 0,2
-bv_object_coords
+bv_object_coordinates
 	DC.W -(35*8),-(35*8),-(35*8)	; P0
 	DC.W 35*8,-(35*8),-(35*8)	; P1
 	DC.W 35*8,35*8,-(35*8)		; P2
@@ -2815,7 +2815,7 @@ bv_object_edges
 	DC.W 3*3,2*3,6*3,7*3,3*3	; Fläche unten
 
 	CNOP 0,2
-bv_rotation_xyz_coords
+bv_rotation_xyz_coordinates
 	DS.W bv_object_edge_points_number*3
 
 
