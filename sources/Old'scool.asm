@@ -279,10 +279,10 @@ extra_pf3_plane_width		EQU extra_pf3_x_size/8
 
 diwstrt_bits			EQU ((display_window_vstart&$ff)*DIWSTRTF_V0)|(display_window_hstart&$ff)
 diwstop_bits			EQU ((display_window_vstop&$ff)*DIWSTOPF_V0)|(display_window_hstop&$ff)
-ddfstrt_bits			EQU DDFSTART_320_PIXEL
+ddfstrt_bits			EQU DDFSTRT_320_PIXEL
 ddfstop_bits			EQU DDFSTOP_320_PIXEL_4X
 bplcon0_bits			EQU BPLCON0F_ECSENA|BPLCON0F_COLOR
-bplcon0_bits2			EQU BPLCON0F_ECSENA|((pf_depth>>3)*BPLCON0F_BPU3)|(BPLCON0F_COLOR)|((pf_depth&$07)*BPLCON0F_BPU0)
+bplcon0_bits2			EQU BPLCON0F_ECSENA|((pf_depth>>3)*BPLCON0F_BPU3)|BPLCON0F_COLOR|((pf_depth&$07)*BPLCON0F_BPU0)
 bplcon1_bits			EQU 0
 bplcon2_bits			EQU 0
 bplcon3_bits1			EQU BPLCON3F_SPRES0
@@ -1229,12 +1229,12 @@ cl1_set_branches_pointers
 	move.l	cl1_construction2(a3),a0 1
 	moveq	#cl1_subextension1_size,d2
 	move.l	cl2_construction2(a3),d0 ; Einsprungadresse
-	add.l	#cl2_extension2_entry,d0
+	ADDF.L	cl2_extension2_entry,d0
 	moveq	#cl1_extension1_size,d4
 	bsr.s	cl1_set_jump_entry_pointers
 	move.l	cl1_display(a3),a0 1
 	move.l	cl2_display(a3),d0	; Einsprungadresse
-	add.l	#cl2_extension2_entry,d0
+	ADDF.L	cl2_extension2_entry,d0
 	bsr.s	cl1_set_jump_entry_pointers
 	rts
 
@@ -1418,7 +1418,7 @@ wave_scrolltext_loop1
 	add.w	#wst_text_char_x_restart,d5 ; X-Pos zurücksetzen
 	bsr.s	wst_get_new_char_image
 	move.l	d0,a0			; Bild für Character
-	add.l	#(spr_pixel_per_datafetch/8)*2,a1 ; Sprite-Header überpsringen
+	ADDF.W	(spr_pixel_per_datafetch/8)*2,a1 ; Sprite-Header überpsringen
 	moveq	#wst_text_char_y_size-1,d6
 wave_scrolltext_loop2
 	move.l	(a0)+,(a1)+		; quadword bitplane 1
@@ -1727,7 +1727,7 @@ bv_draw_lines_init
 bv_fill_image
 	move.l	extra_pf2(a3),a0
 	move.l	(a0),a0
-	add.l	#(extra_pf1_plane_width*extra_pf1_y_size*extra_pf1_depth)-2,a0 ; Ende des Bildes
+	ADDF.W	(extra_pf1_plane_width*extra_pf1_y_size*extra_pf1_depth)-2,a0 ; Ende des Bildes
 	WAITBLIT
 	move.l	#((BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC)<<16)+(BLTCON1F_DESC+BLTCON1F_EFE),BLTCON0-DMACONR(a6) ; Minterm D=A, Füll-Modus, Rückwärts
 	move.l	a0,BLTAPT-DMACONR(a6)	; Quelle
