@@ -1513,7 +1513,7 @@ bv_clear_image
 	move.l	(a0),BLTDPT-DMACONR(a6)
 	moveq	#0,d0
 	move.w	d0,BLTDMOD-DMACONR(a6) ; D-Mod
-	move.w	#((bv_clear_blit_y_size*bv_clear_blit_depth)<<6)+(bv_clear_blit_x_size/WORD_BITS),BLTSIZE-DMACONR(a6) ; Blitter starten
+	move.w	#((bv_clear_blit_y_size*bv_clear_blit_depth)<<6)|(bv_clear_blit_x_size/WORD_BITS),BLTSIZE-DMACONR(a6) ; Blitter starten
 	rts
 
 
@@ -1615,7 +1615,7 @@ bv_draw_lines
 	move.l	extra_pf2(a3),a2
 	move.l	(a2),a2			; Bild
 	move.l	cl1_construction2(a3),a4
-	move.l	#((BC0F_SRCA|BC0F_SRCC|BC0F_DEST+NANBC|NABC|ABNC)<<16)+(BLTCON1F_LINE+BLTCON1F_SING),a3 ; Minterm Linien
+	move.l	#((BC0F_SRCA|BC0F_SRCC|BC0F_DEST+NANBC|NABC|ABNC)<<16)|(BLTCON1F_LINE+BLTCON1F_SING),a3 ; Minterm Linien
 	ADDF.W	cl1_COLOR12_high5+WORD_SIZE,a4
 	lea	bv_color_table(pc),a7	; Zeiger auf Tabelle mit Farbverlaufwerten
 	moveq	#bv_object_faces_number-1,d7
@@ -1729,12 +1729,12 @@ bv_fill_image
 	move.l	(a0),a0
 	ADDF.W	(extra_pf1_plane_width*extra_pf1_y_size*extra_pf1_depth)-2,a0 ; Ende des Bildes
 	WAITBLIT
-	move.l	#((BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC)<<16)+(BLTCON1F_DESC+BLTCON1F_EFE),BLTCON0-DMACONR(a6) ; Minterm D=A, Füll-Modus, Rückwärts
+	move.l	#((BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC)<<16)|(BLTCON1F_DESC+BLTCON1F_EFE),BLTCON0-DMACONR(a6) ; Minterm D=A, Füll-Modus, Rückwärts
 	move.l	a0,BLTAPT-DMACONR(a6)	; Quelle
 	move.l	a0,BLTDPT-DMACONR(a6)	; Ziel
 	moveq	#0,d0
 	move.l	d0,BLTAMOD-DMACONR(a6)	; A+D-Mod
-	move.w	#((bv_fill_blit_y_size*bv_fill_blit_depth)<<6)+(bv_fill_blit_x_size/WORD_BITS),BLTSIZE-DMACONR(a6) ; Blitter starten
+	move.w	#((bv_fill_blit_y_size*bv_fill_blit_depth)<<6)|(bv_fill_blit_x_size/WORD_BITS),BLTSIZE-DMACONR(a6) ; Blitter starten
 	rts
 
 
