@@ -127,7 +127,7 @@ requires_060_cpu		EQU FALSE
 requires_fast_memory		EQU FALSE
 requires_multiscan_monitor	EQU FALSE
 
-workbench_start_enabled		EQU FALSE
+workbench_start_enabled		EQU FALSE ; [TRUE]
 screen_fader_enabled		EQU TRUE
 text_output_enabled		EQU FALSE
 
@@ -1058,7 +1058,7 @@ init_main
 	bsr	wst_init_chars_x_positions
 	bsr	bv_convert_color_table
 	bsr	bv_init_object_info
-	bsr	bg_copy_image_to_plane
+	bsr	bg_copy_image_to_bitplane
 	bsr	init_sprites
 	bsr	init_CIA_timers
 	bsr	init_first_copperlist
