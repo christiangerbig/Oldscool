@@ -1199,7 +1199,7 @@ cl1_init_branches_pointers_loop1
 	COP_MOVEQ 0,COP2LCL
 	moveq	#rz_display_y_scale_factor-1,d6 ; Anzahl der Abschnitte für Y-Skalierung
 cl1_init_branches_pointers_loop2
-	move.l	d0,(a0)+		; CWAIT x,y
+	move.l	d0,(a0)+		; CWAIT
 	COP_MOVEQ 0,SPR6POS
 	COP_MOVEQ 0,SPR7POS
 	COP_MOVEQ 0,COP1LCH
@@ -1582,7 +1582,7 @@ bv_rotation_loop
 	ROTATE_X_AXIS
 	ROTATE_Y_AXIS
 	ROTATE_Z_AXIS
-; Zentralprojektion und Translation
+; Central projection and translation
 	move.w	d2,d3			; save z
 	ext.l	d0
 	add.w	a4,d3			; z+d
