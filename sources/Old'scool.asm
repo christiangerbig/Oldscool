@@ -1013,8 +1013,8 @@ init_main_variables2
 	move.l	#czi_zoom_radius,bv_zoom_distance(a3)
 
 ; Image-Fader
-	move.w	d1,if_rgb8_copy_colors_active(a3)
 	move.w	d0,if_rgb8_colors_counter(a3)
+	move.w	d1,if_rgb8_copy_colors_active(a3)
 
 	move.w	d1,ifi_rgb8_active(a3)
 	move.w	#sine_table_length/4,ifi_rgb8_fader_angle(a3) ; 90°
@@ -2560,8 +2560,8 @@ pt_start_fade_in_image
 pt_start_fade_out_image
 	moveq	#TRUE,d0
 	move.w	d0,ifo_rgb8_active(a3)
-	move.w	d0,if_rgb8_copy_colors_active(a3)
 	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
+	move.w	d0,if_rgb8_copy_colors_active(a3)
 	rts
 	CNOP 0,4
 pt_start_fade_in_rotation_zoomer
