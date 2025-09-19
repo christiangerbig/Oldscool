@@ -1256,13 +1256,13 @@ cl1_set_branches_loop1
 	swap	d0
 	move.w	d0,(a0)			; COP2LCH
 	swap	d0
-	move.w	d0,4(a0)		; COP2LCL
+	move.w	d0,LONGWORD_SIZE(a0)		; COP2LCL
 	moveq	#rz_display_y_scale_factor-1,d6 ; Anzahl der Abschnitte für Y-Skalierung
 cl1_set_branches_loop2
 	swap	d1
 	move.w	d1,(a1)			; COP1LCH
 	swap	d1
-	move.w	d1,4(a1)		; COP1LCL
+	move.w	d1,LONGWORD_SIZE(a1)		; COP1LCL
 	add.l	d2,d1			; Rücksprungadresse CL1 erhöhen
 	add.l	d2,a1			; nächste Zeile in Unterabschnitt der CL1
 	dbf	d6,cl1_set_branches_loop2
@@ -1867,7 +1867,7 @@ bv_wobble_sprites_loop2
 	and.w	d5,d1			; remove overflow
 	and.w	d5,d2			; remove overflow
 	add.w	a6,d3			; x' + vertikaler/horizontaler table start des Sprites7
-	move.w	d3,4(a1)		; SPR7POS
+	move.w	d3,LONGWORD_SIZE(a1)		; SPR7POS
 	add.l	a4,a1			; next line in cl
 	dbf	d6,bv_wobble_sprites_loop2
 	addq.w	#QUADWORD_SIZE,a1	; COP2LCH + COP2LCL überspringen
@@ -2657,13 +2657,13 @@ rz_set_branches_loop1
 	swap	d0
 	move.w	d0,(a0)			; COP2LCH
 	swap	d0
-	move.w	d0,4(a0)		; COP2LCL
+	move.w	d0,LONGWORD_SIZE(a0)		; COP2LCL
 	moveq	#rz_display_y_scale_factor-1,d6 ; Anzahl der Abschnitte für Y-Skalierung
 rz_set_branches_loop2
 	swap	d1
 	move.w	d1,(a1)			; COP1LCH
 	swap	d1
-	move.w	d1,4(a1)		; COP1LCL
+	move.w	d1,LONGWORD_SIZE(a1)		; COP1LCL
 	add.l	d2,d1			; Rücksprungadresse CL1 erhöhen
 	add.l	d2,a1			; nächste Zeile in Unterabschnitt der CL1
 	dbf	d6,rz_set_branches_loop2
