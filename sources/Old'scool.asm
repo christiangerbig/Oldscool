@@ -7,65 +7,64 @@
 ; History/Changes
 
 ; V.1.0 beta
-; - Erstes Release
+; - first release
 
 ; V.1.1 beta
-; - Mit aktueller Greetings-List
+; - with updated greetings list
 
 ; V.1.2 beta
-; - Optimierung der Copperlist2. Wenn kein Rotator/Zoomer dargestellt wird, dann
-; wird kein BPLCON4-Chunky-Screen dargestellt und die CPU entlastet, da der
-; Copper weniger Memory-Slots bei nur 2 CMOVEs benötigt
+; - Copperlist2 optimized. If rotator/zoomer is displayed then the BPLCON4
+;   chunky screen is not displayed and the CPU gets more memory cycles
 ; - Die Credits werden jetzt durch das Modul getriggert
-; - Umstellung auf VERTB main loop
-; - Mit Grass' Titelbild in 64 Farben
+; - change to VERTB for main loop
+; - Grass' title picture in 64 colours added
 
 ; V.1.3 beta
-; - Mit Grass' Zoomer/Rotator-Textur
-; - Würfelfarbe and Textur angepasst und Maximalwertprüfung bei Helligkeit des
-; Würfels
-; - geänderte Schrift
-; - Mit überarbeitetem Titelbild in 128 Farben
-; - Bugfix: Low-Farbwerte des Zoomers wurden falsch initislidiert
+; - Grass' zoomer/rotator texture added
+; - Cube colours and texture changed and cube brightnesss check added
+; - Font changed
+; - with 128 colours title picture
+; - Bugfix: Low colour values of the zoomer were not properly initialized
 
 ; V.1.4 beta
-; - Würfelfarbe an Textur abgepasst, da Würfel zu dunkel
-; - Mit Grass# Font
+; - Cube colour now matches the texture better because the cube was too dark
+; - Grass´ font added
 
 ; V.1.5 beta
-; - Mit Berücksichtigung vorzeitiger Ausstieg des Users
-; - WB-Start
-; - Befehl 870/71 -> 860/61
-; - F1 roter Rahmen, F2 = grüner Rahmen, F3 = blauer Rahmen
+; - User exit by LMB considered
+; - code for WB start enabled
+; - Fx command 870/71 changed to 860/61
+; - For testing purposes regarding the keyboard handler: F1 red border,
+;   F2 = green border, F3 = blue border
 
 ; V.1.6 beta
-; - Alle States, die mit not.w gesetzt werden durch move.w ersetzt
-; - Bugfix: Delay für Tastatur läuft jetzt über CIA-A Timer-B, da Timer-A
-; von der Tastatur benutzt wird. Jetzt ist auch vom Freezer eine Rückkehr
-; ohne Fehler möglich
+; - All state that are set with not.w now set by a move.w
+; - Bugfix: Keyboard delay with CIA-A Timer-B, because CIA-A Timer-A
+;           is already used by the keyboard. Now the freezer module returns
+;           without any error
 
 ; V.1.7 beta
-; - Keyboard-Handler: Handshake-Delay auf 200 µs hochgesetzt und es wird keine
-; Tastaturleitung mehr manuell gesetzt. Die passiert automatisch beim Wechsel
-; von SP input -> SP output -> SP input laut Toni Wilen
+; - Keyboard handler: Handshake delay increased to 200 µs and the keyboard line
+;   is not set manually anymore. Toni Wilen stated this happens automatically
+;   if there is a change from SP input to SP output to SP input
 
 ; V.1.8 beta
-; - Code optimiert
-; - Bugfix: Nach dem Einblenden wurde fälschlicherweise der Title-Part
-; deaktiviert und bei einem vozeitigen User-Abbruch das Titelbild
-; nicht mehr ausgeblendet
+; - Code optimized
+; - Bugfix: After fading in the title picture, the title part was deactivated
+;           and if there was a user abort the title picture was not faded out
+
 ; V.1.0
-; - Endversion
-; - Code optimiert
-; - Mit überarbeitetem Tracker-Modul
-; - Bugfix: Bitplane-DMA wird nur für das Intro und den Title-Screen aktiviert,
-; um die Anzeige von Datenmüll im Hauptteil zu Brginn zu vermeiden
-; - Image-Fader: Abfrage der RGB-Werte beim Vergleich verfeinert. ble -> bls
-; - Rotationen 1-10 geändert damit die Unterschiede offensichtlicher sind
-; - Modul leicht geändert
+; - Final version
+; - Code optimized
+; - With a revised PT-Mod
+; - Bugfix: Bitplane DMA only for the intro and the itle screen enabled,
+;   to avoid the display of data garbage in the main part at the beginning
+; - Image fader: RGB values check improved. ble -> bls
+; - Rotation 1-10 movements changed so that the difference is more obvious
+; - MOD slightly updated
 
 
-; PT 8xy-Befehl
+; PT 8xy command
 ; 800	Restart intro
 ; 810	Enable horizontal scrolltext
 ; 820	Fade title in
@@ -76,7 +75,7 @@
 ; 861	Disable zoomer
 
 
-; Ausführungszeit 68020: 220 Rasterzeilen
+; Execution time 68020: 220 raster lines
 
 
 	MC68040
@@ -237,15 +236,15 @@ ciab_cra_bits			EQU CIACRBF_LOAD
 	ENDC
 ciab_crb_bits			EQU CIACRBF_LOAD|CIACRBF_RUNMODE ; oneshot mode
 ciaa_ta_time			EQU 0
-ciaa_tb_time			EQU 142 ;0.709379 MHz * 200 µs
+ciaa_tb_time			EQU 142	; 0.709379 MHz * 200 µs
 	IFEQ pt_ciatiming_enabled
-ciab_ta_time			EQU 14187 ;= 0.709379 MHz * [20000 µs = 50 Hz duration for one frame on a PAL machine]
-;ciab_ta_time			EQU 14318 ;= 0.715909 MHz * [20000 µs = 50 Hz duration for one frame on a NTSC machine]
+ciab_ta_time			EQU 14187 ; = 0.709379 MHz * [20000 µs = 50 Hz duration for one frame on a PAL machine]
+; ciab_ta_time			EQU 14318 ; = 0.715909 MHz * [20000 µs = 50 Hz duration for one frame on a NTSC machine]
 	ELSE
 ciab_ta_time			EQU 0
 	ENDC
-ciab_tb_time			EQU 362 ;= 0.709379 MHz * [511.43 µs = Lowest note period C1 with Tuning=-8 * 2 / PAL clock constant = 907*2/3546895 ticks per second]
-					;= 0.715909 MHz * [506.76 µs = Lowest note period C1 with Tuning=-8 * 2 / NTSC clock constant = 907*2/3579545 ticks per second]
+ciab_tb_time			EQU 362	; = 0.709379 MHz * [511.43 µs = Lowest note period C1 with Tuning=-8 * 2 / PAL clock constant = 907*2/3546895 ticks per second]
+					; = 0.715909 MHz * [506.76 µs = Lowest note period C1 with Tuning=-8 * 2 / NTSC clock constant = 907*2/3579545 ticks per second]
 ciaa_ta_continuous_enabled	EQU FALSE
 ciaa_tb_continuous_enabled	EQU FALSE
 	IFEQ pt_ciatiming_enabled
@@ -426,11 +425,11 @@ bv_object_face5_lines_number	EQU 4
 bv_object_face6_color		EQU 3
 bv_object_face6_lines_number	EQU 4
 
-bv_light_z_coordinate1		EQU -56
-bv_EpRGB			EQU $3f	; Intensität der Lichtquelle
-bv_kdRGB			EQU 6	; Reflexion der Fläche = Helligkeit des Objekts
-bv_D0				EQU 15	; Helligkeitsverlust, Schutz vor Division durch Null
-bv_EpRGB_max			EQU 63	; Länge der Farbtabelle - 1
+bv_light_z_coordinate		EQU -56
+bv_EpRGB			EQU $3f	; light source intensity
+bv_kdRGB			EQU 6	; face reflection = object brightness
+bv_D0				EQU 15	; loss of brightness, avoid division by zero
+bv_EpRGB_max			EQU 63	; color table length - 1
 
 bv_light_z_radius		EQU 16
 bv_light_z_center		EQU 16
@@ -557,6 +556,7 @@ cl1_begin			RS.B 0
 	INCLUDE "copperlist1.i"
 
 cl1_extension1_entry		RS.B cl1_extension1_size*cl2_display_y_size
+
 cl1_WAIT1			RS.L 1
 cl1_WAIT2			RS.L 1
 cl1_INTENA			RS.L 1
@@ -894,7 +894,7 @@ bv_rotation_x_angle_speed	RS.W 1
 bv_rotation_y_angle_speed	RS.W 1
 bv_rotation_z_angle_speed	RS.W 1
 
-bv_light_z_coordinate		RS.W 1
+bv_variable_light_z_coordinate	RS.W 1
 
 bv_sprite_x_coordinate		RS.W 1
 bv_sprite_y_coordinate		RS.W 1
@@ -953,7 +953,8 @@ variables_size			RS.B 0
 	CNOP 0,4
 init_main_variables
 	bsr.s	init_pt_variables
-	bra.s	init_main_variables2
+	bsr.s	init_main_variables2
+	rts
 
 
 	CNOP 0,4
@@ -1000,7 +1001,7 @@ init_main_variables2
 	move.w	#bv_rotation_y_angle_speed1,bv_rotation_y_angle_speed(a3)
 	move.w	#bv_rotation_z_angle_speed1,bv_rotation_z_angle_speed(a3)
 
-	move.w	#bv_light_z_coordinate1,bv_light_z_coordinate(a3)
+	move.w	#bv_light_z_coordinate,bv_variable_light_z_coordinate(a3)
 
 	move.w	d0,bv_sprite_x_coordinate(a3)
 	move.w	d0,bv_sprite_y_coordinate(a3)
@@ -1062,7 +1063,8 @@ init_main
 	bsr	init_sprites
 	bsr	init_CIA_timers
 	bsr	init_first_copperlist
-	bra	init_second_copperlist
+	bsr	init_second_copperlist
+	rts
 
 
 ; PT-Replay
@@ -1098,10 +1100,10 @@ bv_init_object_info
 	moveq	#bv_object_faces_number-1,d7
 bv_init_object_info_loop
 	move.w	object_info_lines_number(a0),d0
-	addq.w	#2,d0			; Anzahl der Linien + 1 = Anzahl der Eckpunkte
-	move.l	a1,(a0)			; Zeiger auf Tabelle mit Eckpunkten eintragen
-	lea	(a1,d0.w*2),a1		; Zeiger auf Eckpunkte-Tabelle erhöhen
-	add.l	a2,a0			; Object-Info-Struktur der nächsten Fläche
+	addq.w	#2,d0			; number of lines + 1 = number of edge points
+	move.l	a1,(a0)			; edge points table
+	lea	(a1,d0.w*2),a1		; next edge points table
+	add.l	a2,a0			; next object info structure
 	dbf	d7,bv_init_object_info_loop
 	rts
 
@@ -1125,9 +1127,9 @@ init_CIA_timers
 
 ; Keyboard-Handler
 	MOVEF.W ciaa_tb_time&$ff,d0
-	move.b	d0,CIATBLO(a4)		; Timer-B Low-Bits
+	move.b	d0,CIATBLO(a4)
 	moveq	#ciaa_tb_time>>8,d0
-	move.b	d0,CIATBHI(a4)		; Timer-B High-Bits
+	move.b	d0,CIATBHI(a4)
 	moveq	#ciaa_crb_bits,d0
 	move.b	d0,CIACRB(a4)
 
@@ -1149,7 +1151,8 @@ init_first_copperlist
 	bsr	cl1_set_sprite_pointers
 	bsr	cl1_set_bitplane_pointers
 	bsr	copy_first_copperlist
-	bra	cl1_set_branches_pointers
+	bsr	cl1_set_branches_pointers
+	rts
 
 
 	COP_INIT_PLAYFIELD_REGISTERS cl1
@@ -1189,23 +1192,21 @@ cl1_init_colors
 	CNOP 0,4
 cl1_init_branches_pointers
 	move.l	#(((cl1_vstart1<<24)|(((cl1_hstart1/4)*2)<<16))|$10000)|$fffe,d0 ; CWAIT
-	moveq	#2,d1			; X-Verschiebung $00020000
-	swap	d1
-	moveq	#1,d2
-	ror.l	#8,d2			; Y-Additionswert $01000000
+	move.l	#2<<16,d1		; x shift
+	move.l	#1<<24,d2		; next line
 	moveq	#cl2_display_y_size-1,d7
 cl1_init_branches_pointers_loop1
 	COP_MOVEQ 0,COP2LCH
 	COP_MOVEQ 0,COP2LCL
-	moveq	#rz_display_y_scale_factor-1,d6 ; Anzahl der Abschnitte für Y-Skalierung
+	moveq	#rz_display_y_scale_factor-1,d6 ; number of sections for y scaling
 cl1_init_branches_pointers_loop2
 	move.l	d0,(a0)+		; CWAIT
 	COP_MOVEQ 0,SPR6POS
 	COP_MOVEQ 0,SPR7POS
 	COP_MOVEQ 0,COP1LCH
-	eor.l	d1,d0			; X-Shift
+	eor.l	d1,d0			; x shift
 	COP_MOVEQ 0,COP1LCL
-	add.l	d2,d0			; nächste Zeile
+	add.l	d2,d0			; next line in cl
 	COP_MOVEQ 0,COPJMP2
 	dbf	d6,cl1_init_branches_pointers_loop2
 	dbf	d7,cl1_init_branches_pointers_loop1
@@ -1226,29 +1227,29 @@ cl1_init_branches_pointers_loop2
 
 	CNOP 0,4
 cl1_set_branches_pointers
-	move.l	cl1_construction2(a3),a0 1
+	move.l	cl1_construction2(a3),a0
 	moveq	#cl1_subextension1_size,d2
-	move.l	cl2_construction2(a3),d0 ; Einsprungadresse
-	ADDF.L	cl2_extension2_entry,d0
+	move.l	cl2_construction2(a3),d0
+	ADDF.L	cl2_extension2_entry,d0	; jump entry
 	moveq	#cl1_extension1_size,d4
 	bsr.s	cl1_set_jump_entry_pointers
-	move.l	cl1_display(a3),a0 1
-	move.l	cl2_display(a3),d0	; Einsprungadresse
-	ADDF.L	cl2_extension2_entry,d0
+	move.l	cl1_display(a3),a0
+	move.l	cl2_display(a3),d0
+	ADDF.L	cl2_extension2_entry,d0	; jump entry
 	bsr.s	cl1_set_jump_entry_pointers
 	rts
 
 
 ; Input
-; d0.l	Jump in cl2
+; d0.l	Jump entry second copperlist
 ; d2.l	cl1_subextension1_size
 ; d4.l	cl1_extension1_size
-; a0.l	 cl1
+; a0.l	1st copperlist
 ; Result
 	CNOP 0,4
 cl1_set_jump_entry_pointers
-	MOVEF.L cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subextension1_size,d1 ; Offset Rücksprungadresse CL1
-	add.l	a0,d1			; + Rücksprungadresse CL1
+	MOVEF.L cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subextension1_size,d1
+	add.l	a0,d1			; return address 1st copperlist
 	lea	cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subext1_COP1LCH+WORD_SIZE(a0),a1
 	ADDF.W	cl1_extension1_entry+cl1_ext1_COP2LCH+WORD_SIZE,a0
 	moveq	#cl2_display_y_size-1,d7
@@ -1256,19 +1257,19 @@ cl1_set_branches_loop1
 	swap	d0
 	move.w	d0,(a0)			; COP2LCH
 	swap	d0
-	move.w	d0,LONGWORD_SIZE(a0)		; COP2LCL
-	moveq	#rz_display_y_scale_factor-1,d6 ; Anzahl der Abschnitte für Y-Skalierung
+	move.w	d0,LONGWORD_SIZE(a0)	; COP2LCL
+	moveq	#rz_display_y_scale_factor-1,d6 ; number of sections for y scaling
 cl1_set_branches_loop2
 	swap	d1
 	move.w	d1,(a1)			; COP1LCH
 	swap	d1
-	move.w	d1,LONGWORD_SIZE(a1)		; COP1LCL
-	add.l	d2,d1			; Rücksprungadresse CL1 erhöhen
-	add.l	d2,a1			; nächste Zeile in Unterabschnitt der CL1
+	move.w	d1,LONGWORD_SIZE(a1)	; COP1LCL
+	add.l	d2,d1			; next return address 1st copperlist
+	add.l	d2,a1			; next line in sub section 1st copperlist
 	dbf	d6,cl1_set_branches_loop2
-	add.l	d4,a0			; nächste Zeile in CL1
-	addq.l	#8,d1			; CMOVE COP2LCH + CMOVE COP2LCL überspringen
-	addq.w	#8,a1			; CMOVE COP2LCH + CMOVE COP2LCL überspringen
+	add.l	d4,a0			; next line in cl1
+	addq.l	#QUADWORD_SIZE,d1	; skip CMOVE COP2LCH + CMOVE COP2LCL
+	addq.w	#QUADWORD_SIZE,a1	; skip CMOVE COP2LCH + CMOVE COP2LCL
 	dbf	d7,cl1_set_branches_loop1
 	rts
 
@@ -1278,7 +1279,8 @@ init_second_copperlist
 	move.l	cl2_construction2(a3),a0 
 	bsr	cl2_init_bplcon4_chunky
 	bsr	cl2_init_noop
-	bra	copy_second_copperlist
+	bsr	copy_second_copperlist
+	rts
 
 
 	CNOP 0,4
@@ -1290,11 +1292,11 @@ cl2_init_bplcon4_chunky
 	moveq	#cl2_display_y_size-1,d7
 cl2_init_bplcon4_chunky_loop1
 	IFEQ open_border_enabled 
-		move.l	d1,(a0)+	; BPL1DAT
+		move.l	d1,(a0)+	; CMOVE BPL1DAT
 	ENDC
 	moveq	#cl2_display_width-1,d6	; number of columns
 cl2_init_bplcon4_chunky_loop2
-	move.l	d0,(a0)+		; BPLCON4
+	move.l	d0,(a0)+		; CMOVE BPLCON4
 	dbf	d6,cl2_init_bplcon4_chunky_loop2
 	COP_MOVEQ 0,COPJMP1
 	dbf	d7,cl2_init_bplcon4_chunky_loop1
@@ -1309,13 +1311,15 @@ cl2_init_noop
 	COP_MOVEQ 0,COPJMP1
 	rts
 
+
 	COPY_COPPERLIST cl2,2
 
 
 	CNOP 0,4
 main
 	bsr.s	no_sync_routines
-	bra.s	beam_routines
+	bsr.s	beam_routines
+	rts
 
 
 	CNOP 0,4
@@ -1398,38 +1402,38 @@ wave_scrolltext
 	move.w	wst_horiz_scroll_speed(a3),a6
 	moveq	#wst_text_chars_number-1,d7
 wave_scrolltext_loop1
-	move.l	(a4)+,a1		; Zeiger auf Sprite-Struktur
-	move.w	(a2),d5			; X-Position
-	move.w	d5,d0		
+	move.l	(a4)+,a1		; sprite structure
+	move.w	(a2),d5			; x
+	move.w	d5,d0			; store x
 	move.l	(a5,d4.w*4),d1		; sin(w)
-	MULUF.L wst_y_radius*2,d1,d2	; y'=(yr*sin(w))/2^15
-	add.w	#(display_window_hstart-wst_text_char_x_size)*SHIRES_PIXEL_FACTOR,d0 ; X-Zentrierung
+	MULUF.L wst_y_radius*2,d1,d2	; y' = (yr*sin(w))/2^15
+	add.w	#(display_window_hstart-wst_text_char_x_size)*SHIRES_PIXEL_FACTOR,d0 ; x centering
 	swap	d1
-	sub.w	wst_y_angle_step(a3),d4 ; nächster Buchstabe
-	add.w	#wst_y_center,d1	; Y-Zentrierung
+	sub.w	wst_y_angle_step(a3),d4 ; next character
+	add.w	#wst_y_center,d1	; y centering
 	moveq	#wst_text_char_y_size,d2
 	add.w	d1,d2			; VSTOP
 	SET_SPRITE_POSITION d0,d1,d2
 	move.w	d1,(a1)			; SPRxPOS
 	and.w	#sine_table_length-1,d4 ; remove overflow
 	move.w	d2,spr_pixel_per_datafetch/8(a1) ; SPRxCTL
-	sub.w	a6,d5			; X-Position verringern
+	sub.w	a6,d5			; decrease x
 	bpl.s   wave_scrolltext_skip
-	add.w	#wst_text_char_x_restart,d5 ; X-Pos zurücksetzen
+	add.w	#wst_text_char_x_restart,d5 ; reset x
 	bsr.s	wst_get_new_char_image
-	move.l	d0,a0			; Bild für Character
-	ADDF.W	(spr_pixel_per_datafetch/8)*2,a1 ; Sprite-Header überpsringen
+	move.l	d0,a0			; store character image
+	ADDF.W	(spr_pixel_per_datafetch/8)*2,a1 ; skip sprite header
 	moveq	#wst_text_char_y_size-1,d6
 wave_scrolltext_loop2
 	move.l	(a0)+,(a1)+		; quadword bitplane 1
 	move.l	(a0),(a1)+
-	add.l	d3,a0			; nächste Zeile in Quelle
+	add.l	d3,a0			; next line in source
 	move.l	(a0)+,(a1)+		; quadword bitplane 2
 	move.l	(a0),(a1)+
-	add.l	d3,a0			; nächste Zeile in Quelle
+	add.l	d3,a0			; next line in source
 	dbf	d6,wave_scrolltext_loop2
 wave_scrolltext_skip
-	move.w	d5,(a2)+		; X-Position
+	move.w	d5,(a2)+		; store x
 	dbf	d7,wave_scrolltext_loop1
 wave_scrolltext_quit
 	movem.l (a7)+,a4-a6
@@ -1440,9 +1444,9 @@ wave_scrolltext_quit
 
 
 ; Input
-; d0.b	ASCII-Code
+; d0.b	ASCII code
 ; Result
-; d0.l	Return-Code
+; d0.l	Return code
 	CNOP 0,4
 wst_check_control_codes
 	cmp.b	#"°",d0
@@ -1464,23 +1468,23 @@ wst_check_control_codes
 	rts
 	CNOP 0,4
 wst_set_standard_scroll
-	move.w	#sine_table_length/2,wst_y_angle(a3) ; Y-Winkel = 180°
-	clr.w	wst_y_angle_speed(a3) ; Y-Winkel-Geschwindigkeit = 0
+	move.w	#sine_table_length/2,wst_y_angle(a3) ; 180°
+	clr.w	wst_y_angle_speed(a3)	; 0°
 	moveq	#RETURN_OK,d0
 	rts
 	CNOP 0,4
 wst_clear_y_angle_step
-	clr.w	wst_y_angle_step(a3) ; Y-Winkel-Schrittweite = 0
+	clr.w	wst_y_angle_step(a3)	; 0°
 	moveq	#RETURN_OK,d0
 	rts
 	CNOP 0,4
 wst_set_y_angle_step
-	move.w	#wst_y_angle_step1,wst_y_angle_step(a3) ; Y-Winkel-Schrittweite setzen
+	move.w	#wst_y_angle_step1,wst_y_angle_step(a3)
 	moveq	#RETURN_OK,d0
 	rts
 	CNOP 0,4
 wst_set_y_angle_speed
-	move.w	#wst_y_angle_speed1,wst_y_angle_speed(a3) ; Y-Winkel-Geschwindigkeit setzen
+	move.w	#wst_y_angle_speed1,wst_y_angle_speed(a3)
 	moveq	#RETURN_OK,d0
 	rts
 	CNOP 0,4
@@ -1509,11 +1513,11 @@ wst_stop_scrolltext
 bv_clear_image
 	move.l	extra_pf1(a3),a0
 	WAITBLIT
-	move.l	#BC0F_DEST<<16,BLTCON0-DMACONR(a6) ; Minterm Löschen
+	move.l	#BC0F_DEST<<16,BLTCON0-DMACONR(a6) ; minterm clear
 	move.l	(a0),BLTDPT-DMACONR(a6)
 	moveq	#0,d0
-	move.w	d0,BLTDMOD-DMACONR(a6) ; D-Mod
-	move.w	#((bv_clear_blit_y_size*bv_clear_blit_depth)<<6)|(bv_clear_blit_x_size/WORD_BITS),BLTSIZE-DMACONR(a6) ; Blitter starten
+	move.w	d0,BLTDMOD-DMACONR(a6)
+	move.w	#((bv_clear_blit_y_size*bv_clear_blit_depth)<<6)|(bv_clear_blit_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
 	rts
 
 
@@ -1523,12 +1527,12 @@ bv_move_lightsource
 	lea	sine_table(pc),a0	
 	move.l	(a0,d0.w*4),d0		; -sin(w)
 	neg.l	d0
-	MULUF.L bv_light_z_radius*2,d0,d1 ; z'=(zr*(-sin(w)))/2^15
+	MULUF.L bv_light_z_radius*2,d0,d1 ; z' = (zr*(-sin(w)))/2^15
 	swap	d0
-	add.w	#bv_light_z_center,d0	; z' + Z-Mittelpunkt
-	moveq	#bv_light_z_coordinate1,d1
-	sub.w	d0,d1			; + Z-Koodinate der Lichtquelle
-	move.w	d1,bv_light_z_coordinate(a3)
+	add.w	#bv_light_z_center,d0	; z' + z center
+	moveq	#bv_light_z_coordinate,d1
+	sub.w	d0,d1			; add lightsource z
+	move.w	d1,bv_variable_light_z_coordinate(a3)
 	rts
 
 
@@ -1539,34 +1543,34 @@ bv_rotation
 	move.w	d1,d0		
 	lea	sine_table(pc),a2
 	move.w	2(a2,d0.w*4),d4		; sin(a)
-	move.w	#sine_table_length/4,a4
+ 	move.w	#sine_table_length/4,a4
 	MOVEF.W sine_table_length-1,d3
 	add.w	a4,d0			; + 90°
 	swap	d4 			; high word: sin(a)
-	and.w	d3,d0			; Übertrag entfernen
+	and.w	d3,d0			; remove overflow
 	move.w	2(a2,d0.w*4),d4		; low word: cos(a)
-	add.w	bv_rotation_x_angle_speed(a3),d1 ; nächster X-Winkel
-	and.w	d3,d1			; Übertrag entfernen
+	add.w	bv_rotation_x_angle_speed(a3),d1
+	and.w	d3,d1			; remove overflow
 	move.w	d1,bv_rotation_x_angle(a3) 
 	move.w	bv_rotation_y_angle(a3),d1
 	move.w	d1,d0		
 	move.w	2(a2,d0.w*4),d5		; sin(b)
 	add.w	a4,d0			; + 90°
 	swap	d5 			; high word: sin(b)
-	and.w	d3,d0			; Übertrag entfernen
+	and.w	d3,d0			; remove overflow
 	move.w	2(a2,d0.w*4),d5		; low word: cos(b)
-	add.w	bv_rotation_y_angle_speed(a3),d1 ; nächster Y-Winkel
-	and.w	d3,d1			; Übertrag entfernen
+	add.w	bv_rotation_y_angle_speed(a3),d1
+	and.w	d3,d1			; remove overflow
 	move.w	d1,bv_rotation_y_angle(a3) 
 	move.w	bv_rotation_z_angle(a3),d1
 	move.w	d1,d0		
 	move.w	2(a2,d0.w*4),d6	;sin(c)
 	add.w	a4,d0			; + 90°
 	swap	d6 			; high word: sin(c)
-	and.w	d3,d0			; Übertrag entfernen
+	and.w	d3,d0			; remove overflow
 	move.w	2(a2,d0.w*4),d6	 	; low word: cos(c)
-	add.w	bv_rotation_z_angle_speed(a3),d1 ; nächster Z-Winkel
-	and.w	d3,d1			; Übertrag entfernen
+	add.w	bv_rotation_z_angle_speed(a3),d1
+	and.w	d3,d1			; remove overflow
 	move.w	d1,bv_rotation_z_angle(a3) 
 	lea	bv_object_coordinates(pc),a0
 	lea	bv_rotation_xyz_coordinates(pc),a1
@@ -1575,29 +1579,29 @@ bv_rotation
 	move.w	#bv_rotation_xy_center,a5
 	moveq	#bv_object_edge_points_number-1,d7
 bv_rotation_loop
-	move.w	(a0)+,d0		; X-Koord.
+	move.w	(a0)+,d0		; x
 	move.l	d7,a2		
-	move.w	(a0)+,d1		; Y-Koord.
-	move.w	(a0)+,d2		; Z-Koord.
+	move.w	(a0)+,d1		; y
+	move.w	(a0)+,d2		; z
 	ROTATE_X_AXIS
 	ROTATE_Y_AXIS
 	ROTATE_Z_AXIS
-; Central projection and translation
-	move.w	d2,d3			; save z
+
+	move.w	d2,d3			; store z
 	ext.l	d0
 	add.w	a4,d3			; z+d
-	MULUF.L bv_rotation_d,d0,d7	; x*d X-Projektion
+	MULUF.L bv_rotation_d,d0,d7	; x*d [x projection]
 	ext.l	d1
 	divs.w	d3,d0			; x' = (x*d)/(z+d)
-	MULUF.L bv_rotation_d,d1,d7	; y*d Y-Projektion
-	add.w	a5,d0			; x' + X-Mittelpunkt
-	move.w	d0,(a1)+		; X-Pos.
+	MULUF.L bv_rotation_d,d1,d7	; y*d [y projection]
+	add.w	a5,d0			; x' + x center
+	move.w	d0,(a1)+		; store x'
 	divs.w	d3,d1			; y' = (y*d)/(z+d)
-	add.w	a5,d1			; y' + Y-Mittelpunkt
-	move.w	d1,(a1)+		; Y-Pos.
-	asr.w	#3,d2			; Z/8
-	move.l	a2,d7			; Schleifenzähler
-	move.w	d2,(a1)+		; Z-Pos.
+	add.w	a5,d1			; y' + y center
+	move.w	d1,(a1)+		; store y'
+	asr.w	#3,d2			; z' = z/8
+	move.l	a2,d7			; loop counter
+	move.w	d2,(a1)+		; store z'
 	dbf	d7,bv_rotation_loop
 	movem.l (a7)+,a4-a5
 	rts
@@ -1613,21 +1617,20 @@ bv_draw_lines
 	lea	bv_object_info(pc),a0
 	lea	bv_rotation_xyz_coordinates(pc),a1
 	move.l	extra_pf2(a3),a2
-	move.l	(a2),a2			; Bild
+	move.l	(a2),a2
 	move.l	cl1_construction2(a3),a4
-	move.l	#((BC0F_SRCA|BC0F_SRCC|BC0F_DEST+NANBC|NABC|ABNC)<<16)|(BLTCON1F_LINE+BLTCON1F_SING),a3 ; Minterm Linien
+	move.l	#((BC0F_SRCA|BC0F_SRCC|BC0F_DEST+NANBC|NABC|ABNC)<<16)|(BLTCON1F_LINE+BLTCON1F_SING),a3 ; minterm line mode
 	ADDF.W	cl1_COLOR12_high5+WORD_SIZE,a4
-	lea	bv_color_table(pc),a7	; Zeiger auf Tabelle mit Farbverlaufwerten
+	lea	bv_color_table(pc),a7
 	moveq	#bv_object_faces_number-1,d7
 bv_draw_lines_loop1
-; Z-Koordinate des Vektors N durch das Kreuzprodukt u x v berechnen
-	move.l	(a0)+,a5		; Zeiger auf Startwerte der Punkte
-	swap	d7			; Flächenzähler retten
-	move.w	(a5),d4			; P1-Startwert
-	move.w	2(a5),d5		; P2-Startwert
-	move.w	4(a5),d6		; P3-Startwert
-	movem.w (a1,d5.w*2),d0-d1	; P2(x,y)
-	movem.w (a1,d6.w*2),d2-d3	; P3(x,y)
+	move.l	(a0)+,a5		; points starts
+	swap	d7			; store loop counter
+	move.w	(a5),d4			; p1 start
+	move.w	2(a5),d5		; p2 start
+	move.w	4(a5),d6		; p3 start
+	movem.w (a1,d5.w*2),d0-d1	; p2(x,y)
+	movem.w (a1,d6.w*2),d2-d3	; p3(x,y)
 	sub.w	d0,d2			; xv = xp3-xp2
 	sub.w	(a1,d4.w*2),d0		; xu = xp2-xp1
 	sub.w	d1,d3			; yv = yp3-yp2
@@ -1636,23 +1639,24 @@ bv_draw_lines_loop1
 	muls.w	d2,d1			; yu*xv
 	sub.l	d0,d1			; zn = (yu*xv)-(xu*yv)
 	bpl	bv_draw_lines_skip5
-; Mittlere Z-Koordinate der Fläche berechnen
-	move.w	6(a5),d7		; P4-Startwert
+
+	move.w	6(a5),d7		; p4 start
 	move.w	4(a1,d4.w*2),d0		; zm = zp1+zp2+zp3+zp4
 	add.w	4(a1,d5.w*2),d0
 	add.w	4(a1,d6.w*2),d0
-	move.l	#bv_kdRGB*bv_EpRGB,d1	; (kdRGB*EpRGB)
-	add.w	4(a1,d7.w*2),d0
 	IFEQ bv_object_edge_points_per_face-4
-		asr.w	#2,d0		; zm / Anzahl der Eckpunkte
+		add.w	4(a1,d7.w*2),d0
+	ENDC
+	move.l	#bv_kdRGB*bv_EpRGB,d1	; kdRGB*EpRGB
+	IFEQ bv_object_edge_points_per_face-4
+		asr.w	#2,d0		; zm / number of edge points
 	ELSE
 		ext.l	d0
-		divs.w	#bv_object_edge_points_per_face,d0 ; zm / Anzahl der Eckpunkte
+		divs.w	#bv_object_edge_points_per_face,d0 ; zm / number of edge points
 	ENDC
-; Entfernung zur Lichtquelle berechnen
-	move.w	(a0),d7			; Farbnummer
-	sub.w	variables+bv_light_z_coordinate(pc),d0 ; D = zm-zl
-; Farbintensität der Fläche ermitteln
+
+	move.w	(a0),d7			; color number
+	sub.w	variables+bv_variable_light_z_coordinate(pc),d0 ; D = zm-zl
 	sub.w	#bv_D0,d0		; D-D0
 	bgt.s	bv_draw_lines_skip1
 	moveq	#1,d0			; D = 1
@@ -1664,46 +1668,46 @@ bv_draw_lines_skip1
 		MOVEF.W bv_EpRGB_max,d1
 bv_draw_lines_skip2
 	ENDC
-; Farbwert in Copperliste eintragen
+
 	move.l	(a7,d1.w*4),d0
-	move.w	d0,(cl1_COLOR12_low5-cl1_COLOR12_high5,a4,d7.w*4) ; Color low
-	swap	d0			; High
-	move.w	d0,(a4,d7.w*4)		; High-Bits COLORxx
-	move.w	object_info_lines_number-object_info_face_color(a0),d6 ; Anzahl der Linien
+	move.w	d0,(cl1_COLOR12_low5-cl1_COLOR12_high5,a4,d7.w*4) ; color low
+	swap	d0
+	move.w	d0,(a4,d7.w*4)		; color high
+	move.w	object_info_lines_number-object_info_face_color(a0),d6 ; number of lines
 bv_draw_lines_loop2
-	move.w	(a5)+,d0		; Startwerte der Punkte P1,P2
+	move.w	(a5)+,d0		; p1,p2 starts
 	move.w	(a5),d2
-	movem.w (a1,d0.w*2),d0-d1	; P1(x,y)
-	movem.w (a1,d2.w*2),d2-d3	; P2(x,y)
+	movem.w (a1,d0.w*2),d0-d1	; p1(x,y)
+	movem.w (a1,d2.w*2),d2-d3	; p2(x,y)
 	GET_LINE_PARAMETERS bv,AREAFILL,,extra_pf1_plane_width*extra_pf1_depth,bv_draw_lines_skip4
-	add.l	a2,d1			; + Bitplanes-Adresse
-	add.l	a3,d0			; restliche BLTCON0 & BLTCON1-Bits setzen
-	btst	#0,d7			; Bitplane1 ?
+	add.l	a2,d1			; add bitplane address
+	add.l	a3,d0			; set remaining BLTCON0 & BLTCON1 bits
+	btst	#0,d7			; bitplane 1 ?
 	beq.s	bv_draw_lines_skip3
 	WAITBLIT
 	move.l	d0,BLTCON0-DMACONR(a6) 	; low word: BLTCON1, high word: BLTCON0
-	move.w	d3,BLTAPTL-DMACONR(a6)	; (dy)-(2*dx)
-	move.l	d1,BLTCPT-DMACONR(a6)	; Bitplanes lesen
-	move.l	d1,BLTDPT-DMACONR(a6)	; Bitplanes schreiben
+	move.w	d3,BLTAPTL-DMACONR(a6)	; dy-(2*dx)
+	move.l	d1,BLTCPT-DMACONR(a6)	; bitplanes read
+	move.l	d1,BLTDPT-DMACONR(a6)	; bitplanes write
 	move.l	d4,BLTBMOD-DMACONR(a6) 	; low word: 4*(dy-dx), high word: 4*dy
 	move.w	d2,BLTSIZE-DMACONR(a6)
 bv_draw_lines_skip3
-	btst	#1,d7			; Bitplane2 ?
+	btst	#1,d7			; bitplane 2 ?
 	beq.s	bv_draw_lines_skip4
 	moveq	#extra_pf1_plane_width,d5
-	add.l	d5,d1			; nächste Bitplane
+	add.l	d5,d1			; next bitplane
 	WAITBLIT
 	move.l	d0,BLTCON0-DMACONR(a6) 	; low word: BLTCON1, high word: BLTCON0
-	move.w	d3,BLTAPTL-DMACONR(a6)	; (dy)-(2*dx)
-	move.l	d1,BLTCPT-DMACONR(a6)	; Bitplanes lesen
-	move.l	d1,BLTDPT-DMACONR(a6)	; Bitplanes schreiben
+	move.w	d3,BLTAPTL-DMACONR(a6)	; dy-(2*dx)
+	move.l	d1,BLTCPT-DMACONR(a6)	; bitplanes read
+	move.l	d1,BLTDPT-DMACONR(a6)	; bitplanes write
 	move.l	d4,BLTBMOD-DMACONR(a6) 	; low word: 4*(dy-dx), high word: 4*dy
 	move.w	d2,BLTSIZE-DMACONR(a6)
 bv_draw_lines_skip4
 	dbf	d6,bv_draw_lines_loop2
 bv_draw_lines_skip5
-	swap	d7			; Flächenzähler
-	addq.w	#LONGWORD_SIZE,a0	; Farbnummer und Anzahl der Linien überspringen
+	swap	d7			; loop counter
+	addq.w	#LONGWORD_SIZE,a0	; skip entries color number and number of lines
 	dbf	d7,bv_draw_lines_loop1
 	move.w	#DMAF_BLITHOG,DMACON-DMACONR(a6)
 bv_draw_lines_quit
@@ -1714,10 +1718,10 @@ bv_draw_lines_quit
 bv_draw_lines_init
 	move.w	#DMAF_BLITHOG|DMAF_SETCLR,DMACON-DMACONR(a6)
 	WAITBLIT
-	move.l	#$ffff8000,BLTBDAT-DMACONR(a6) ; low word: Linientextur mit MSB beginnen, high word: Linientextur
+	move.l	#$ffff8000,BLTBDAT-DMACONR(a6) ; low word: start line texture with MSB, high word: line texture
 	moveq	#-1,d0
 	move.l	d0,BLTAFWM-DMACONR(a6)
-	moveq	#extra_pf1_plane_width*extra_pf1_depth,d0 ; Moduli für Interleaved-Bitmaps
+	moveq	#extra_pf1_plane_width*extra_pf1_depth,d0 ; moduli interleaved bitmaps
 	move.w	d0,BLTCMOD-DMACONR(a6)
 	move.w	d0,BLTDMOD-DMACONR(a6)
 	rts
@@ -1727,14 +1731,14 @@ bv_draw_lines_init
 bv_fill_image
 	move.l	extra_pf2(a3),a0
 	move.l	(a0),a0
-	ADDF.W	(extra_pf1_plane_width*extra_pf1_y_size*extra_pf1_depth)-2,a0 ; Ende des Bildes
+	ADDF.W	(extra_pf1_plane_width*extra_pf1_y_size*extra_pf1_depth)-2,a0 ; end of bitplanes
 	WAITBLIT
-	move.l	#((BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC)<<16)|(BLTCON1F_DESC+BLTCON1F_EFE),BLTCON0-DMACONR(a6) ; Minterm D=A, Füll-Modus, Rückwärts
-	move.l	a0,BLTAPT-DMACONR(a6)	; Quelle
-	move.l	a0,BLTDPT-DMACONR(a6)	; Ziel
+	move.l	#((BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC)<<16)|(BLTCON1F_DESC+BLTCON1F_EFE),BLTCON0-DMACONR(a6) ; minterm D=A, fill mode, backwards
+	move.l	a0,BLTAPT-DMACONR(a6)	; source
+	move.l	a0,BLTDPT-DMACONR(a6)	; destination
 	moveq	#0,d0
-	move.l	d0,BLTAMOD-DMACONR(a6)	; A+D-Mod
-	move.w	#((bv_fill_blit_y_size*bv_fill_blit_depth)<<6)|(bv_fill_blit_x_size/WORD_BITS),BLTSIZE-DMACONR(a6) ; Blitter starten
+	move.l	d0,BLTAMOD-DMACONR(a6)	; A&D moduli
+	move.w	#((bv_fill_blit_y_size*bv_fill_blit_depth)<<6)|(bv_fill_blit_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
 	rts
 
 
@@ -1742,22 +1746,22 @@ bv_fill_image
 bv_copy_image
 	move.l	a4,-(a7)
 	move.l	extra_pf3(a3),a0
-	move.l	(a0),a0			; Image
+	move.l	(a0),a0			; image
 	lea	spr_pointers_construction+(bv_used_first_sprite*LONGWORD_SIZE)(pc),a2
-	move.l	(a2)+,a1		; Sprite6
-	ADDF.W	(spr_pixel_per_datafetch/4),a1 ; Header überspringen
-	move.l	(a2),a2			; Sprite7
-	ADDF.W	(spr_pixel_per_datafetch/4),a2 ; Header überspringen
+	move.l	(a2)+,a1		; sprite6 structure
+	ADDF.W	(spr_pixel_per_datafetch/4),a1 ; skip sprite header
+	move.l	(a2),a2			; sprite7 structure
+	ADDF.W	(spr_pixel_per_datafetch/4),a2 ; skip sprite header
 	moveq	#bv_image_y_size-1,d7
 bv_copy_image_loop
-	movem.l (a0)+,d0-d6/a4		; Bitplane1&2 mit jeweils 128 Pixel lesen
-	move.l	d0,(a1)+		; quadword Sprite0 Bitplane 1
+	movem.l (a0)+,d0-d6/a4		; quadwords bitplane 1&2
+	move.l	d0,(a1)+		; quadword sprite6 bitplane 1
 	move.l	d1,(a1)+
-	move.l	d2,(a2)+		; quadword Sprite1 Bitplane 1
+	move.l	d2,(a2)+		; quadword sprite7 bitplane 1
 	move.l	d3,(a2)+
-	move.l	d4,(a1)+		; quadword Sprite0 Bitplane 2
+	move.l	d4,(a1)+		; quadword sprite6 bitplane 2
 	move.l	d5,(a1)+
-	move.l	d6,(a2)+		; quadword Sprite1 Bitplane 2
+	move.l	d6,(a2)+		; quadword sprite7 bitplane 2
 	move.l	a4,(a2)+
 	dbf	d7,bv_copy_image_loop
 	move.l	(a7)+,a4
@@ -1775,55 +1779,56 @@ bv_move_sprites
 	move.w	#bv_sprite_x_max,a2
 	move.w	#bv_sprite_y_max,a4
 	move.w	#bv_sprite_x_center,a5
-	add.w	d5,d3			; X-Pos. erhöhen/verringern
+	add.w	d5,d3			; decrease/increase x
 	IFNE bv_sprite_x_min
-		cmp.w	#bv_sprite_x_min,d3 ; X >= X-Min ?
+		cmp.w	#bv_sprite_x_min,d3
 	ENDC
 	bge.s	bv_move_sprites_skip1
-	moveq	#bv_sprite_x_min,d3	; X zurücksetzen
-	neg.w	d5			; X-Richtung umkehren
+	moveq	#bv_sprite_x_min,d3	; reset x
+	neg.w	d5			; reverse x direction
 bv_move_sprites_skip1
-	cmp.w	a2,d3			; X-Max ?
+	cmp.w	a2,d3			; x max ?
 	blt.s	bv_move_sprites_skip2
-	move.w	a2,d3			; X zurücksetzen
-	neg.w	d5			; X-Richtung umkehren
+	move.w	a2,d3			; reset x
+	neg.w	d5			; reverse x direction
 bv_move_sprites_skip2
 	move.w	d3,bv_sprite_x_coordinate(a3)
-	add.w	a5,d3			; + X-Mittelpunkt
+	add.w	a5,d3			; + x center
 	move.w	d5,bv_sprite_x_direction(a3)
 
 	move.w	bv_sprite_y_direction(a3),d5
-	add.w	d5,d4			; Y-Pos. erhöhen/verringern
+	add.w	d5,d4			; decrease/increase y
 	IFNE bv_sprite_y_min
 		cmp.w	#bv_sprite_y_min,d4
 	ENDC
 	bge.s	bv_move_sprites_skip3
-	moveq	#bv_sprite_y_min,d4	; Y zurücksetzen
-	neg.w	d5			; Y-Richtung ändern
+	moveq	#bv_sprite_y_min,d4	; reset y
+	neg.w	d5			; reverse y direction
 bv_move_sprites_skip3
-	cmp.w	a4,d4			; Y-Max ?
+	cmp.w	a4,d4			; y max ?
 	blt.s	bv_move_sprites_skip4
-	move.w	a4,d4			; Y zurücksetzen
-	neg.w	d5			; Y-Richtung ändern
+	move.w	a4,d4			; reset y
+	neg.w	d5			; reverse y direction
 bv_move_sprites_skip4
 	move.w	d4,bv_sprite_y_coordinate(a3)
-	add.w	d6,d4			; + Y-Mittelpunkt
+	add.w	d6,d4			; + y center
 	move.w	d5,bv_sprite_y_direction(a3)
-	move.w	#spr_x_size2*SHIRES_PIXEL_FACTOR,a2 ; X-Offset nächstes Sprite
+	move.w	#spr_x_size2*SHIRES_PIXEL_FACTOR,a2 ; x position next sprite
 	moveq	#bv_used_sprites_number-1,d7
 bv_move_sprites_loop
-	move.l	(a1)+,a0		; Sprite-Struktur
-	move.w	d3,d0			; X-Pos.
-	move.w	d4,d1			; Y-Pos.
+	move.l	(a1)+,a0		; sprite structure
+	move.w	d3,d0			; x
+	move.w	d4,d1			; y
 	MOVEF.W bv_image_y_size,d2
 	add.w	d1,d2			; VSTOP
 	SET_SPRITE_POSITION d0,d1,d2
 	move.w	d1,(a0)			; SPRxPOS
-	add.w	a2,d3			; X-Position des nächsten Sprites
+	add.w	a2,d3			; x position next sprite
 	move.w	d2,spr_pixel_per_datafetch/8(a0) ; SPRxCTL
 	dbf	d7,bv_move_sprites_loop
 	movem.l (a7)+,a3-a6
 	rts
+
 
 	CNOP 0,4
 bv_wobble_sprites
@@ -1831,46 +1836,46 @@ bv_wobble_sprites
 	move.w	bv_wobble_x_radius_angle(a3),d1
 	move.w	d1,d0		
 	MOVEF.W sine_table_length-1,d5
-	addq.w	#bv_wobble_x_radius_angle_speed,d0 ; nächster X-Radius-Winkel
+	addq.w	#bv_wobble_x_radius_angle_speed,d0
 	move.w	bv_wobble_x_angle(a3),d2
 	and.w	d5,d0			; remove overflow
 	move.w	d0,bv_wobble_x_radius_angle(a3)
 	move.w	d2,d0		
-	addq.w	#bv_wobble_x_angle_speed,d0 ; nächster X-Winkel
+	addq.w	#bv_wobble_x_angle_speed,d0
 	move.w	d5,d0			; remove overflow
 	move.w	d0,bv_wobble_x_angle(a3)
 	lea	spr_pointers_construction+(bv_used_first_sprite*LONGWORD_SIZE)(pc),a0
 	move.l	cl1_construction2(a3),a1
 	ADDF.W	cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subext1_SPR6POS+WORD_SIZE,a1
-	move.l	(a0)+,a2		; Sprite6-Struktur
+	move.l	(a0)+,a2		; sprite6 structure
 	move.w	(a2),a5			; SPR6POS
-	move.l	(a0),a2			; Sprite7-Struktur
+	move.l	(a0),a2			; sprite7 structure
 	move.w	(a2),a6			; SPR7POS
 	lea	sine_table(pc),a0
 	move.w	#bv_wobble_x_center,a2
 	move.w	#cl1_subextension1_size,a4
 	MOVEF.W cl2_display_y_size-1,d7
 bv_wobble_sprites_loop1
-	moveq	#rz_display_y_scale_factor-1,d6 ; Anzahl der Abschnitte für Y-Skalierung
+	moveq	#rz_display_y_scale_factor-1,d6 ; number of sections for y scaling
 bv_wobble_sprites_loop2
 	move.l	(a0,d1.w*4),d0		; cos(w)
-	MULUF.L bv_wobble_x_radius*2*2,d0,d3 ; xr'=(xr*cos(w))/2*^15
+	MULUF.L bv_wobble_x_radius*2*2,d0,d3 ; xr' = (xr*cos(w))/2*^15
 	swap	d0
-	muls.w	2(a0,d2.w*4),d0		; x'=(xr'*cos(w))/2*^15
+	muls.w	WORD_SIZE(a0,d2.w*4),d0	; x' = (xr'*cos(w))/2*^15
 	swap	d0
-	add.w	a2,d0			; x' + X-Mittelpunkt
-	move.w	d0,d3		
-	add.w	a5,d0			; x' + vertikaler/horizontaler table start des Sprites6
+	add.w	a2,d0			; x' + x center
+	move.w	d0,d3			; store x'
+	add.w	a5,d0			; x' + vert/horiz table start of sprite6
 	move.w	d0,(a1)			; SPR6POS
-	addq.w	#bv_wobble_x_radius_angle_step,d1 ; nächster X-Radius-Winkel
-	addq.w	#bv_wobble_x_angle_step,d2 ; nächster X-Winkel
+	addq.w	#bv_wobble_x_radius_angle_step,d1
+	addq.w	#bv_wobble_x_angle_step,d2
 	and.w	d5,d1			; remove overflow
 	and.w	d5,d2			; remove overflow
-	add.w	a6,d3			; x' + vertikaler/horizontaler table start des Sprites7
-	move.w	d3,LONGWORD_SIZE(a1)		; SPR7POS
+	add.w	a6,d3			; x' + vert/horiz table start of sprite7
+	move.w	d3,LONGWORD_SIZE(a1)	; SPR7POS
 	add.l	a4,a1			; next line in cl
 	dbf	d6,bv_wobble_sprites_loop2
-	addq.w	#QUADWORD_SIZE,a1	; COP2LCH + COP2LCL überspringen
+	addq.w	#QUADWORD_SIZE,a1	; skip COP2LCH + COP2LCL
 	dbf	d7,bv_wobble_sprites_loop1
 	movem.l (a7)+,a4-a6
 	rts
@@ -1886,7 +1891,7 @@ rotation_zoomer
 	move.w	d4,d3
 	move.w	rz_zoom_angle(a3),d5
 	IFNE rz_table_length_256
-		MOVEF.W sine_table_length-1,d6 ; Überlauf
+		MOVEF.W sine_table_length-1,d6 ; overflow
 	ENDC
 	move.w	2(a0,d4.w*4),d1		; sin(w)
 	IFEQ rz_table_length_256
@@ -1894,36 +1899,36 @@ rotation_zoomer
 	ELSE
 		add.w	#sine_table_length/4,d4 ; + 90°
 	ENDC
-	move.w	2(a0,d5.w*4),d2		; sin(w) für Zoom
+	move.w	2(a0,d5.w*4),d2		; sin(w) for zoom
 	IFEQ rz_table_length_256
-		addq.b	#rz_z_rotation_angle_speed,d3 ; nächster Rotations-Winkel
+		addq.b	#rz_z_rotation_angle_speed,d3
 	ELSE
 	and.w	d6,d4			; remove overflow
-		addq.w	#rz_z_rotation_angle_speed,d3 ; nächster Rotations-Winkel
+		addq.w	#rz_z_rotation_angle_speed,d3
 		and.w	d6,d3		; remove overflow
 	ENDC
 	move.w	2(a0,d4.w*4),d0	;cos(w)
 	tst.w	rz_zoomer_active(a3)
 	bne.s	rotation_zoomer_skip
 	IFEQ rz_table_length_256
-		addq.b	#rz_zoom_angle_speed,d5 ; nächster Zoom-Winkel
+		addq.b	#rz_zoom_angle_speed,d5
 rotation_zoomer_skip
 	ELSE
-		addq.w	#rz_zoom_angle_speed,d5 ; nächster Zoom-Winkel
+		addq.w	#rz_zoom_angle_speed,d5
 		and.w	d6,d5		; remove overflow
 	ENDC
 rotation_zoomer_skip
-; Zoomfaktor berechnen
+
 	IFEQ rz_zoom_radius-4096
-		asr.w	#3,d2		; zoom'=(zoomr*sin(w))/2^15
+		asr.w	#3,d2		; zoom' = (zoomr*sin(w))/2^15
 	ELSE
 		IFEQ rz_zoom_radius-2048
-			asr.w	#4,d2	; zoom'=(zoomr*sin(w))/2^15
+			asr.w	#4,d2	; zoom' = (zoomr*sin(w))/2^15
 		ELSE
 			IFEQ rz_zoom_radius-1024
-				asr.w	#5,d2 ; zoom'=(zoomr*sin(w))/2^15
+				asr.w	#5,d2 ; zoom' = (zoomr*sin(w))/2^15
 			ELSE
-				MULSF.W rz_zoom_radius*2,d2,d6 ; zoom=(zoomr*sin(w))/2^15
+				MULSF.W rz_zoom_radius*2,d2,d6 ; zoom = (zoomr*sin(w))/2^15
 				swap	d2
 			ENDC
 		ENDC
@@ -1931,56 +1936,55 @@ rotation_zoomer_skip
 	move.w	d3,rz_z_rotation_angle(a3)
 	add.w	#rz_zoom_center,d2
 	move.w	d5,rz_zoom_angle(a3)
-	muls.w	d2,d0			; x'=(zoom'*cos(w))/2^15
-	muls.w	d2,d1			; y'=(zoom'*sin(w))/2^15
+	muls.w	d2,d0			; x' = (zoom'*cos(w))/2^15
+	muls.w	d2,d1			; y' = (zoom'*sin(w))/2^15
 	swap	d0
 	swap	d1
-; Rotation um die Z-Achse
-	moveq	#rz_Ax,d2		; X links oben
+
+	moveq	#rz_Ax,d2		; upper left x
 	muls.w	d0,d2			; Ax*cos(w)
-	moveq	#rz_Ay,d3		; Y links oben
+	moveq	#rz_Ay,d3		; upper left y
 	muls.w	d1,d3			; Ay*sin(w)
-	move.l	extra_memory(a3),a0	; Zeiger auf BPLAM-Tabelle
-	add.l	d3,d2			; Ax'=Ax*cos(w)+Ay*sin(w)
-	moveq	#rz_Bx,d3		; X rechts oben
+	move.l	extra_memory(a3),a0	; BPLAM table
+	add.l	d3,d2			; Ax' = Ax*cos(w)+Ay*sin(w)
+	moveq	#rz_Bx,d3		; upper right x
 	muls.w	d1,d3			; Bx*sin(w)
-	moveq	#rz_By,d4		; Y rechts oben
+	moveq	#rz_By,d4		; upper right y
 	muls.w	d0,d4			; By*cos(w)
-	add.w	#rz_z_rotation_x_center<<8,d2 ; x' + X-Mittelpunkt
-	add.l	d4,d3			; By'=Bx*sin(w)+By*cos(w)
-; Translation
-	move.w	d2,a4			; X-Mittelpunkt retten
-	add.w	#rz_z_rotation_y_center<<8,d3 ; y' + Y-Mittelpunkt
-	move.l	cl2_construction2(a3),a1
-	move.w	d3,a5			; Y-Mittelpunkt retten
-; BPLAM-werte in Copperliste kopieren
+	add.w	#rz_z_rotation_x_center<<8,d2 ; x' + x center
+	move.w	d2,a4			; store x
+	add.l	d4,d3			; By' = Bx*sin(w)+By*cos(w)
+	add.w	#rz_z_rotation_y_center<<8,d3 ; y' + y center
+	move.w	d3,a5			; store y
+
 	move.l	a7,save_a7(a3)	
-	move.w	#cl2_extension1_size,a2
-	move.w	d0,a3			; cos(w) retten
-	move.w	d1,a7			; sin(w)
-	add.w	a3,a3			; notwendig, um die 2:1 Pixelverzerrung auszugleichen
+	move.l	cl2_construction2(a3),a1
 	ADDF.W	cl2_extension1_entry+cl2_ext1_BPLCON4_1+WORD_SIZE,a1
+	move.w	#cl2_extension1_size,a2
+	move.w	d0,a3			; store cos(w)
+	add.w	a3,a3			; avoid horizontal 2:1 pixel distortion
 	move.w	#(cl2_extension1_size*cl2_display_y_size)-4,a6
-	add.w	a7,a7			; notwendig, um die 2:1 Pixelverzerrung auszugleichen
+	move.w	d1,a7			; sin(w)
+	add.w	a7,a7			; avoid vertical 2:1 pixel distortion
 	moveq	#0,d2
 	moveq	#cl2_display_width-1,d7 ; number of columns
 rotation_zoomer_loop1
-	move.w	a4,d4			; X Linke obere Ecke in BPLAM-Tabelle
-	move.w	a5,d5			; Y Linke obere Ecke in BPLAM-Tabelle
+	move.w	a4,d4			; upper left x in BPLAM table
+	move.w	a5,d5			; upper left y in BPLAM table
 	moveq	#cl2_display_y_size-1,d6
 rotation_zoomer_loop2
-	move.w	d4,d3			; X-Pos in BPLAM-Tabelle
-	move.w	d5,d2			; Y-Pos in BPLAM-Tabelle
-	lsr.w	#8,d3			; Bits in richtige Postion bringen
-	move.b	d3,d2			; Bits 0-7: X-Offset, Bits 8-15: Y-Offset
+	move.w	d4,d3			; x in BPLAM table
+	move.w	d5,d2			; y in BPLAM table
+	lsr.w	#8,d3			; adjust bits
+	move.b	d3,d2			; bits 0..7: x offset, bits 8..15: y offset
 	move.b	(a0,d2.l),(a1)		; BPLCON4 high
-	add.w	d1,d4			; nächste Pixel-Spalte in BPLAM-Tabelle
-	add.w	d0,d5			; nächste Pixel-Zeile in BPLAM-Tabelle
+	add.w	d1,d4			; next column in BPLAM table
+	add.w	d0,d5			; next line in BPLAM table
 	add.l	a2,a1			; next line in cl
 	dbf	d6,rotation_zoomer_loop2
-	add.w	a3,a4			; nächste X-Pos in BPLAM--Tabelle
-	sub.w	a7,a5			; nächste Y-Pos in BPLAM-Tabelle
-	sub.l	a6,a1			; next column in CL
+	add.w	a3,a4			; next x in BPLAM table
+	sub.w	a7,a5			; next y in BPLAM table
+	sub.l	a6,a1			; next column in cl
 	dbf	d7,rotation_zoomer_loop1
 	move.l	variables+save_a7(pc),a7
 rotation_zoomer_quit
@@ -1995,20 +1999,20 @@ image_fader_in
 	bne.s	image_fader_in_quit
 	move.w	ifi_rgb8_fader_angle(a3),d2
 	move.w	d2,d0
-	ADDF.W	ifi_rgb8_fader_angle_speed,d0 ; nächster Winkel
+	ADDF.W	ifi_rgb8_fader_angle_speed,d0
 	cmp.w	#sine_table_length/2,d0	; 180° ?
 	ble.s	image_fader_in_skip
 	MOVEF.W sine_table_length/2,d0
 image_fader_in_skip
 	move.w	d0,ifi_rgb8_fader_angle(a3) 
-	MOVEF.W if_rgb8_colors_number*3,d6 ; RGB-Zähler
+	MOVEF.W if_rgb8_colors_number*3,d6 ; RGB counter
 	lea	sine_table(pc),a0
 	move.l	(a0,d2.w*4),d0		; sin(w)
-	MULUF.L ifi_rgb8_fader_radius*2,d0,d1 ; y'=(yr*sin(w))/2^15
+	MULUF.L ifi_rgb8_fader_radius*2,d0,d1 ; y' = (yr*sin(w))/2^15
 	swap	d0
 	ADDF.W	ifi_rgb8_fader_center,d0
-	lea	pf1_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a0 ; Puffer für Farbwerte
-	lea	ifi_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a1 ; Sollwerte
+	lea	pf1_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a0 ; colors buffer
+	lea	ifi_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a1 ; destination colors
 	move.w	d0,a5			; increase/decrease blue
 	swap	d0
 	clr.w	d0
@@ -2017,7 +2021,7 @@ image_fader_in_skip
 	move.l	d0,a4			; increase/decrease green
 	MOVEF.W if_rgb8_colors_number-1,d7
 	bsr	if_rgb8_fader_loop
-	move.w	d6,if_rgb8_colors_counter(a3) ; Fading-In beendet ?
+	move.w	d6,if_rgb8_colors_counter(a3) ; fading finished ?
 	bne.s	image_fader_in_quit
 	move.w	#FALSE,ifi_rgb8_active(a3)
 image_fader_in_quit
@@ -2032,20 +2036,20 @@ image_fader_out
 	bne.s	image_fader_out_quit
 	move.w	ifo_rgb8_fader_angle(a3),d2
 	move.w	d2,d0
-	ADDF.W	ifo_rgb8_fader_angle_speed,d0 ; nächster Winkel
+	ADDF.W	ifo_rgb8_fader_angle_speed,d0
 	cmp.w	#sine_table_length/2,d0	; 180° ?
 	ble.s	image_fader_out_skip
 	MOVEF.W sine_table_length/2,d0
 image_fader_out_skip
 	move.w	d0,ifo_rgb8_fader_angle(a3) 
-	MOVEF.W if_rgb8_colors_number*3,d6 ; RGB-Zähler
+	MOVEF.W if_rgb8_colors_number*3,d6 ; RGB counter
 	lea	sine_table(pc),a0
 	move.l	(a0,d2.w*4),d0		; sin(w)
-	MULUF.L ifo_rgb8_fader_radius*2,d0,d1 ; y'=(yr*sin(w))/2^15
+	MULUF.L ifo_rgb8_fader_radius*2,d0,d1 ; y' = (yr*sin(w))/2^15
 	swap	d0
 	ADDF.W	ifo_rgb8_fader_center,d0
-	lea	pf1_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a0 ; Puffer für Farbwerte
-	lea	ifo_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a1 ; Sollwerte
+	lea	pf1_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a0 ; colors buffer
+	lea	ifo_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a1 ; destination colors
 	move.w	d0,a5			; increase/decrease blue
 	swap	d0
 	clr.w	d0
@@ -2054,7 +2058,7 @@ image_fader_out_skip
 	move.l	d0,a4			; increase/decrease green
 	MOVEF.W if_rgb8_colors_number-1,d7
 	bsr.s	if_rgb8_fader_loop
-	move.w	d6,if_rgb8_colors_counter(a3) ; Fading-Out beendet ?
+	move.w	d6,if_rgb8_colors_counter(a3) ; fading finished ?
 	bne.s	image_fader_out_quit
 	moveq	#FALSE,d0
 	move.w	d0,ifo_rgb8_active(a3)
@@ -2088,7 +2092,7 @@ blind_fader_in
 	CNOP 0,4
 blind_fader_in_skip
 	move.w	d0,bf_address_offsets_table_start(a3) 
-	lea	bf_address_offsets_table(pc),a0 ; Tabelle mit Registeroffsets
+	lea	bf_address_offsets_table(pc),a0
 	IFNE cl2_size1
 		move.l	cl2_construction1(a3),a1
 		IFNE cl2_extension1_entry+cl2_ext1_BPL1DAT
@@ -2109,22 +2113,22 @@ blind_fader_in_skip
 	ENDC
 	moveq	#bf_lamellas_number-1,d7
 blind_fader_in_loop1
-	move.w	d2,d1			; Startwert
+	move.w	d2,d1			; table start
 	moveq	#bf_lamella_height-1,d6
 blind_fader_in_loop2
-	move.w	(a0,d1.w*2),d0		; Registeroffset aus Tabelle
+	move.w	(a0,d1.w*2),d0		; register offset
 	addq.w	#bf_step1,d1		; next entry
 	IFNE cl2_size1
-		move.w	d0,(a1)		; Registeroffset in CL schreiben
+		move.w	d0,(a1)		; CMOVE 0,offset
 		add.l	d4,a1		; next line in cl
 	ENDC
 	IFNE cl2_size2
-		move.w	d0,(a2)		; Registeroffset in CL schreiben
-		add.l	d4,a2		; next line in cl
+		move.w	d0,(a2)
+		add.l	d4,a2
 	ENDC
 	IFNE cl2_size3
-		move.w	d0,(a4)		; Registeroffset in CL schreiben
-		add.l	d4,a4		; next line in cl
+		move.w	d0,(a4)
+		add.l	d4,a4
 	ENDC
 	and.w	d3,d1			; remove overflow
 	dbf	d6,blind_fader_in_loop2
@@ -2157,9 +2161,9 @@ blind_fader_out
 	bsr	init_colors2
 	bsr	set_noop_screen
 	bsr	cl1_set_branches_pointers
-	move.w	#DMAF_RASTER|DMAF_SETCLR,DMACON-DMACONR(a6)
+	move.w	#DMAF_RASTER|DMAF_SETCLR,DMACON-DMACONR(a6) ; enable bitplane DMA
 	moveq	#0,d0
-	move.w	d0,COPJMP1-DMACONR(a6)	; 1. Copperliste neu starten, damit die geänderte Palette dargestellt wird
+	move.w	d0,COPJMP1-DMACONR(a6)	; restart 1st copperlist so that new palette is used
 	bra.s	blind_fader_out_quit
 	CNOP 0,4
 blind_fader_out_skip
@@ -2186,22 +2190,22 @@ blind_fader_out_skip
 	ENDC
 	moveq	#bf_lamellas_number-1,d7
 blind_fader_out_loop1
-	move.w	d2,d1			; Startwert
+	move.w	d2,d1			; table start
 	moveq	#bf_lamella_height-1,d6
 blind_fader_out_loop2
-	move.w	(a0,d1.w*2),d0		; Registeradresse aus Tabelle
+	move.w	(a0,d1.w*2),d0		; register offset
 	addq.w	#bf_step1,d1		; next entry
 	IFNE cl2_size1
-		move.w	d0,(a1)		; Registeroffset in CL schreiben
+		move.w	d0,(a1)		; CMOVE 0,offset
 		add.l	d4,a1		; next line in cl
 	ENDC
 	IFNE cl2_size2
-		move.w	d0,(a2)		; Registeroffset in CL schreiben
-		add.l	d4,a2		; next line in cl
+		move.w	d0,(a2)
+		add.l	d4,a2
 	ENDC
 	IFNE cl2_size3
-		move.w	d0,(a4)		; Registeroffset in CL schreiben
-		add.l	d4,a4		; next line in cl
+		move.w	d0,(a4)
+		add.l	d4,a4
 	ENDC
 	and.w	d3,d1			; remove overflow
 	dbf	d6,blind_fader_out_loop2
@@ -2215,7 +2219,7 @@ blind_fader_out_quit
 
 	CNOP 0,4
 init_colors2
-; Bild
+; Background-Image
 	lea	ifo_rgb8_color_table(pc),a0
 	move.l	cl1_construction2(a3),a1 
 	ADDF.W	cl1_COLOR00_high1+WORD_SIZE,a1
@@ -2223,25 +2227,25 @@ init_colors2
 	ADDF.W	cl1_COLOR00_high1+WORD_SIZE,a2
 	move.w	#RB_NIBBLES_MASK,d3
 	IFGT pf1_colors_number-32
-		moveq	#0,d4		; Farbregisterzähler
+		moveq	#0,d4		; color registers counter
 	ENDC
 	moveq	#pf1_colors_number-1,d7
 init_colors2_loop
 	move.l	(a0)+,d0		; RGB8
 	move.l	d0,d1		
 	RGB8_TO_RGB4_HIGH d0,d2,d3
-	move.w	d0,(a1)			; Color high
+	move.w	d0,(a1)			; color high
 	addq.w	#4,a1
-	move.w	d0,(a2)			; Color high
+	move.w	d0,(a2)			; color high
 	RGB8_TO_RGB4_LOW d1,d2,d3
-	move.w	d2,cl1_COLOR00_low1-cl1_COLOR00_high1-4(a1) ; Color low
+	move.w	d2,cl1_COLOR00_low1-cl1_COLOR00_high1-4(a1) ; color low
 	addq.w	#4,a2
-	move.w	d2,cl1_COLOR00_low1-cl1_COLOR00_high1-4(a2) ; Color low
+	move.w	d2,cl1_COLOR00_low1-cl1_COLOR00_high1-4(a2) ; color low
 	IFGT pf1_colors_number-32
-	addq.b	#1<<3,d4		; Farbregister-Zähler erhöhen
+	addq.b	#1<<3,d4		; increase color registers counter
 	bne.s	init_colors2_skip
-	addq.w	#LONGWORD_SIZE,a1	; CMOVE BPLCON3 überspringen
-	addq.w	#LONGWORD_SIZE,a2	; CMOVE BPLCON3 überspringen
+	addq.w	#LONGWORD_SIZE,a1	; skip CMOVE BPLCON3
+	addq.w	#LONGWORD_SIZE,a2	; skip CMOVE BPLCON3
 init_colors2_skip
 	ENDC
 	dbf	d7,init_colors2_loop
@@ -2253,25 +2257,25 @@ init_colors2_skip
 	ADDF.W	cl1_COLOR00_high5+WORD_SIZE,a2
 	move.w	#RB_NIBBLES_MASK,d3
 	IFGT spr_colors_number-32
-		moveq	#0,d4		; Farbregisterzähler
+		moveq	#0,d4		; color registers counter
 	ENDC
 	moveq	#spr_colors_number-1,d7
 init_colors2_loop2
 	move.l	(a0)+,d0		; RGB8
 	move.l	d0,d1		
 	RGB8_TO_RGB4_HIGH d0,d2,d3
-	move.w	d0,(a1)			; Color high
+	move.w	d0,(a1)			; color high
 	addq.w	#4,a1
-	move.w	d0,(a2)			; Color high
+	move.w	d0,(a2)			; color high
 	RGB8_TO_RGB4_LOW d1,d2,d3
-	move.w	d2,cl1_COLOR00_low5-cl1_COLOR00_high5-4(a1) ; Color low
+	move.w	d2,cl1_COLOR00_low5-cl1_COLOR00_high5-4(a1) ; color low
 	addq.w	#4,a2
-	move.w	d2,cl1_COLOR00_low5-cl1_COLOR00_high5-4(a2) ; Color low
+	move.w	d2,cl1_COLOR00_low5-cl1_COLOR00_high5-4(a2) ; color low
 	IFGT spr_colors_number-32
-		addq.b	1<<3,d4		; Farbregister-Zähler erhöhen
+		addq.b	1<<3,d4		; increase color registers counter
 		bne.s	init_colors2_skip
-		addq.w	#LONGWORD_SIZE,a1 ; CMOVE BPLCON3 überspringen
-		addq.w	#LONGWORD_SIZE,a2 ; CMOVE BPLCON3 überspringen
+		addq.w	#LONGWORD_SIZE,a1 ; skip CMOVE BPLCON3
+		addq.w	#LONGWORD_SIZE,a2 ; skip CMOVE BPLCON3
 init_colors2_skip
 	ENDC
 	dbf	d7,init_colors2_loop2
@@ -2280,6 +2284,8 @@ init_colors2_skip
 
 	CNOP 0,4
 set_noop_screen
+	move.w	#BPL1DAT,d0
+	MOVEF.L cl2_extension1_size,d1
 	IFNE cl2_size1
 		move.l	cl2_construction1(a3),a0
 		IFNE cl2_extension1_entry+cl2_ext1_BPL1DAT
@@ -2298,13 +2304,11 @@ set_noop_screen
 			ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a2
 		ENDC
 	ENDC
-	move.w	#BPL1DAT,d0
-	MOVEF.L cl2_extension1_size,d1
 	moveq	#cl2_display_y_size-1,d7
 set_noop_screen_loop1
 	IFNE cl2_size1
-		move.w	d0,(a0)		; Offset BPL1DAT setzen
-		add.l	d1,a0
+		move.w	d0,(a0)		; set offset BPL1DAT
+		add.l	d1,a0		; next line in cl
 	ENDC
 	IFNE cl2_size2
 		move.w	d0,(a1)
@@ -2346,26 +2350,26 @@ keyboard_handler
 	bne	keyboard_handler_quit
 	btst	#CIAICRB_SP,CIAICR(a4)
 	beq	keyboard_handler_quit
-	btst	#CIACRAB_SPMODE,CIACRA(a4) ; Ausgabe ?
+	btst	#CIACRAB_SPMODE,CIACRA(a4) ; output ?
 	bne	keyboard_handler_quit
-	move.b	CIASDR(a4),d0		; Tastencode
-	ror.b	#1,d0			; Bits in richtige Position bringen
+	move.b	CIASDR(a4),d0		; fetch key code
+	ror.b	#1,d0			; adjust bits
 	not.b	d0
 	bmi.s	keyboard_handler_skip
-	tst.b	kh_key_flag(a3)		; Bereits ein Tastencode gespeichert ?
+	tst.b	kh_key_flag(a3)		; key code already stored ?
 	bne.s	keyboard_handler_skip
 	move.b	d0,kh_key_code(a3)
 	not.b	kh_key_flag(a3)
 keyboard_handler_skip
 	moveq	#CIACRAF_SPMODE,d0
-	or.b	d0,CIACRA(a4)		; Serieller-Port = Ausgabe, Handshake starten
+	or.b	d0,CIACRA(a4)		; serial port = output, start handshake
 	moveq	#CIACRBF_START,d0
-	or.b	d0,CIACRB(a4)		; Wartezeit 200 µs
+	or.b	d0,CIACRB(a4)		; delay 200 µs
 keyboard_handler_loop
 	btst	#CIACRBB_START,CIACRB(a4)
 	bne.s	keyboard_handler_loop
 	moveq	#~CIACRAF_SPMODE,d0
-	and.b	d0,CIACRA(a4)		; Serieller-Port = Eingabe, Handshake beenden
+	and.b	d0,CIACRA(a4)		; serial port = input, stop handshake
 	clr.b	kh_key_flag(a3)
 	move.b	kh_key_code(a3),d0
 	cmp.b	#KEYBOARD_KEYCODE_F1,d0
@@ -2451,9 +2455,10 @@ kh_set_xyz_rotation_angle_speed10
 	move.w	#bv_rotation_z_angle_speed10,bv_rotation_z_angle_speed(a3)
 	rts
 
+
 	CNOP 0,4
 mouse_handler
-	btst	#CIAB_GAMEPORT0,CIAPRA(a4) ; LMB gedrückt ?
+	btst	#CIAB_GAMEPORT0,CIAPRA(a4) ; LMB pressed ?
 	beq.s	mh_exit_demo
 	rts
 	CNOP 0,4
@@ -2551,9 +2556,9 @@ pt_start_fade_in_image
 	clr.w	if_rgb8_copy_colors_active(a3)
 	clr.w	part_title_active(a3)
 	move.l	cl1_construction2(a3),a0 
-	move.w	#bplcon0_bits2,cl1_BPLCON0+WORD_SIZE(a0) ; Bitplanes an
+	move.w	#bplcon0_bits2,cl1_BPLCON0+WORD_SIZE(a0) ; enable bitplanes
 	move.l	cl1_display(a3),a0 
-	move.w	#bplcon0_bits2,cl1_BPLCON0+WORD_SIZE(a0) ; Bitplanes an
+	move.w	#bplcon0_bits2,cl1_BPLCON0+WORD_SIZE(a0) ; enable bitplanes
 	move.l	(a7)+,a0
 	rts
 	CNOP 0,4
@@ -2569,13 +2574,13 @@ pt_start_fade_in_rotation_zoomer
 	moveq	#TRUE,d0
 	move.w	d0,rz_active(a3)
 	move.w	d0,bfi_active(a3)
-	clr.w	part_main_active(a3)
+	move.w	d0,part_main_active(a3)
 	bsr.s	rz_init_colors
 	bsr	rz_set_branches_pointers
 	move.l	cl1_construction2(a3),a0 
-	move.w	#bplcon0_bits,cl1_BPLCON0+WORD_SIZE(a0) ; Bitplanes aus
+	move.w	#bplcon0_bits,cl1_BPLCON0+WORD_SIZE(a0) ; disable bitplanes
 	move.l	cl1_display(a3),a0 
-	move.w	#bplcon0_bits,cl1_BPLCON0+WORD_SIZE(a0) ; Bitplanes aus
+	move.w	#bplcon0_bits,cl1_BPLCON0+WORD_SIZE(a0) ; disable bitplanes
 	movem.l (a7)+,d1-d7/a0-a2
 	rts
 	CNOP 0,4
@@ -2602,54 +2607,56 @@ rz_init_colors
 	ADDF.W	cl1_COLOR00_high1+WORD_SIZE,a2
 	move.w	#RB_NIBBLES_MASK,d3
 	IFGT if_rgb8_colors_number-32
-		moveq	#0,d4		; Farbregisterzähler
+		moveq	#0,d4		; color registers counter
 	ENDC
 	MOVEF.W if_rgb8_colors_number-1,d7
 rz_init_colors_loop
-	move.l	(a0)+,d0		; RGB8-Farbwert
+	move.l	(a0)+,d0		; RGB8
 	move.l	d0,d1		
 	RGB8_TO_RGB4_HIGH d0,d2,d3
-	move.w	d0,(a1)			; High-Bits COLORxx
+	move.w	d0,(a1)			; color high
 	addq.w	#LONGWORD_SIZE,a1
-	move.w	d0,(a2)			; High-Bits COLORxx
+	move.w	d0,(a2)			; color high
 	RGB8_TO_RGB4_LOW d1,d2,d3
-	move.w	d1,cl1_COLOR00_low1-cl1_COLOR00_high1-4(a1) ; Low-Bits COLORxx
+	move.w	d1,cl1_COLOR00_low1-cl1_COLOR00_high1-4(a1) ; color low
 	addq.w	#4,a2
-	move.w	d1,cl1_COLOR00_low1-cl1_COLOR00_high1-4(a2) ; Low-Bits COLORxx
+	move.w	d1,cl1_COLOR00_low1-cl1_COLOR00_high1-4(a2) ; color low
 	IFGT if_rgb8_colors_number-32
-		addq.b	#1<<3,d4	; Farbregister-Zähler erhöhen
+		addq.b	#1<<3,d4	; increase color registers counter
 		bne.s	rz_init_colors_skip
-		addq.w	#LONGWORD_SIZE,a1 ; CMOVE BPLCON3 überspringen
-		addq.w	#LONGWORD_SIZE,a2 ; CMOVE BPLCON3 überspringen
+		addq.w	#LONGWORD_SIZE,a1 ; skip CMOVE BPLCON3
+		addq.w	#LONGWORD_SIZE,a2 ; skip CMOVE BPLCON3
 rz_init_colors_skip
 	ENDC
 	dbf	d7,rz_init_colors_loop
 	rts
 
+
 	CNOP 0,4
 rz_set_branches_pointers
-	move.l	cl1_construction2(a3),a0
+	move.l	cl2_construction2(a3),d0
 	MOVEF.L cl1_subextension1_size,d2
-	move.l	cl2_construction2(a3),d0 ; Einsprungadresse
 	MOVEF.L cl2_extension1_size,d3
 	moveq	#cl1_extension1_size,d4
+	move.l	cl1_construction2(a3),a0
 	bsr.s	rz_set_jump_entry_pointers
+
+	move.l	cl2_display(a3),d0
 	move.l	cl1_display(a3),a0
-	move.l	cl2_display(a3),d0	; Einsprungadresse
 	bsr.s	rz_set_jump_entry_pointers
 	rts
 
 
 ; Input
-; a0.l	Copperliste1
-; d0.l	Einsprungadresse Copperliste2
+; d0.l	second copperlist
 ; d2.l	cl1_subextension1_size
 ; d3.l	cl2_extension1_size
+; a0.l	1st copperlist
 ; Result
 	CNOP 0,4
 rz_set_jump_entry_pointers
-	MOVEF.L cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subextension1_size,d1 ; Offset Rücksprungadresse CL1
-	add.l	a0,d1			; + Rücksprungadresse CL1
+	MOVEF.L cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subextension1_size,d1
+	add.l	a0,d1			; jump in 1st copperlist
 	lea	cl1_extension1_entry+cl1_ext1_subextension1_entry+cl1_subext1_COP1LCH+WORD_SIZE(a0),a1
 	ADDF.W	cl1_extension1_entry+cl1_ext1_COP2LCH+WORD_SIZE,a0
 	moveq	#cl2_display_y_size-1,d7
@@ -2657,22 +2664,23 @@ rz_set_branches_loop1
 	swap	d0
 	move.w	d0,(a0)			; COP2LCH
 	swap	d0
-	move.w	d0,LONGWORD_SIZE(a0)		; COP2LCL
-	moveq	#rz_display_y_scale_factor-1,d6 ; Anzahl der Abschnitte für Y-Skalierung
+	move.w	d0,LONGWORD_SIZE(a0)	; COP2LCL
+	moveq	#rz_display_y_scale_factor-1,d6 ; number of sections for y scaling
 rz_set_branches_loop2
 	swap	d1
 	move.w	d1,(a1)			; COP1LCH
 	swap	d1
-	move.w	d1,LONGWORD_SIZE(a1)		; COP1LCL
-	add.l	d2,d1			; Rücksprungadresse CL1 erhöhen
-	add.l	d2,a1			; nächste Zeile in Unterabschnitt der CL1
+	move.w	d1,LONGWORD_SIZE(a1)	; COP1LCL
+	add.l	d2,d1			; next return address in 1st copperlist
+	add.l	d2,a1			; next line in sub section 1st copperlist
 	dbf	d6,rz_set_branches_loop2
-	add.l	d3,d0			; Einsprungadresse CL2 erhöhen
-	add.l	d4,a0			; nächste Zeile in CL1
-	addq.l	#QUADWORD_SIZE,d1	; CMOVE COP2LCH + CMOVE COP2LCL überspringen
-	addq.w	#QUADWORD_SIZE,a1	; CMOVE COP2LCH + CMOVE COP2LCL überspringen
+	add.l	d3,d0			; next jump in second copperlist
+	add.l	d4,a0			; next line in cl1
+	addq.l	#QUADWORD_SIZE,d1	; skip CMOVE COP2LCH + CMOVE COP2LCL
+	addq.w	#QUADWORD_SIZE,a1	; skip CMOVE COP2LCH + CMOVE COP2LCL
 	dbf	d7,rz_set_branches_loop1
 	rts
+
 
 	CNOP 0,4
 ciab_tb_server
@@ -2765,8 +2773,7 @@ wst_chars_x_positions
 bv_color_table
 	INCLUDE "Old'scool:colortables/64-Colorgradient-Brown.ct"
 
-
-; Würfel
+; Cube
 	CNOP 0,2
 bv_object_coordinates
 	DC.W -(35*8),-(35*8),-(35*8)	; P0
@@ -2780,39 +2787,39 @@ bv_object_coordinates
 
 	CNOP 0,4
 bv_object_info
-; ** 1. Fläche **
-	DC.L 0				; Zeiger auf Koords
-	DC.W bv_object_face1_color	; Farbe der Fläche
-	DC.W bv_object_face1_lines_number-1 ; Anzahl der Linien
-; ** 2. Fläche **
-	DC.L 0				; Zeiger auf Koords
-	DC.W bv_object_face2_color	; Farbe der Fläche
-	DC.W bv_object_face2_lines_number-1 ; Anzahl der Linien
-; ** 3. Fläche **
-	DC.L 0				; Zeiger auf Koords
-	DC.W bv_object_face3_color	; Farbe der Fläche
-	DC.W bv_object_face3_lines_number-1 ; Anzahl der Linien
-; ** 4. Fläche **
-	DC.L 0				; Zeiger auf Koords
-	DC.W bv_object_face4_color	; Farbe der Fläche
-	DC.W bv_object_face4_lines_number-1 ; Anzahl der Linien
-; ** 5. Fläche **
-	DC.L 0				; Zeiger auf Koords
-	DC.W bv_object_face5_color	; Farbe der Fläche
-	DC.W bv_object_face5_lines_number-1 ; Anzahl der Linien
-; ** 6. Fläche **
-	DC.L 0				; Zeiger auf Koords
-	DC.W bv_object_face6_color	; Farbe der Fläche
-	DC.W bv_object_face6_lines_number-1 ; Anzahl der Linien
+; 1. face
+	DC.L 0				; xyz coordinates
+	DC.W bv_object_face1_color
+	DC.W bv_object_face1_lines_number-1
+; 2. face
+	DC.L 0				; xyz coordinates
+	DC.W bv_object_face2_color
+	DC.W bv_object_face2_lines_number-1
+; 3. face
+	DC.L 0				; xyz coordinates
+	DC.W bv_object_face3_color
+	DC.W bv_object_face3_lines_number-1
+; 4. face
+	DC.L 0				; xyz coordinates
+	DC.W bv_object_face4_color
+	DC.W bv_object_face4_lines_number-1
+; 5. face
+	DC.L 0				; xyz coordinates
+	DC.W bv_object_face5_color
+	DC.W bv_object_face5_lines_number-1
+; 6. face
+	DC.L 0				; xyz coordinates
+	DC.W bv_object_face6_color
+	DC.W bv_object_face6_lines_number-1
 
 	CNOP 0,2
 bv_object_edges
-	DC.W 0*3,1*3,2*3,3*3,0*3	; Fläche vorne
-	DC.W 5*3,4*3,7*3,6*3,5*3	; Fläche hinten
-	DC.W 4*3,0*3,3*3,7*3,4*3	; Fläche links
-	DC.W 1*3,5*3,6*3,2*3,1*3	; Fläche rechts
-	DC.W 4*3,5*3,1*3,0*3,4*3	; Fläche oben
-	DC.W 3*3,2*3,6*3,7*3,3*3	; Fläche unten
+	DC.W 0*3,1*3,2*3,3*3,0*3	; front face
+	DC.W 5*3,4*3,7*3,6*3,5*3	; back face
+	DC.W 4*3,0*3,3*3,7*3,4*3	; left face
+	DC.W 1*3,5*3,6*3,2*3,1*3	; right face
+	DC.W 4*3,5*3,1*3,0*3,4*3	; upper face
+	DC.W 3*3,2*3,6*3,7*3,3*3	; lower face
 
 	CNOP 0,2
 bv_rotation_xyz_coordinates
@@ -2906,7 +2913,7 @@ wst_stop_text
 	EVEN
 
 
-; Audiodaten nachladen
+; Audio data
 
 ; PT-Replay
 	IFNE pt_split_module_enabled
@@ -2921,7 +2928,7 @@ pt_audsmps			SECTION pt_audio_samples,DATA_C
 	ENDC
 
 
-; Grafikdaten nachladen
+; Gfx data
 
 ; Background-Image
 bg_image_data			SECTION bg_gfx,DATA
@@ -2938,7 +2945,7 @@ wst_image_data			SECTION wst_gfx,DATA
 	END
 
 
-; -- Unbenutzt ---
+; Storage for unused routines
 czo_zoom_radius			EQU 32768
 czo_zoom_center			EQU 32768
 czo_zoom_angle_speed		EQU 1
@@ -2957,7 +2964,7 @@ cube_zoomer_out
 	move.w	czo_zoom_angle(a3),d1
 	cmp.w	#sine_table_length/2,d1	; 180° ?
 	blt.s	cube_zoomer_out_skip
-	move.w	#FALSE,czo_active(a3)	; Cube-Zoomer-Out aus
+	move.w	#FALSE,czo_active(a3)
 	bra.s	cube_zoomer_out_quit
 	CNOP 0,4
 cube_zoomer_out_skip
