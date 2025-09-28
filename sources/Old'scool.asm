@@ -136,7 +136,7 @@ pt_usedfx			EQU %1111010101011001
 pt_usedefx			EQU %0000100000000000
 pt_mute_enabled			EQU FALSE
 pt_music_fader_enabled		EQU TRUE
-pt_fade_out_delay		EQU 2 ; ticks
+pt_fade_out_delay		EQU 2	; ticks
 pt_split_module_enabled		EQU TRUE
 pt_track_notes_played_enabled	EQU FALSE
 pt_track_volumes_enabled	EQU FALSE
@@ -1542,33 +1542,33 @@ bv_rotation
 	move.w	bv_rotation_x_angle(a3),d1
 	move.w	d1,d0		
 	lea	sine_table(pc),a2
-	move.w	2(a2,d0.w*4),d4		; sin(a)
+	move.w	WORD_SIZE(a2,d0.w*4),d4	; sin(a)
  	move.w	#sine_table_length/4,a4
 	MOVEF.W sine_table_length-1,d3
 	add.w	a4,d0			; + 90°
 	swap	d4 			; high word: sin(a)
 	and.w	d3,d0			; remove overflow
-	move.w	2(a2,d0.w*4),d4		; low word: cos(a)
+	move.w	WORD_SIZE(a2,d0.w*4),d4	; low word: cos(a)
 	add.w	bv_rotation_x_angle_speed(a3),d1
 	and.w	d3,d1			; remove overflow
 	move.w	d1,bv_rotation_x_angle(a3) 
 	move.w	bv_rotation_y_angle(a3),d1
 	move.w	d1,d0		
-	move.w	2(a2,d0.w*4),d5		; sin(b)
+	move.w	WORD_SIZE(a2,d0.w*4),d5	; sin(b)
 	add.w	a4,d0			; + 90°
 	swap	d5 			; high word: sin(b)
 	and.w	d3,d0			; remove overflow
-	move.w	2(a2,d0.w*4),d5		; low word: cos(b)
+	move.w	WORD_SIZE(a2,d0.w*4),d5	; low word: cos(b)
 	add.w	bv_rotation_y_angle_speed(a3),d1
 	and.w	d3,d1			; remove overflow
 	move.w	d1,bv_rotation_y_angle(a3) 
 	move.w	bv_rotation_z_angle(a3),d1
 	move.w	d1,d0		
-	move.w	2(a2,d0.w*4),d6	;sin(c)
+	move.w	WORD_SIZE(a2,d0.w*4),d6	;sin(c)
 	add.w	a4,d0			; + 90°
 	swap	d6 			; high word: sin(c)
 	and.w	d3,d0			; remove overflow
-	move.w	2(a2,d0.w*4),d6	 	; low word: cos(c)
+	move.w	WORD_SIZE(a2,d0.w*4),d6	; low word: cos(c)
 	add.w	bv_rotation_z_angle_speed(a3),d1
 	and.w	d3,d1			; remove overflow
 	move.w	d1,bv_rotation_z_angle(a3) 
@@ -1627,14 +1627,14 @@ bv_draw_lines_loop1
 	move.l	(a0)+,a5		; points starts
 	swap	d7			; store loop counter
 	move.w	(a5),d4			; p1 start
-	move.w	2(a5),d5		; p2 start
-	move.w	4(a5),d6		; p3 start
+	move.w	WORD_SIZE(a5),d5	; p2 start
+	move.w	LONGWORD_SIZE(a5),d6	; p3 start
 	movem.w (a1,d5.w*2),d0-d1	; p2(x,y)
 	movem.w (a1,d6.w*2),d2-d3	; p3(x,y)
 	sub.w	d0,d2			; xv = xp3-xp2
 	sub.w	(a1,d4.w*2),d0		; xu = xp2-xp1
 	sub.w	d1,d3			; yv = yp3-yp2
-	sub.w	2(a1,d4.w*2),d1		; yu = yp2-yp1
+	sub.w	WORD_SIZE(a1,d4.w*2),d1	; yu = yp2-yp1
 	muls.w	d3,d0			; xu*yv
 	muls.w	d2,d1			; yu*xv
 	sub.l	d0,d1			; zn = (yu*xv)-(xu*yv)
@@ -1893,13 +1893,13 @@ rotation_zoomer
 	IFNE rz_table_length_256
 		MOVEF.W sine_table_length-1,d6 ; overflow
 	ENDC
-	move.w	2(a0,d4.w*4),d1		; sin(w)
+	move.w	WORD_SIZE(a0,d4.w*4),d1	; sin(w)
 	IFEQ rz_table_length_256
 		add.b	#sine_table_length/4,d4 ; + 90°
 	ELSE
 		add.w	#sine_table_length/4,d4 ; + 90°
 	ENDC
-	move.w	2(a0,d5.w*4),d2		; sin(w) for zoom
+	move.w	WORD_SIZE(a0,d5.w*4),d2	; sin(w) for zoom
 	IFEQ rz_table_length_256
 		addq.b	#rz_z_rotation_angle_speed,d3
 	ELSE
@@ -1907,7 +1907,7 @@ rotation_zoomer
 		addq.w	#rz_z_rotation_angle_speed,d3
 		and.w	d6,d3		; remove overflow
 	ENDC
-	move.w	2(a0,d4.w*4),d0	;cos(w)
+	move.w	WORD_SIZE(a0,d4.w*4),d0	; cos(w)
 	tst.w	rz_zoomer_active(a3)
 	bne.s	rotation_zoomer_skip
 	IFEQ rz_table_length_256
@@ -2335,7 +2335,7 @@ cube_zoomer_in
 	CNOP 0,4
 cube_zoomer_in_skip
 	moveq	#0,d0
-	move.w	2(a0,d1.w*4),d0		; sin(w)
+	move.w	WORD_SIZE(a0,d1.w*4),d0	; sin(w)
 	add.w	#czi_zoom_center,d0
 	move.l	d0,bv_zoom_distance(a3) 
 	addq.w	#czi_zoom_angle_speed,d1
@@ -2970,7 +2970,7 @@ cube_zoomer_out
 cube_zoomer_out_skip
 	move.w	d1,czo_zoom_angle(a3)
 	moveq	#0,d0
-	move.w	2(a0,d1.w*4),d0		; sin(w)
+	move.w	WORD_SIZE(a0,d1.w*4),d0	; sin(w)
 	add.w	#czo_zoom_center,d0
 	move.l	d0,bv_zoom_distance(a3) 
 	addq.w	#czo_zoom_angle_speed,d1
