@@ -109,10 +109,10 @@
 	INCLUDE "hardware/intbits.i"
 
 
-PROTRACKER_VERSION_3		SET 1
-
-
 	INCDIR "custom-includes-aga:"
+
+
+PROTRACKER_VERSION_3		SET 1
 
 
 	INCLUDE "macros.i"
