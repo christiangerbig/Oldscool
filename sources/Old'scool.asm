@@ -1206,7 +1206,7 @@ cl1_init_branches_pointers_loop2
 	COP_MOVEQ 0,COP1LCH
 	eor.l	d1,d0			; x shift
 	COP_MOVEQ 0,COP1LCL
-	add.l	d2,d0			; next line in cl
+	add.l	d2,d0			; next line
 	COP_MOVEQ 0,COPJMP2
 	dbf	d6,cl1_init_branches_pointers_loop2
 	dbf	d7,cl1_init_branches_pointers_loop1
@@ -1267,7 +1267,7 @@ cl1_set_branches_loop2
 	add.l	d2,d1			; next return address 1st copperlist
 	add.l	d2,a1			; next line in sub section 1st copperlist
 	dbf	d6,cl1_set_branches_loop2
-	add.l	d4,a0			; next line in cl1
+	add.l	d4,a0			; next line1
 	addq.l	#QUADWORD_SIZE,d1	; skip CMOVE COP2LCH + CMOVE COP2LCL
 	addq.w	#QUADWORD_SIZE,a1	; skip CMOVE COP2LCH + CMOVE COP2LCL
 	dbf	d7,cl1_set_branches_loop1
@@ -1733,7 +1733,7 @@ bv_fill_image
 	move.l	(a0),a0
 	ADDF.W	(extra_pf1_plane_width*extra_pf1_y_size*extra_pf1_depth)-2,a0 ; end of bitplanes
 	WAITBLIT
-	move.l	#((BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC)<<16)|(BLTCON1F_DESC+BLTCON1F_EFE),BLTCON0-DMACONR(a6) ; minterm D=A, fill mode, backwards
+	move.l	#((BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC)<<16)|(BLTCON1F_DESC+BLTCON1F_EFE),BLTCON0-DMACONR(a6) ; minterm D = A, fill mode, backwards
 	move.l	a0,BLTAPT-DMACONR(a6)	; source
 	move.l	a0,BLTDPT-DMACONR(a6)	; destination
 	moveq	#0,d0
@@ -1873,7 +1873,7 @@ bv_wobble_sprites_loop2
 	and.w	d5,d2			; remove overflow
 	add.w	a6,d3			; x' + vert/horiz table start of sprite7
 	move.w	d3,LONGWORD_SIZE(a1)	; SPR7POS
-	add.l	a4,a1			; next line in cl
+	add.l	a4,a1			; next line
 	dbf	d6,bv_wobble_sprites_loop2
 	addq.w	#QUADWORD_SIZE,a1	; skip COP2LCH + COP2LCL
 	dbf	d7,bv_wobble_sprites_loop1
@@ -1980,11 +1980,11 @@ rotation_zoomer_loop2
 	move.b	(a0,d2.l),(a1)		; BPLCON4 high
 	add.w	d1,d4			; next column in BPLAM table
 	add.w	d0,d5			; next line in BPLAM table
-	add.l	a2,a1			; next line in cl
+	add.l	a2,a1			; next line
 	dbf	d6,rotation_zoomer_loop2
 	add.w	a3,a4			; next x in BPLAM table
 	sub.w	a7,a5			; next y in BPLAM table
-	sub.l	a6,a1			; next column in cl
+	sub.l	a6,a1			; next column
 	dbf	d7,rotation_zoomer_loop1
 	move.l	variables+save_a7(pc),a7
 rotation_zoomer_quit
@@ -2120,7 +2120,7 @@ blind_fader_in_loop2
 	addq.w	#bf_step1,d1		; next entry
 	IFNE cl2_size1
 		move.w	d0,(a1)		; CMOVE 0,offset
-		add.l	d4,a1		; next line in cl
+		add.l	d4,a1		; next line
 	ENDC
 	IFNE cl2_size2
 		move.w	d0,(a2)
@@ -2197,7 +2197,7 @@ blind_fader_out_loop2
 	addq.w	#bf_step1,d1		; next entry
 	IFNE cl2_size1
 		move.w	d0,(a1)		; CMOVE 0,offset
-		add.l	d4,a1		; next line in cl
+		add.l	d4,a1		; next line
 	ENDC
 	IFNE cl2_size2
 		move.w	d0,(a2)
@@ -2308,7 +2308,7 @@ set_noop_screen
 set_noop_screen_loop1
 	IFNE cl2_size1
 		move.w	d0,(a0)		; set offset BPL1DAT
-		add.l	d1,a0		; next line in cl
+		add.l	d1,a0		; next line
 	ENDC
 	IFNE cl2_size2
 		move.w	d0,(a1)
@@ -2675,7 +2675,7 @@ rz_set_branches_loop2
 	add.l	d2,a1			; next line in sub section 1st copperlist
 	dbf	d6,rz_set_branches_loop2
 	add.l	d3,d0			; next jump in second copperlist
-	add.l	d4,a0			; next line in cl1
+	add.l	d4,a0			; next line1
 	addq.l	#QUADWORD_SIZE,d1	; skip CMOVE COP2LCH + CMOVE COP2LCL
 	addq.w	#QUADWORD_SIZE,a1	; skip CMOVE COP2LCH + CMOVE COP2LCL
 	dbf	d7,rz_set_branches_loop1
@@ -2918,13 +2918,13 @@ wst_stop_text
 ; PT-Replay
 	IFNE pt_split_module_enabled
 pt_auddata			SECTION pt_audio_module,DATA_C
-		INCBIN "Old'scool:modules/mod.ClassicTune14remix"
+		INCBIN "Old'scool:trackermodules/mod.ClassicTune14remix"
 	ELSE
 pt_auddata			SECTION pt_audio_song,DATA
-		INCBIN "Old'scool:modules/MOD.ClassicTune14Remix.song"
+		INCBIN "Old'scool:trackermodules/MOD.ClassicTune14Remix.song"
 
 pt_audsmps			SECTION pt_audio_samples,DATA_C
-		INCBIN "Old'scool:modules/MOD.ClassicTune14Remix.smps"
+		INCBIN "Old'scool:trackermodules/MOD.ClassicTune14Remix.smps"
 	ENDC
 
 
