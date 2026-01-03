@@ -2704,7 +2704,7 @@ nmi_server
 	CNOP 0,4
 pf1_rgb8_color_table
 	REPT pf1_colors_number
-		DC.L color00_bits
+	DC.L color00_bits
 	ENDR
 	INCLUDE "Old'scool:colortables/256x256x128-Texture.ct"
 
@@ -2715,7 +2715,7 @@ spr_rgb8_color_table
 	INCLUDE "Old'scool:colortables/64x56x4-Font.ct"
 	INCLUDE "Old'scool:colortables/64x56x4-Font.ct"
 	REPT 4
-		DC.L color00_bits
+	DC.L color00_bits
 	ENDR
 
 
@@ -2834,7 +2834,7 @@ ifi_rgb8_color_table
 	CNOP 0,4
 ifo_rgb8_color_table
 	REPT pf1_colors_number
-		DC.L color00_bits
+	DC.L color00_bits
 	ENDR
 
 
@@ -2842,10 +2842,10 @@ ifo_rgb8_color_table
 	CNOP 0,2
 bf_address_offsets_table
 	REPT bf_table_length/2
-		DC.W NOOP
+	DC.W NOOP
 	ENDR
 	REPT bf_table_length/2
-		DC.W BPL1DAT
+	DC.W BPL1DAT
 	ENDR
 
 
@@ -2863,21 +2863,21 @@ wst_text
 	DC.B ASCII_CTRL_F,"°¹"
 	DC.B "RESISTANCE"
 	REPT wst_text_chars_number/(wst_origin_char_x_size/wst_text_char_x_size)
-		DC.B " "
+	DC.B " "
 	ENDR
 	DC.B "PRESENTS  "
 	REPT wst_text_chars_number/(wst_origin_char_x_size/wst_text_char_x_size)
-		DC.B " "
+	DC.B " "
 	ENDR
 	DC.B ASCII_CTRL_W,ASCII_CTRL_M,"¹³"
 	DC.B " YES WE ARE BACK ON THE AMIGA ### "
 	REPT wst_text_chars_number/(wst_origin_char_x_size/wst_text_char_x_size)
-		DC.B " "
+	DC.B " "
 	ENDR
 	DC.B ASCII_CTRL_W,ASCII_CTRL_S
 	DC.B "PRESS F1-F10 FOR DIFFERENT CUBE MOVEMENTS...  "
 	REPT wst_text_chars_number/(wst_origin_char_x_size/wst_text_char_x_size)
-		DC.B " "
+	DC.B " "
 	ENDR
 	DC.B ASCII_CTRL_W,ASCII_CTRL_F,"²³"
 	DC.B "THE ELECRONIC KNIGHTS  "
@@ -2891,7 +2891,7 @@ wst_text
 	DC.B "SOFTWARE FAILURE  "
 	DC.B "EPHIDRENA  "
 	REPT wst_text_chars_number/(wst_origin_char_x_size/wst_text_char_x_size)
-		DC.B " "
+	DC.B " "
 	ENDR
 	DC.B ASCII_CTRL_W,ASCII_CTRL_M,"¹³"
 	DC.B "THE CREDITS      "
@@ -2900,7 +2900,7 @@ wst_text
 	DC.B "RELEASED @ NORDLICHT 2023"
 wst_stop_text
 	REPT wst_text_chars_number/(wst_origin_char_x_size/wst_text_char_x_size)
-		DC.B " "
+	DC.B " "
 	ENDR
 	DC.B ASCII_CTRL_W," "
 	EVEN
