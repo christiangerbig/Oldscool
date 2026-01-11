@@ -488,7 +488,7 @@ bf_lamella_height		EQU 8
 bf_step1			EQU 1
 bf_step2			EQU 1
 bf_speed			EQU 1
-bf_table_length			EQU bf_lamella_height*4
+bf_registers_table_length	EQU bf_lamella_height*4
 
 ; Cube-Zoomer-In
 czi_zoom_radius			EQU 32768
@@ -920,7 +920,7 @@ ifo_rgb8_active			RS.W 1
 ifo_rgb8_fader_angle		RS.W 1
 
 ; Blind-Fader
-bf_address_offsets_table_start	RS.W 1
+bf_registers_table_start	RS.W 1
 
 ; Blind-Fader-In
 bfi_active			RS.W 1
@@ -1024,7 +1024,7 @@ init_main_variables2
 	move.w	#sine_table_length/4,ifo_rgb8_fader_angle(a3) ; 90°
 
 ; Blind-Fader
-	move.w	d0,bf_address_offsets_table_start(a3)
+	move.w	d0,bf_registers_table_start(a3)
 
 ; Blind-Fader-In
 	move.w	d1,bfi_active(a3)
@@ -2079,37 +2079,29 @@ blind_fader_in
 	move.l	a4,-(a7)
 	tst.w	bfi_active(a3)
 	bne.s	blind_fader_in_quit
-	move.w	bf_address_offsets_table_start(a3),d2
-	MOVEF.W bf_table_length-1,d3
+	move.w	bf_registers_table_start(a3),d2
 	move.w	d2,d0		
-	MOVEF.L cl2_extension1_size,d4
 	addq.w	#bf_speed,d0		; increase table start
-	moveq	#bf_step2,d5
-	cmp.w	#(bf_table_length/2)+1,d0 ; end of table ?
+	cmp.w	#bf_registers_table_length/2,d0 ; end of table ?
 	ble.s	blind_fader_in_skip
 	move.w	#FALSE,bfi_active(a3)
-	bra.s	blind_fader_in_quit
-	CNOP 0,4
 blind_fader_in_skip
-	move.w	d0,bf_address_offsets_table_start(a3) 
-	lea	bf_address_offsets_table(pc),a0
+	move.w	d0,bf_registers_table_start(a3)
+	MOVEF.W bf_registers_table_length-1,d3
+	MOVEF.L cl2_extension1_size,d4
+	MOVEF.W	bf_step2,d5
+	lea	bf_registers_table(pc),a0
 	IFNE cl2_size1
 		move.l	cl2_construction1(a3),a1
-		IFNE cl2_extension1_entry+cl2_ext1_BPL1DAT
-			ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a1
-		ENDC
+		ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a1
 	ENDC
 	IFNE cl2_size2
 		move.l	cl2_construction2(a3),a2
-		IFNE cl2_extension1_entry+cl2_ext1_BPL1DAT
-			ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a2
-		ENDC
+		ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a2
 	ENDC
 	IFNE cl2_size3
 		move.l	cl2_display(a3),a4
-		IFNE cl2_extension1_entry+cl2_ext1_BPL1DAT
-			ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a4
-		ENDC
+		ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a4
 	ENDC
 	moveq	#bf_lamellas_number-1,d7
 blind_fader_in_loop1
@@ -2145,10 +2137,8 @@ blind_fader_out
 	move.l	a4,-(a7)
 	tst.w	bfo_active(a3)
 	bne.s	blind_fader_out_quit
-	move.w	bf_address_offsets_table_start(a3),d2
-	MOVEF.W bf_table_length-1,d3
+	move.w	bf_registers_table_start(a3),d2
 	move.w	d2,d0		
-	MOVEF.L cl2_extension1_size,d4
 	subq.w	#bf_speed,d0		; decrease table start
 	bpl.s	blind_fader_out_skip
 	moveq	#FALSE,d0
@@ -2164,29 +2154,23 @@ blind_fader_out
 	move.w	#DMAF_RASTER|DMAF_SETCLR,DMACON-DMACONR(a6) ; enable bitplane DMA
 	moveq	#0,d0
 	move.w	d0,COPJMP1-DMACONR(a6)	; restart 1st copperlist so that new palette is used
-	bra.s	blind_fader_out_quit
-	CNOP 0,4
 blind_fader_out_skip
-	move.w	d0,bf_address_offsets_table_start(a3) 
-	moveq	#bf_step2,d5
-	lea	bf_address_offsets_table(pc),a0
+	move.w	d0,bf_registers_table_start(a3)
+	MOVEF.W bf_registers_table_length-1,d3
+	MOVEF.L cl2_extension1_size,d4
+	MOVEF.W	bf_step2,d5
+	lea	bf_registers_table(pc),a0
 	IFNE cl2_size1
 		move.l	cl2_construction1(a3),a1
-		IFNE cl2_extension1_entry+cl2_ext1_BPL1DAT
-			ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a1
-		ENDC
+		ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a1
 	ENDC
 	IFNE cl2_size2
 		move.l	cl2_construction2(a3),a2
-		IFNE cl2_extension1_entry+cl2_ext1_BPL1DAT
-			ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a2
-		ENDC
+		ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a2
 	ENDC
 	IFNE cl2_size3
 		move.l	cl2_display(a3),a4
-		IFNE cl2_extension1_entry+cl2_ext1_BPL1DAT
-			ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a4
-		ENDC
+		ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a4
 	ENDC
 	moveq	#bf_lamellas_number-1,d7
 blind_fader_out_loop1
@@ -2220,32 +2204,32 @@ blind_fader_out_quit
 	CNOP 0,4
 init_colors2
 ; Background-Image
+	move.w	#RB_NIBBLES_MASK,d3
+	IFGT pf1_colors_number-32
+		moveq	#0,d4		; color registers counter
+	ENDC
 	lea	ifo_rgb8_color_table(pc),a0
 	move.l	cl1_construction2(a3),a1 
 	ADDF.W	cl1_COLOR00_high1+WORD_SIZE,a1
 	move.l	cl1_display(a3),a2 
 	ADDF.W	cl1_COLOR00_high1+WORD_SIZE,a2
-	move.w	#RB_NIBBLES_MASK,d3
-	IFGT pf1_colors_number-32
-		moveq	#0,d4		; color registers counter
-	ENDC
-	moveq	#pf1_colors_number-1,d7
+	MOVEF.W	pf1_colors_number-1,d7
 init_colors2_loop
 	move.l	(a0)+,d0		; RGB8
 	move.l	d0,d1		
 	RGB8_TO_RGB4_HIGH d0,d2,d3
 	move.w	d0,(a1)			; color high
-	addq.w	#4,a1
+	addq.w	#LONGWORD_SIZE,a1
 	move.w	d0,(a2)			; color high
 	RGB8_TO_RGB4_LOW d1,d2,d3
 	move.w	d2,cl1_COLOR00_low1-cl1_COLOR00_high1-4(a1) ; color low
-	addq.w	#4,a2
+	addq.w	#LONGWORD_SIZE,a2
 	move.w	d2,cl1_COLOR00_low1-cl1_COLOR00_high1-4(a2) ; color low
 	IFGT pf1_colors_number-32
-	addq.b	#1<<3,d4		; increase color registers counter
-	bne.s	init_colors2_skip
-	addq.w	#LONGWORD_SIZE,a1	; skip CMOVE BPLCON3
-	addq.w	#LONGWORD_SIZE,a2	; skip CMOVE BPLCON3
+		addq.b	#1<<3,d4	; increase color registers counter
+		bne.s	init_colors2_skip
+		addq.w	#LONGWORD_SIZE,a1 ; skip CMOVE BPLCON3
+		addq.w	#LONGWORD_SIZE,a2 ; skip CMOVE BPLCON3
 init_colors2_skip
 	ENDC
 	dbf	d7,init_colors2_loop
@@ -2269,7 +2253,7 @@ init_colors2_loop2
 	move.w	d0,(a2)			; color high
 	RGB8_TO_RGB4_LOW d1,d2,d3
 	move.w	d2,cl1_COLOR00_low5-cl1_COLOR00_high5-4(a1) ; color low
-	addq.w	#4,a2
+	addq.w	#LONGWORD_SIZE,a2
 	move.w	d2,cl1_COLOR00_low5-cl1_COLOR00_high5-4(a2) ; color low
 	IFGT spr_colors_number-32
 		addq.b	1<<3,d4		; increase color registers counter
@@ -2845,11 +2829,11 @@ ifo_rgb8_color_table
 
 ; Blind-Fader
 	CNOP 0,2
-bf_address_offsets_table
-	REPT bf_table_length/2
+bf_registers_table
+	REPT bf_registers_table_length/2
 	DC.W NOOP
 	ENDR
-	REPT bf_table_length/2
+	REPT bf_registers_table_length/2
 	DC.W BPL1DAT
 	ENDR
 
