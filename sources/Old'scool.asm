@@ -2464,26 +2464,30 @@ mouse_handler
 	CNOP 0,4
 mh_exit_demo
 	move.w	#wst_stop_text-wst_text,wst_text_table_start(a3)
-	move.w	#FALSE,pt_effects_handler_active(a3)
-	clr.w	pt_music_fader_active(a3)
+	moveq	#FALSE,d1
+	move.w	d1,pt_effects_handler_active(a3)
+	moveq	#TRUE,d0
+	move.w	d0,pt_music_fader_active(a3)
+; Image-Fader
 	tst.w	part_title_active(a3)
 	bne.s	mh_exit_demo_skip2
-	clr.w	ifo_rgb8_active(a3)
-	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
-	clr.w	if_rgb8_copy_colors_active(a3)
-	tst.w	ifi_rgb8_active(a3)
+	tst.w	ifi_rgb8_active(a3)	; fader still running ?
 	bne.s	mh_exit_demo_skip1
-	move.w	#FALSE,ifi_rgb8_active(a3)
+	move.w	d1,ifi_rgb8_active(a3)  ; force fader stop
 mh_exit_demo_skip1
+	move.w	d0,ifo_rgb8_active(a3)
+	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
+	move.w	d0,if_rgb8_copy_colors_active(a3)
 	bra.s	mh_exit_demo_quit
 	CNOP 0,4
 mh_exit_demo_skip2
 	tst.w	part_main_active(a3)
 	bne.s	mh_exit_demo_quit
-	clr.w	bfo_active(a3)
-	tst.w	bfi_active(a3)
-	bne.s   mh_exit_demo_quit
-	move.w	#FALSE,bfi_active(a3)
+	tst.w	bfi_active(a3)		; fader still running ?
+	bne.s   mh_exit_demo_skip3
+	move.w	d1,bfi_active(a3)	; force fader stop
+mh_exit_demo_skip3
+	move.w	d0,bfo_active(a3)
 mh_exit_demo_quit
 	rts
 
@@ -2551,10 +2555,11 @@ pt_start_horiz_scrolltext
 	CNOP 0,4
 pt_start_fade_in_image
 	move.l	a0,-(a7)
-	clr.w	ifi_rgb8_active(a3)
+	moveq	#TRUE,d0
+	move.w	d0,ifi_rgb8_active(a3)
 	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
-	clr.w	if_rgb8_copy_colors_active(a3)
-	clr.w	part_title_active(a3)
+	move.w	d0,if_rgb8_copy_colors_active(a3)
+	move.w	d0,part_title_active(a3)
 	move.l	cl1_construction2(a3),a0 
 	move.w	#bplcon0_bits2,cl1_BPLCON0+WORD_SIZE(a0) ; enable bitplanes
 	move.l	cl1_display(a3),a0 
