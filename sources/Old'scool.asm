@@ -2140,7 +2140,7 @@ blind_fader_out
 	move.w	bf_registers_table_start(a3),d2
 	move.w	d2,d0		
 	subq.w	#bf_speed,d0		; decrease table start
-	bpl.s	blind_fader_out_skip
+	bpl.s	blind_fader_out_skip1
 	moveq	#FALSE,d0
 	move.w	d0,bfo_active(a3)
 	move.w	d0,part_main_active(a3)
@@ -2154,8 +2154,11 @@ blind_fader_out
 	move.w	#DMAF_RASTER|DMAF_SETCLR,DMACON-DMACONR(a6) ; enable bitplane DMA
 	moveq	#0,d0
 	move.w	d0,COPJMP1-DMACONR(a6)	; restart 1st copperlist so that new palette is used
-blind_fader_out_skip
+	bra.s	blind_fader_out_skip2
+	CNOP 0,4
+blind_fader_out_skip1
 	move.w	d0,bf_registers_table_start(a3)
+blind_fader_out_skip2
 	MOVEF.W bf_registers_table_length-1,d3
 	MOVEF.L cl2_extension1_size,d4
 	MOVEF.W	bf_step2,d5
