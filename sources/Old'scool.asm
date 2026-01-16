@@ -2089,7 +2089,6 @@ blind_fader_in_skip
 	move.w	d0,bf_registers_table_start(a3)
 	MOVEF.W bf_registers_table_length-1,d3
 	MOVEF.L cl2_extension1_size,d4
-	MOVEF.W	bf_step2,d5
 	lea	bf_registers_table(pc),a0
 	IFNE cl2_size1
 		move.l	cl2_construction1(a3),a1
@@ -2124,7 +2123,7 @@ blind_fader_in_loop2
 	ENDC
 	and.w	d3,d1			; remove overflow
 	dbf	d6,blind_fader_in_loop2
-	add.w	d5,d2			; increase table start
+	addq.w	#bf_step2,d2		; increase table start
 	and.w	d3,d2			; remove overflow
 	dbf	d7,blind_fader_in_loop1
 blind_fader_in_quit
@@ -2161,7 +2160,6 @@ blind_fader_out_skip1
 blind_fader_out_skip2
 	MOVEF.W bf_registers_table_length-1,d3
 	MOVEF.L cl2_extension1_size,d4
-	MOVEF.W	bf_step2,d5
 	lea	bf_registers_table(pc),a0
 	IFNE cl2_size1
 		move.l	cl2_construction1(a3),a1
@@ -2196,7 +2194,7 @@ blind_fader_out_loop2
 	ENDC
 	and.w	d3,d1			; remove overflow
 	dbf	d6,blind_fader_out_loop2
-	add.w	d5,d2			; increase table start
+	addq.w	#bf_step2,d2		; increase table start
 	and.w	d3,d2			; remove overflow
 	dbf	d7,blind_fader_out_loop1
 blind_fader_out_quit
