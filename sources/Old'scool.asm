@@ -126,7 +126,7 @@ requires_060_cpu		EQU FALSE
 requires_fast_memory		EQU FALSE
 requires_multiscan_monitor	EQU FALSE
 
-workbench_start_enabled		EQU FALSE ; [TRUE]
+workbench_start_enabled		EQU TRUE
 screen_fader_enabled		EQU TRUE
 text_output_enabled		EQU FALSE
 
