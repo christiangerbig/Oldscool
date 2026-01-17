@@ -1115,7 +1115,8 @@ bv_init_object_info_loop
 	CNOP 0,4
 init_sprites
 	bsr.s	spr_init_pointers_table
-	bra	spr_copy_structures
+	bsr	spr_copy_structures
+	rts
 
 	INIT_SPRITE_POINTERS_TABLE
 
@@ -2491,7 +2492,8 @@ vertb_interrupt_server
 ; PT-Replay
 	IFEQ pt_music_fader_enabled
 		bsr.s	pt_music_fader
-		bra.s	pt_PlayMusic
+		bsr.s	pt_PlayMusic
+		rts
 
 		PT_FADE_OUT_VOLUME stop_fx_active
 		CNOP 0,4
@@ -2500,7 +2502,6 @@ vertb_interrupt_server
 	IFD PROTRACKER_VERSION_2 
 		PT2_REPLAY pt_effects_handler
 	ENDC
-
 	IFD PROTRACKER_VERSION_3
 		PT3_REPLAY pt_effects_handler
 	ENDC
