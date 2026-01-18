@@ -644,6 +644,7 @@ copperlist2_size		RS.B 0
 cl1_size1			EQU 0
 cl1_size2			EQU copperlist1_size
 cl1_size3			EQU copperlist1_size
+
 cl2_size1			EQU 0
 cl2_size2			EQU copperlist2_size
 cl2_size3			EQU copperlist2_size
@@ -2099,10 +2100,8 @@ blind_fader_in_skip
 		move.l	cl2_construction2(a3),a2
 		ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a2
 	ENDC
-	IFNE cl2_size3
-		move.l	cl2_display(a3),a4
-		ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a4
-	ENDC
+	move.l	cl2_display(a3),a4
+	ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a4
 	moveq	#bf_lamellas_number-1,d7
 blind_fader_in_loop1
 	move.w	d2,d1			; table start
@@ -2118,11 +2117,9 @@ blind_fader_in_loop2
 		move.w	d0,(a2)
 		add.l	d4,a2
 	ENDC
-	IFNE cl2_size3
-		move.w	d0,(a4)
-		add.l	d4,a4
-	ENDC
+	move.w	d0,(a4)
 	and.w	d3,d1			; remove overflow
+	add.l	d4,a4
 	dbf	d6,blind_fader_in_loop2
 	addq.w	#bf_step2,d2		; increase table start
 	and.w	d3,d2			; remove overflow
@@ -2170,10 +2167,8 @@ blind_fader_out_skip2
 		move.l	cl2_construction2(a3),a2
 		ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a2
 	ENDC
-	IFNE cl2_size3
-		move.l	cl2_display(a3),a4
-		ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a4
-	ENDC
+	move.l	cl2_display(a3),a4
+	ADDF.W	cl2_extension1_entry+cl2_ext1_BPL1DAT,a4
 	moveq	#bf_lamellas_number-1,d7
 blind_fader_out_loop1
 	move.w	d2,d1			; table start
@@ -2189,11 +2184,9 @@ blind_fader_out_loop2
 		move.w	d0,(a2)
 		add.l	d4,a2
 	ENDC
-	IFNE cl2_size3
-		move.w	d0,(a4)
-		add.l	d4,a4
-	ENDC
+	move.w	d0,(a4)
 	and.w	d3,d1			; remove overflow
+	add.l	d4,a4
 	dbf	d6,blind_fader_out_loop2
 	addq.w	#bf_step2,d2		; increase table start
 	and.w	d3,d2			; remove overflow
