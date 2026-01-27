@@ -2438,36 +2438,34 @@ kh_set_xyz_rotation_angle_speed10
 	CNOP 0,4
 mouse_handler
 	btst	#CIAB_GAMEPORT0,CIAPRA(a4) ; LMB pressed ?
-	beq.s	mh_exit_demo
-	rts
-	CNOP 0,4
-mh_exit_demo
+	bne.s	mouse_handler_quit
 	move.w	#wst_stop_text-wst_text,wst_text_table_start(a3)
 	moveq	#FALSE,d1
 	move.w	d1,pt_effects_handler_active(a3)
+; Music-Fader
 	moveq	#TRUE,d0
 	move.w	d0,pt_music_fader_active(a3)
 ; Image-Fader
 	tst.w	part_title_active(a3)
-	bne.s	mh_exit_demo_skip2
+	bne.s	mouse_handler_skip2
 	tst.w	ifi_rgb8_active(a3)	; fader still running ?
-	bne.s	mh_exit_demo_skip1
+	bne.s	mouse_handler_skip1
 	move.w	d1,ifi_rgb8_active(a3)  ; force fader stop
-mh_exit_demo_skip1
+mouse_handler_skip1
 	move.w	d0,ifo_rgb8_active(a3)
 	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	move.w	d0,if_rgb8_copy_colors_active(a3)
-	bra.s	mh_exit_demo_quit
+	bra.s	mouse_handler_quit
 	CNOP 0,4
-mh_exit_demo_skip2
+mouse_handler_skip2
 	tst.w	part_main_active(a3)
-	bne.s	mh_exit_demo_quit
+	bne.s	mouse_handler_quit
 	tst.w	bfi_active(a3)		; fader still running ?
-	bne.s   mh_exit_demo_skip3
+	bne.s   mouse_handler_skip3
 	move.w	d1,bfi_active(a3)	; force fader stop
-mh_exit_demo_skip3
+mouse_handler_skip3
 	move.w	d0,bfo_active(a3)
-mh_exit_demo_quit
+mouse_handler_quit
 	rts
 
 
