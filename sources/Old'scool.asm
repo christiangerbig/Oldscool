@@ -4,6 +4,9 @@
 ; 3.0+
 
 
+; Code optimized for O.M.A. 2.0 Assembler
+
+
 ; History/Changes
 
 ; V.1.0 beta
@@ -1063,8 +1066,8 @@ init_main
 	bsr	bg_copy_image_to_bitplane
 	bsr	init_sprites
 	bsr	init_CIA_timers
-	bsr	init_first_copperlist
-	bsr	init_second_copperlist
+	bsr	cl1_init_copperlist
+	bsr	cl2_init_copperlist
 	rts
 
 
@@ -1141,7 +1144,7 @@ init_CIA_timers
 
 
 	CNOP 0,4
-init_first_copperlist
+cl1_init_copperlist
 	move.l	cl1_construction2(a3),a0 
 	bsr.s	cl1_init_playfield_props
 	bsr.s	cl1_init_sprite_pointers
@@ -1277,7 +1280,7 @@ cl1_set_branches_loop2
 
 
 	CNOP 0,4
-init_second_copperlist
+cl2_init_copperlist
 	move.l	cl2_construction2(a3),a0 
 	bsr	cl2_init_bplcon4_chunky
 	bsr	cl2_init_noop
@@ -2686,14 +2689,14 @@ pf1_rgb8_color_table
 	REPT pf1_colors_number
 	DC.L color00_bits
 	ENDR
-	INCLUDE "Old'scool:colortables/256x256x128-Texture.ct"
+	INCLUDE "Old'scool:colorpalettes/256x256x128-Texture.ct"
 
 
 	CNOP 0,4
 spr_rgb8_color_table
-	INCLUDE "Old'scool:colortables/64x56x4-Font.ct"
-	INCLUDE "Old'scool:colortables/64x56x4-Font.ct"
-	INCLUDE "Old'scool:colortables/64x56x4-Font.ct"
+	INCLUDE "Old'scool:colorpalettes/64x56x4-Font.ct"
+	INCLUDE "Old'scool:colorpalettes/64x56x4-Font.ct"
+	INCLUDE "Old'scool:colorpalettes/64x56x4-Font.ct"
 	REPT 4
 	DC.L color00_bits
 	ENDR
@@ -2751,7 +2754,7 @@ wst_chars_x_positions
 ; Blenk-Vectors
 	CNOP 0,4
 bv_color_table
-	INCLUDE "Old'scool:colortables/64-Colorgradient-Brown.ct"
+	INCLUDE "Old'scool:colorpalettes/64-Colorgradient-Brown.ct"
 
 ; Cube
 	CNOP 0,2
@@ -2809,7 +2812,7 @@ bv_rotation_xyz_coordinates
 ; Image-Fader
 	CNOP 0,4
 ifi_rgb8_color_table
-	INCLUDE "Old'scool:colortables/320x256x128-Title.ct"
+	INCLUDE "Old'scool:colorpalettes/320x256x128-Title.ct"
 
 	CNOP 0,4
 ifo_rgb8_color_table

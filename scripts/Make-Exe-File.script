@@ -1,3 +1,3 @@
 CD Old'scool:sources
-OMA Old'scool.asm -o projects-exe-files:RSE-Old'scool -c c -m >RAM:make-output.txt
+OMA Old'scool.asm -o Old'scool:executables/RSE-Old'scool -c c -m >RAM:make-output.txt
 CD /
