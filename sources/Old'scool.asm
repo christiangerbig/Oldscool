@@ -566,7 +566,7 @@ cl1_INTENA			RS.L 1
 
 cl1_end				RS.L 1
 
-copperlist1_size		RS.B 0
+cl1_copperlist_size		RS.B 0
 
 
 	RSRESET
@@ -641,16 +641,16 @@ cl2_begin			RS.B 0
 cl2_extension1_entry		RS.B cl2_extension1_size*cl2_display_y_size
 cl2_extension2_entry		RS.B cl2_extension2_size
 
-copperlist2_size		RS.B 0
+cl2_copperlist_size		RS.B 0
 
 
 cl1_size1			EQU 0
-cl1_size2			EQU copperlist1_size
-cl1_size3			EQU copperlist1_size
+cl1_size2			EQU cl1_copperlist_size
+cl1_size3			EQU cl1_copperlist_size
 
 cl2_size1			EQU 0
-cl2_size2			EQU copperlist2_size
-cl2_size3			EQU copperlist2_size
+cl2_size2			EQU cl2_copperlist_size
+cl2_size3			EQU cl2_copperlist_size
 
 
 ; Sprite0 additional structure
@@ -1149,13 +1149,13 @@ cl1_init_copperlist
 	bsr.s	cl1_init_playfield_props
 	bsr.s	cl1_init_sprite_pointers
 	bsr	cl1_init_colors
-	bsr	cl1_init_bitplane_pointers
+	bsr	cl1_init_plane_pointers
 	bsr	cl1_init_branches_pointers
 	bsr	cl1_init_copper_interrupt
 	COP_LISTEND
 	bsr	cl1_set_sprite_pointers
-	bsr	cl1_set_bitplane_pointers
-	bsr	copy_first_copperlist
+	bsr	cl1_set_plane_pointers
+	bsr	cl1_copy_copperlist
 	bsr	cl1_set_branches_pointers
 	rts
 
@@ -1284,7 +1284,7 @@ cl2_init_copperlist
 	move.l	cl2_construction2(a3),a0 
 	bsr	cl2_init_bplcon4_chunky
 	bsr	cl2_init_noop
-	bsr	copy_second_copperlist
+	bsr	cl2_copy_copperlist
 	rts
 
 
@@ -1351,9 +1351,9 @@ beam_routines
 	bsr	keyboard_handler
 	bsr	mouse_handler
 	bsr	wait_copint
-	bsr	swap_first_copperlist
-	bsr	set_first_copperlist
-	bsr	swap_second_copperlist
+	bsr	cl1_swap_copperlist
+	bsr	cl1_set_copperlist
+	bsr	cl2_swap_copperlist
 	bsr	swap_sprite_structures
 	bsr	set_sprite_pointers
 	bsr	swap_images
@@ -1470,48 +1470,49 @@ wst_check_control_codes
 	beq.s	wst_set_horiz_scroll_speed_fast
 	cmp.b	#ASCII_CTRL_W,d0
 	beq.s	wst_stop_scrolltext
+wst_check_control_codes_quit
 	rts
 	CNOP 0,4
 wst_set_standard_scroll
 	move.w	#sine_table_length/2,wst_y_angle(a3) ; 180°
 	clr.w	wst_y_angle_speed(a3)	; 0°
 	moveq	#RETURN_OK,d0
-	rts
+	bra.s	wst_check_control_codes_quit
 	CNOP 0,4
 wst_clear_y_angle_step
 	clr.w	wst_y_angle_step(a3)	; 0°
 	moveq	#RETURN_OK,d0
-	rts
+	bra.s	wst_check_control_codes_quit
 	CNOP 0,4
 wst_set_y_angle_step
 	move.w	#wst_y_angle_step1,wst_y_angle_step(a3)
 	moveq	#RETURN_OK,d0
-	rts
+	bra.s	wst_check_control_codes_quit
 	CNOP 0,4
 wst_set_y_angle_speed
 	move.w	#wst_y_angle_speed1,wst_y_angle_speed(a3)
 	moveq	#RETURN_OK,d0
-	rts
+	bra.s	wst_check_control_codes_quit
 	CNOP 0,4
 wst_set_horiz_scroll_speed_slow
 	move.w	#wst_horiz_scroll_speed1,wst_horiz_scroll_speed(a3)
 	moveq	#RETURN_OK,d0
-	rts
+	bra.s	wst_check_control_codes_quit
 	CNOP 0,4
 wst_set_horiz_scroll_speed_medium
 	move.w	#wst_horiz_scroll_speed2,wst_horiz_scroll_speed(a3)
 	moveq	#RETURN_OK,d0
-	rts
+	bra.s	wst_check_control_codes_quit
 	CNOP 0,4
 wst_set_horiz_scroll_speed_fast
 	move.w	#wst_horiz_scroll_speed3,wst_horiz_scroll_speed(a3)
 	moveq	#RETURN_OK,d0
-	rts
+	bra.s	wst_check_control_codes_quit
 	CNOP 0,4
 wst_stop_scrolltext
 	move.w	#FALSE,wst_active(a3)
 	moveq	#RETURN_OK,d0
-	rts
+	bra.s	wst_check_control_codes_quit
 
 
 	CNOP 0,4
@@ -1725,7 +1726,7 @@ bv_draw_lines_init
 	WAITBLIT
 	move.l	#$ffff8000,BLTBDAT-DMACONR(a6) ; low word: start line texture with MSB, high word: line texture
 	moveq	#-1,d0
-	move.l	d0,BLTAFWM-DMACONR(a6)
+	move.l	d0,BLTAFWM-DMACONR(a6)	; no mask
 	moveq	#extra_pf1_plane_width*extra_pf1_depth,d0 ; moduli interleaved bitmaps
 	move.w	d0,BLTCMOD-DMACONR(a6)
 	move.w	d0,BLTDMOD-DMACONR(a6)
@@ -2381,67 +2382,71 @@ kh_set_xyz_rotation_angle_speed1
 	move.w	#bv_rotation_x_angle_speed1,bv_rotation_x_angle_speed(a3)
 	move.w	#bv_rotation_y_angle_speed1,bv_rotation_y_angle_speed(a3)
 	move.w	#bv_rotation_z_angle_speed1,bv_rotation_z_angle_speed(a3)
-	rts
+	bra.s	keyboard_handler_quit
 	CNOP 0,4
 kh_set_xyz_rotation_angle_speed2
 	move.w	#bv_rotation_x_angle_speed2,bv_rotation_x_angle_speed(a3)
 	move.w	#bv_rotation_y_angle_speed2,bv_rotation_y_angle_speed(a3)
 	move.w	#bv_rotation_z_angle_speed2,bv_rotation_z_angle_speed(a3)
-	rts
+	bra.s	keyboard_handler_quit
 	CNOP 0,4
 kh_set_xyz_rotation_angle_speed3
 	move.w	#bv_rotation_x_angle_speed3,bv_rotation_x_angle_speed(a3)
 	move.w	#bv_rotation_y_angle_speed3,bv_rotation_y_angle_speed(a3)
 	move.w	#bv_rotation_z_angle_speed3,bv_rotation_z_angle_speed(a3)
-	rts
+	bra.s	keyboard_handler_quit
 	CNOP 0,4
 kh_set_xyz_rotation_angle_speed4
 	move.w	#bv_rotation_x_angle_speed4,bv_rotation_x_angle_speed(a3)
 	move.w	#bv_rotation_y_angle_speed4,bv_rotation_y_angle_speed(a3)
 	move.w	#bv_rotation_z_angle_speed4,bv_rotation_z_angle_speed(a3)
-	rts
+	bra.s	keyboard_handler_quit
 	CNOP 0,4
 kh_set_xyz_rotation_angle_speed5
 	move.w	#bv_rotation_x_angle_speed5,bv_rotation_x_angle_speed(a3)
 	move.w	#bv_rotation_y_angle_speed5,bv_rotation_y_angle_speed(a3)
 	move.w	#bv_rotation_z_angle_speed5,bv_rotation_z_angle_speed(a3)
-	rts
+	bra.s	keyboard_handler_quit
 	CNOP 0,4
 kh_set_xyz_rotation_angle_speed6
 	move.w	#bv_rotation_x_angle_speed6,bv_rotation_x_angle_speed(a3)
 	move.w	#bv_rotation_y_angle_speed6,bv_rotation_y_angle_speed(a3)
 	move.w	#bv_rotation_z_angle_speed6,bv_rotation_z_angle_speed(a3)
-	rts
+	bra.s	keyboard_handler_quit
 	CNOP 0,4
 kh_set_xyz_rotation_angle_speed7
 	move.w	#bv_rotation_x_angle_speed7,bv_rotation_x_angle_speed(a3)
 	move.w	#bv_rotation_y_angle_speed7,bv_rotation_y_angle_speed(a3)
 	move.w	#bv_rotation_z_angle_speed7,bv_rotation_z_angle_speed(a3)
-	rts
+	bra	keyboard_handler_quit
 	CNOP 0,4
 kh_set_xyz_rotation_angle_speed8
 	move.w	#bv_rotation_x_angle_speed8,bv_rotation_x_angle_speed(a3)
 	move.w	#bv_rotation_y_angle_speed8,bv_rotation_y_angle_speed(a3)
 	move.w	#bv_rotation_z_angle_speed8,bv_rotation_z_angle_speed(a3)
-	rts
+	bra	keyboard_handler_quit
 	CNOP 0,4
 kh_set_xyz_rotation_angle_speed9
 	move.w	#bv_rotation_x_angle_speed9,bv_rotation_x_angle_speed(a3)
 	move.w	#bv_rotation_y_angle_speed9,bv_rotation_y_angle_speed(a3)
 	move.w	#bv_rotation_z_angle_speed9,bv_rotation_z_angle_speed(a3)
-	rts
+	bra	keyboard_handler_quit
 	CNOP 0,4
 kh_set_xyz_rotation_angle_speed10
 	move.w	#bv_rotation_x_angle_speed10,bv_rotation_x_angle_speed(a3)
 	move.w	#bv_rotation_y_angle_speed10,bv_rotation_y_angle_speed(a3)
 	move.w	#bv_rotation_z_angle_speed10,bv_rotation_z_angle_speed(a3)
-	rts
+	bra	keyboard_handler_quit
 
 
 	CNOP 0,4
 mouse_handler
 	btst	#CIAB_GAMEPORT0,CIAPRA(a4) ; LMB pressed ?
-	bne.s	mouse_handler_quit
+	beq.s	mouse_handler_skip1
+mouse_handler_quit
+	rts
+	CNOP 0,4
+mouse_handler_skip1
 	move.w	#wst_stop_text-wst_text,wst_text_table_start(a3)
 	moveq	#FALSE,d1
 	move.w	d1,pt_effects_handler_active(a3)
@@ -2450,26 +2455,25 @@ mouse_handler
 	move.w	d0,pt_music_fader_active(a3)
 ; Image-Fader
 	tst.w	part_title_active(a3)
-	bne.s	mouse_handler_skip2
+	bne.s	mouse_handler_skip3
 	tst.w	ifi_rgb8_active(a3)	; fader still running ?
-	bne.s	mouse_handler_skip1
+	bne.s	mouse_handler_skip2
 	move.w	d1,ifi_rgb8_active(a3)  ; force fader stop
-mouse_handler_skip1
+mouse_handler_skip2
 	move.w	d0,ifo_rgb8_active(a3)
 	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	move.w	d0,if_rgb8_copy_colors_active(a3)
 	bra.s	mouse_handler_quit
 	CNOP 0,4
-mouse_handler_skip2
+mouse_handler_skip3
 	tst.w	part_main_active(a3)
 	bne.s	mouse_handler_quit
 	tst.w	bfi_active(a3)		; fader still running ?
-	bne.s   mouse_handler_skip3
+	bne.s   mouse_handler_skip4
 	move.w	d1,bfi_active(a3)	; force fader stop
-mouse_handler_skip3
+mouse_handler_skip4
 	move.w	d0,bfo_active(a3)
-mouse_handler_quit
-	rts
+	bra.s	mouse_handler_quit
 
 
 	INCLUDE "int-autovectors-handlers.i"
@@ -2525,11 +2529,11 @@ pt_effects_handler_quit
 	CNOP 0,4
 pt_restart_intro
 	clr.w	bfo_active(a3)
-	rts
+	bra.s	pt_effects_handler_quit
 	CNOP 0,4
 pt_start_horiz_scrolltext
 	clr.w	wst_active(a3)
-	rts
+	bra.s	pt_effects_handler_quit
 	CNOP 0,4
 pt_start_fade_in_image
 	move.l	a0,-(a7)
@@ -2543,14 +2547,14 @@ pt_start_fade_in_image
 	move.l	cl1_display(a3),a0 
 	move.w	#bplcon0_bits2,cl1_BPLCON0+WORD_SIZE(a0) ; enable bitplanes
 	move.l	(a7)+,a0
-	rts
+	bra.s	pt_effects_handler_quit
 	CNOP 0,4
 pt_start_fade_out_image
 	moveq	#TRUE,d0
 	move.w	d0,ifo_rgb8_active(a3)
 	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	move.w	d0,if_rgb8_copy_colors_active(a3)
-	rts
+	bra.s	pt_effects_handler_quit
 	CNOP 0,4
 pt_start_fade_in_rotation_zoomer
 	movem.l d1-d7/a0-a2,-(a7)
@@ -2565,21 +2569,21 @@ pt_start_fade_in_rotation_zoomer
 	move.l	cl1_display(a3),a0 
 	move.w	#bplcon0_bits,cl1_BPLCON0+WORD_SIZE(a0) ; disable bitplanes
 	movem.l (a7)+,d1-d7/a0-a2
-	rts
+	bra	pt_effects_handler_quit
 	CNOP 0,4
 pt_start_cube_zoomer_in
 	moveq	#TRUE,d0
 	move.w	d0,czi_active(a3)
 	move.w	d0,bv_active(a3)
-	rts
+	bra	pt_effects_handler_quit
 	CNOP 0,4
 pt_start_zoomer
 	clr.w	rz_zoomer_active(a3)
-	rts
+	bra	pt_effects_handler_quit
 	CNOP 0,4
 pt_stop_zoomer
 	move.w #FALSE,rz_zoomer_active(a3)
-	rts
+	bra	pt_effects_handler_quit
 
 	CNOP 0,4
 rz_init_colors
@@ -2669,9 +2673,11 @@ rz_set_branches_loop2
 ciab_tb_interrupt_server
 	PT_TIMER_INTERRUPT_SERVER
 
+
 	CNOP 0,4
 exter_interrupt_server
 	rts
+
 
 	CNOP 0,4
 nmi_interrupt_server
