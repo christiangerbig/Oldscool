@@ -1059,6 +1059,7 @@ init_main
 	bsr	pt_InitAudTempStrucs
 	bsr	pt_ExamineSongStruc
 	bsr	pt_InitFtuPeriodTableStarts
+	bsr	init_CIA_timers
 	bsr	rz_convert_image_data
 	bsr	wst_init_chars_offsets
 	bsr	wst_init_chars_x_positions
@@ -1066,7 +1067,6 @@ init_main
 	bsr	bv_init_object_info
 	bsr	bg_copy_image_to_bitplane
 	bsr	init_sprites
-	bsr	init_CIA_timers
 	bsr	cl1_init_copperlist
 	bsr	cl2_init_copperlist
 	rts
@@ -1082,6 +1082,22 @@ init_main
 	PT_EXAMINE_SONG_STRUCTURE
 
 	PT_INIT_FINETUNE_TABLE_STARTS
+
+
+	CNOP 0,4
+init_CIA_timers
+
+; Keyboard-Handler
+	MOVEF.W ciaa_tb_time&$ff,d0
+	move.b	d0,CIATBLO(a4)
+	moveq	#ciaa_tb_time>>8,d0
+	move.b	d0,CIATBHI(a4)
+	moveq	#ciaa_crb_bits,d0
+	move.b	d0,CIACRB(a4)
+
+; PT-Replay
+	PT_INIT_TIMERS
+	rts
 
 
 ; Rotation-Zoomer
@@ -1126,22 +1142,6 @@ init_sprites
 	INIT_SPRITE_POINTERS_TABLE
 
 	COPY_SPRITE_STRUCTURES
-
-
-	CNOP 0,4
-init_CIA_timers
-
-; Keyboard-Handler
-	MOVEF.W ciaa_tb_time&$ff,d0
-	move.b	d0,CIATBLO(a4)
-	moveq	#ciaa_tb_time>>8,d0
-	move.b	d0,CIATBHI(a4)
-	moveq	#ciaa_crb_bits,d0
-	move.b	d0,CIACRB(a4)
-
-; PT-Replay
-	PT_INIT_TIMERS
-	rts
 
 
 	CNOP 0,4
