@@ -1521,7 +1521,7 @@ bv_move_lightsource
 	lea	sine_table(pc),a0	
 	move.l	(a0,d0.w*4),d0		; -sin(w)
 	neg.l	d0
-	MULUF.L bv_light_z_radius*2,d0,d1 ; z' = (zr*(-sin(w)))/2^15
+	MULUF.L bv_light_z_radius*2,d0	; z' = (zr*(-sin(w)))/2^15
 	swap	d0
 	add.w	#bv_light_z_center,d0	; z' + z center
 	moveq	#bv_light_z_coordinate1,d1
@@ -1585,10 +1585,10 @@ bv_rotation_loop
 	move.w	d2,d3			; store z
 	ext.l	d0
 	add.w	a4,d3			; z+d
-	MULUF.L bv_rotation_d,d0,d7	; x projection
+	MULUF.L bv_rotation_d,d0	; x projection
 	ext.l	d1
 	divs.w	d3,d0			; x' = (x*d)/(z+d)
-	MULUF.L bv_rotation_d,d1,d7	; y projection
+	MULUF.L bv_rotation_d,d1	; y projection
 	add.w	a5,d0			; x' + x center
 	move.w	d0,(a1)+		; x position
 	divs.w	d3,d1			; y' = (y*d)/(z+d)
@@ -2003,7 +2003,7 @@ image_fader_in_skip
 	MOVEF.W if_rgb8_colors_number*3,d6 ; RGB counter
 	lea	sine_table(pc),a0
 	move.l	(a0,d2.w*4),d0		; sin(w)
-	MULUF.L ifi_rgb8_fader_radius*2,d0,d1 ; y' = (yr*sin(w))/2^15
+	MULUF.L ifi_rgb8_fader_radius*2,d0 ; y' = (yr*sin(w))/2^15
 	swap	d0
 	ADDF.W	ifi_rgb8_fader_center,d0
 	lea	pf1_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a0 ; colors buffer
@@ -2040,7 +2040,7 @@ image_fader_out_skip
 	MOVEF.W if_rgb8_colors_number*3,d6 ; RGB counter
 	lea	sine_table(pc),a0
 	move.l	(a0,d2.w*4),d0		; sin(w)
-	MULUF.L ifo_rgb8_fader_radius*2,d0,d1 ; y' = (yr*sin(w))/2^15
+	MULUF.L ifo_rgb8_fader_radius*2,d0 ; y' = (yr*sin(w))/2^15
 	swap	d0
 	ADDF.W	ifo_rgb8_fader_center,d0
 	lea	pf1_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a0 ; colors buffer
